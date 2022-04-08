@@ -21,3 +21,5 @@ See [Basic Usage](basicusage.md) for information on how to use the library.
 It also provide *safe initialization*, a compile time check that can be used
 to detect code errors, and comes in very handy to detect breakage when on enum
 value changes. See [Safe Initialization](safeinitialization.md).
+
+To learn how to write a custom indexer, see [Custom Indexer](customindexer.md).

@@ -1,37 +1,23 @@
-## Welcome to GitHub Pages
+<!--
+Copyright 2022 Julien Blanc
+Distributed under the Boost Software License, Version 1.0.
+https://www.boost.org/LICENSE_1_0.txt
+-->
 
-You can use the [editor on GitHub](https://github.com/Julien-Blanc-tgcm/indexed_array/edit/main/docs/index.md) to maintain and preview the content for your website in Markdown files.
+# Overview
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
-
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+This library provides a generic fixed-size container, that is a drop-in
+replacement for `std::array`, that uses custom indexes. It allows writing
+code like the following:
+```cpp
+enum class Foo { Bar1 = 4, Bar2, Bar3 };
+// ...
+indexed_array<string, Foo> foo; // foo.size() == 3
+foo[Foo::Bar2] = "an example string"; // modify the second element of foo
 ```
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
+See [Basic Usage](basicusage.md) for information on how to use the library.
 
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/Julien-Blanc-tgcm/indexed_array/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+It also provide *safe initialization*, a compile time check that can be used
+to detect code errors, and comes in very handy to detect breakage when on enum
+value changes. See [Safe Initialization](safeinitialization.md).

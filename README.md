@@ -19,6 +19,10 @@ compiler)
 * boost::describe library for described enums support (can be disabled at
   compile time)
 
+## Documentation
+
+* See [Online doc](https://julien-blanc-tgcm.github.io/indexed_array/)
+
 ## Licence
 
 Distributed under the

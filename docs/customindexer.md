@@ -18,3 +18,21 @@ it is given an invalid index. This method may be `noexcept(!b)`.
 
 This is an example of a custom index:
 
+```cpp
+struct custom_index
+{
+	using index = int;
+	inline static constexpr size_t const size = 4;
+	template <bool>
+	static constexpr auto at(index v) noexcept
+	{
+		if (v <= 0)
+			return 0;
+		if (v < 10)
+			return 1;
+		if (v < 20)
+			return 2;
+		return 3;
+	}
+};
+```

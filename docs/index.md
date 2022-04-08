@@ -23,3 +23,5 @@ to detect code errors, and comes in very handy to detect breakage when on enum
 value changes. See [Safe Initialization](safeinitialization.md).
 
 To learn how to write a custom indexer, see [Custom Indexer](customindexer.md).
+
+If you're worried about performance, see [Performance Considerations](performance.md)

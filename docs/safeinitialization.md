@@ -51,7 +51,7 @@ indexed_array<int, Color> values {
     safe_arg<Color::blue>(0x0000FF),
     safe_arg<Color::green>(0x00FF00),
     safe_arg<Color::black>(0x0),
-    safe_arg<Color::white>}; // compiles without error
+    safe_arg<Color::white>(0xFFFFFF)}; // compiles without error
 ```
 
 ## Safe Arg

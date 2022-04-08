@@ -14,7 +14,7 @@ as doing index translation between the container interface and the internal
 array.
 
 The library provides a `default_indexer` which should be suitable for most use
-cases. Users can defines custom indexers, see <<customindexer>>.
+cases. Users can defines custom indexers, see [Custom Indexer](customindexer.md).
 
 ## Usage with arbitrary intervals
 

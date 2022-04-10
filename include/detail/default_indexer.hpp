@@ -180,8 +180,13 @@ struct default_indexer<interval<min, max>, typename std::enable_if_t<std::is_int
 	static inline constexpr auto const size = max - min + 1;
 	using index = T;
 	template <bool throws_on_error = true>
-	static constexpr auto at(index v)
+	static constexpr auto at(index v) noexcept(!throws_on_error)
 	{
+		if constexpr (throws_on_error)
+		{
+			if (v < min || v > max)
+				throw std::out_of_range("Invalid index");
+		}
 		return (v - min);
 	}
 };
@@ -193,8 +198,14 @@ struct default_indexer<interval<min, max>, typename std::enable_if_t<std::is_enu
 	    static_cast<std::underlying_type_t<T> >(max) - static_cast<std::underlying_type_t<T> >(min) + 1;
 	using index = T;
 	template <bool throws_on_error = false>
-	static constexpr auto at(index v)
+	static constexpr auto at(index v) noexcept(!throws_on_error)
 	{
+		if constexpr (throws_on_error)
+		{
+			if (static_cast<std::underlying_type_t<T> >(v) < static_cast<std::underlying_type_t<T> >(min) ||
+			    static_cast<std::underlying_type_t<T> >(v) > static_cast<std::underlying_type_t<T> >(max))
+				throw std::out_of_range("Invalid index");
+		}
 		return (static_cast<std::underlying_type_t<T> >(v) - static_cast<std::underlying_type_t<T> >(min));
 	}
 };

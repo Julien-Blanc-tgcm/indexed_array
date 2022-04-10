@@ -1,0 +1,68 @@
+#define BOOST_TEST_MODULE Indexed Array
+#include <boost/test/unit_test.hpp>
+
+#include "indexed_array.hpp"
+
+using namespace jbc::indexed_array;
+
+enum class Foo
+{
+	bar = -2,
+	ber = -1,
+	bir = 0,
+	bor = 1,
+	bur
+};
+
+/*std::ostream& operator<<(std::ostream& o, Foo f)
+{
+	switch(f)
+	{
+		case Foo::bar:
+			return o << "bar";
+		case Foo::ber:
+			return o << "ber";
+		case Foo::bir:
+			return o << "bir";
+		case Foo::bor:
+			return o << "bor";
+		case Foo::bur:
+			return o << "bur";
+	}
+	return o;
+}*/
+
+BOOST_AUTO_TEST_CASE(interval_enum_s)
+{
+	indexed_array<int, interval<Foo::bir, Foo::bur> > arr{1, 2, 3};
+	BOOST_TEST(arr.size() == 3);
+	BOOST_TEST(arr[Foo::bir] == 1);
+	BOOST_TEST(arr[Foo::bor] == 2);
+	BOOST_TEST(arr[Foo::bur] == 3);
+}
+
+BOOST_AUTO_TEST_CASE(interval_enum_negative)
+{
+	indexed_array<int, interval<Foo::ber, Foo::bor> > arr{1, 2, 3};
+	BOOST_TEST(arr.size() == 3);
+	BOOST_TEST(arr[Foo::ber] == 1);
+	BOOST_TEST(arr[Foo::bir] == 2);
+	BOOST_TEST(arr[Foo::bor] == 3);
+}
+
+BOOST_AUTO_TEST_CASE(interval_enum_out_of_bound)
+{
+	indexed_array<int, interval<Foo::bar, Foo::bir> > arr{1, 2, 3};
+	BOOST_TEST(arr.size() == 3);
+	bool catched = false;
+	int a = 0;
+	try
+	{
+		a = arr.at(Foo::bur);
+	}
+	catch (std::out_of_range&)
+	{
+		catched = true;
+	}
+	BOOST_TEST(catched);
+}

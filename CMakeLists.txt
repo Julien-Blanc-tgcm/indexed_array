@@ -6,6 +6,8 @@ cmake_minimum_required(VERSION 3.5)
 
 project(indexed_array LANGUAGES CXX)
 
+enable_testing()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -18,3 +20,5 @@ add_executable(indexed_array "main.cpp"
 )
 target_compile_options(indexed_array PRIVATE -Wall -Wextra -Werror)
 target_include_directories(indexed_array PRIVATE $ENV{HOME}/development/Describe_ref/describe/include)
+
+add_subdirectory(tests)

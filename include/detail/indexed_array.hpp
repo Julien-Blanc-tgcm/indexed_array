@@ -50,24 +50,24 @@ class indexed_array
 
 	template <typename... Args,
 	          std::enable_if_t<!has_member_index<mp11::mp_first<mp11::mp_list<Args...> > >::value, bool> = true>
-	indexed_array(Args&&... list) : data_{std::forward<Args>(list)...}
+	constexpr indexed_array(Args&&... list) : data_{std::forward<Args>(list)...}
 	{
 	}
 
 	template <typename... Args,
 	          std::enable_if_t<has_member_index<mp11::mp_first<mp11::mp_list<Args...> > >::value, bool> = true>
-	indexed_array(Args&&... args) : data_{static_cast<Value>(args)...}
+	constexpr indexed_array(Args&&... args) : data_{static_cast<Value>(args)...}
 	{
 		static_assert(detail::correct_index<Indexer, Args::index...>(), "Argument mismatch");
 	}
 
-	indexed_array(indexed_array const& other) = default;
+	constexpr indexed_array(indexed_array const& other) = default;
 
-	indexed_array(indexed_array&& other) = default;
+	constexpr indexed_array(indexed_array&& other) = default;
 
-	indexed_array& operator=(indexed_array const& other) = default;
+	constexpr indexed_array& operator=(indexed_array const& other) = default;
 
-	indexed_array& operator=(indexed_array&& other) = default;
+	constexpr indexed_array& operator=(indexed_array&& other) = default;
 
 	constexpr reference operator[](typename Indexer::index idx)
 	{

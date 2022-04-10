@@ -1,0 +1,23 @@
+#·Copyright·2022·Julien Blanc
+#·Distributed·under·the·Boost·Software·License,·Version·1.0.
+#·https://www.boost.org/LICENSE_1_0.txt
+
+cmake_minimum_required(VERSION 3.5)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(describe_directory $ENV{HOME}/development/Describe_ref/describe/include)
+
+find_package(Boost COMPONENTS unit_test_framework REQUIRED)
+
+function(add_single_test target)
+	add_executable(${target} ${ARGN})
+	target_link_libraries(${target} ${Boost_LIBRARIES})
+	target_include_directories(${target} PRIVATE "../include" ${describe_directory} ${Boost_INCLUDE_DIRS} )
+	add_test(NAME test_${target} COMMAND ${target} )
+endfunction()
+
+add_single_test(interval_ints interval_ints.cpp)
+add_single_test(interval_enums interval_enums.cpp)
+add_single_test(safe_initialization safe_initialization.cpp)

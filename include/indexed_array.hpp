@@ -14,19 +14,33 @@
 namespace jbc::indexed_array
 {
 
-template <typename Value, typename Index>
-using indexed_array = std::conditional_t<detail::has_member_size<detail::default_indexer<Index> >::value,
-                                         detail::indexed_array<Value, detail::default_indexer<Index> >,
-                                         detail::indexed_array<Value, Index> >;
+template <typename Value, typename... Index>
+using indexed_array = std::conditional_t<detail::has_member_size<detail::default_indexer<Index...> >::value,
+                                         detail::indexed_array<Value, detail::default_indexer<Index...> >,
+                                         detail::indexed_array<Value, Index...> >;
 
 using detail::interval;
 using detail::single_value;
 using detail::union_of;
 
-template <auto C, typename T>
+namespace detail
+{
+template <auto... C>
+struct integral_args
+{
+	using type = boost::mp11::mp_list<std::integral_constant<decltype(C), C>...>;
+};
+template <auto C>
+struct integral_args<C>
+{
+	using type = std::integral_constant<decltype(C), C>;
+};
+} // namespace detail
+
+template <auto... C, typename T>
 auto safe_arg(T&& val)
 {
-	return detail::checked_arg_h<C, T>(std::forward<T>(val));
+	return detail::checked_arg_h<typename detail::integral_args<C...>::type, T>(std::forward<T>(val));
 }
 
 } // namespace jbc::indexed_array

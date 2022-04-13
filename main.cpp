@@ -5,8 +5,10 @@
 #include "include/indexed_array.hpp"
 
 #include <boost/describe.hpp>
+
 #include <iostream>
 #include <memory>
+#include <tuple>
 #include <utility>
 
 using namespace std;
@@ -37,7 +39,7 @@ struct custom_index
 {
 	using index = int;
 	inline static constexpr size_t const size = 4;
-	template <bool>
+	template <bool c = true>
 	static constexpr auto at(index v)
 	{
 		if (v <= 0)
@@ -50,6 +52,39 @@ struct custom_index
 	}
 };
 
+struct custom_index2
+{
+	using index = mp11::mp_list<int, int>;
+	inline static constexpr size_t const size = 4;
+	template <bool c = true>
+	static constexpr auto at(int v1, int v2)
+	{
+		auto res = v1 * 2 + v2;
+		if constexpr(c)
+		{
+			if(res < 0 || static_cast<std::size_t>(res) >= size)
+				throw std::out_of_range("Invalid index");
+		}
+		return res;
+	}
+};
+
+struct custom_index3
+{
+	using index = mp11::mp_list<int, Toto2>;
+	inline static constexpr size_t const size = 8;
+	template <bool c = true>
+	static constexpr auto at(int v1, Toto2 v2)
+	{
+		auto res = v1 * 4 + static_cast<int>(v2) + 1;
+		if constexpr(c)
+		{
+			if(res < 0 || static_cast<std::size_t>(res) >= size)
+				throw std::out_of_range("Invalid index");
+		}
+		return res;
+	}
+};
 template <typename T1>
 int sum(T1&& v)
 {
@@ -78,15 +113,15 @@ template <typename... T>
 int f(T&&... args)
 {
 	using indexer = detail::default_indexer<Toto>;
-	static_assert(detail::correct_index<indexer, T::index...>(), "Args index must be consistent");
+	static_assert(detail::correct_index<indexer, typename T::index...>(), "Args index must be consistent");
 	return sum(static_cast<typename T::value_type>(args)...);
 }
 
 template <typename T1, typename... T>
 int f2(T1&& arg, T&&... args)
 {
-	using indexer = detail::default_indexer<std::decay_t<decltype(T1::index)> >;
-	static_assert(detail::correct_index<indexer, T1::index, T::index...>(), "Args index must be consistent");
+	using indexer = detail::default_indexer<std::decay_t<decltype(T1::index::value)>>;
+	static_assert(detail::correct_index<indexer, typename T1::index, typename T::index...>(), "Args index must be consistent");
 	return sum2(static_cast<typename T1::value_type>(arg), static_cast<typename T::value_type>(args)...);
 }
 
@@ -216,8 +251,35 @@ int main(int argc, char** /*argv*/)
 		std::cout << a;
 	}
 	std::cout << std::endl;
+	static_assert(std::is_trivially_copyable<decltype(unarr2)>::value, "Triviality preserved");
+	static_assert(std::is_trivially_destructible<decltype(unarr2)>::value, "Triviality preserved");
+	static_assert(std::is_trivially_constructible<decltype(unarr2)>::value, "Triviality preserved");
+	static_assert(std::is_trivially_move_constructible<decltype(unarr2)>::value, "Triviality preserved");
+	static_assert(std::is_trivially_move_assignable<decltype(unarr2)>::value, "Triviality preserved");
+	static_assert(std::is_trivially_default_constructible<decltype(unarr2)>::value, "Triviality preserved");
+	static_assert(std::is_trivially_copy_assignable<decltype(unarr2)>::value, "Triviality preserved");
+	static_assert(std::is_trivially_copy_constructible<decltype(unarr2)>::value, "Triviality preserved");
+	static_assert(std::is_trivial_v<std::decay_t<decltype(unarr2)> >, "Triviality preserved");
 
+	static_assert(!std::is_trivial<decltype(arr8)>::value, "Triviality preserved (string array not trivial)");
+
+	static_assert(std::is_trivial_v<std::array<int, 12> >, "array is trivial");
+
+	indexed_array<int, custom_index2> multidim{
+	    safe_arg<0,0>(10),
+	    safe_arg<0, 1>(20),
+	    safe_arg<1, 0>(30),
+	    safe_arg<1, 1>(40)};
+	std::cout << multidim.at(0, 0) << multidim.at(0, 1) << multidim[{1, 0}] << multidim[{1, 1}] << std::endl;
+	try {
+		std::cout << multidim.at(2, 0) << multidim.at(0, 1) << multidim[{1, 0}] << multidim[{1, 1}] << std::endl;
+	}
+	catch(std::out_of_range&) {
+		std::cout << "catched" << multidim[{0, 1}] << multidim[{1, 0}] << multidim[{1, 1}] << std::endl;
+	}
 	//	std::array<int, 3> index{2, 3, 4};
 	//	cout << "Hello World ! (" << index[argc] << ")" << endl;
+	indexed_array<int, custom_index3> multidim2{0,1,2,3,4,5,6,7};
+	std::cout << multidim2.at(0, Toto2::First) << multidim2.at(1, Toto2::Second) << std::endl;
 	return 0;
 }

@@ -113,15 +113,16 @@ template <typename... T>
 int f(T&&... args)
 {
 	using indexer = detail::default_indexer<Toto>;
-	static_assert(detail::correct_index<indexer, typename T::index...>(), "Args index must be consistent");
+	static_assert(detail::correct_index<indexer, typename T::checked_arg_index...>(), "Args index must be consistent");
 	return sum(static_cast<typename T::value_type>(args)...);
 }
 
 template <typename T1, typename... T>
 int f2(T1&& arg, T&&... args)
 {
-	using indexer = detail::default_indexer<std::decay_t<decltype(T1::index::value)>>;
-	static_assert(detail::correct_index<indexer, typename T1::index, typename T::index...>(), "Args index must be consistent");
+	using indexer = detail::default_indexer<std::decay_t<decltype(T1::checked_arg_index::value)>>;
+	static_assert(detail::correct_index<indexer, typename T1::checked_arg_index, typename T::checked_arg_index...>(),
+	              "Args index must be consistent");
 	return sum2(static_cast<typename T1::value_type>(arg), static_cast<typename T::value_type>(args)...);
 }
 

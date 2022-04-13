@@ -7,20 +7,21 @@
 
 #include "checked_arg.hpp"
 
+#include <boost/mp11.hpp>
+
 #include <array>
 #include <functional>
 #include <type_traits>
 
 namespace jbc::indexed_array::detail
 {
-
 template <typename T, typename T2 = void>
 struct has_member_index : public std::false_type
 {
 };
 
 template <typename T>
-struct has_member_index<T, std::enable_if_t<std::is_class<typename T::index>::value, void> > : public std::true_type
+struct has_member_index<T, std::enable_if_t<std::is_class<typename T::checked_arg_index>::value, void> > : public std::true_type
 {
 };
 
@@ -75,17 +76,19 @@ class indexed_array :
 	~indexed_array() noexcept = default;
 
 	// standard constructor
-	template <typename... Args,
-	          std::enable_if_t<!has_member_index<mp11::mp_first<mp11::mp_list<Args...> > >::value, bool> = true>
+	template <
+	    typename... Args,
+	    std::enable_if_t<!has_member_index<boost::mp11::mp_first<boost::mp11::mp_list<Args...> > >::value, bool> = true>
 	constexpr indexed_array(Args&&... list) : data_{std::forward<Args>(list)...}
 	{
 	}
 	// safe_arg constructor
-	template <typename... Args,
-	          std::enable_if_t<has_member_index<mp11::mp_first<mp11::mp_list<Args...> > >::value, bool> = true>
+	template <
+	    typename... Args,
+	    std::enable_if_t<has_member_index<boost::mp11::mp_first<boost::mp11::mp_list<Args...> > >::value, bool> = true>
 	constexpr indexed_array(Args&&... args) : data_{static_cast<Value>(args)...}
 	{
-		static_assert(detail::correct_index<Indexer, typename Args::index...>(), "Argument mismatch");
+		static_assert(detail::correct_index<Indexer, typename Args::checked_arg_index...>(), "Argument mismatch");
 	}
 
 	constexpr indexed_array(indexed_array const& other) = default;

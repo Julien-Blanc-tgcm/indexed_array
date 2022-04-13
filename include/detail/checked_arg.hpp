@@ -35,7 +35,7 @@ struct at_helper<Indexer, L<Args...> >
 template <typename C, typename T>
 struct checked_arg
 {
-	using index = C;
+	using checked_arg_index = C;
 	using value_type = T;
 	T&& v;
 	explicit checked_arg(T&& val) : v{std::forward<T>(val)} {};
@@ -48,7 +48,7 @@ struct checked_arg
 template <typename C, typename T>
 struct checked_arg_h
 {
-	using index = C;
+	using checked_arg_index = C;
 	using value_type = T;
 	T&& v;
 	explicit checked_arg_h(T&& val) : v{std::forward<T>(val)} {};
@@ -70,7 +70,7 @@ struct checked_arg_h
 template <template <auto...> class L, typename T, auto... C>
 struct checked_arg_h<L<C...>, T>
 {
-	using index = boost::mp11::mp_list<std::integral_constant<decltype(C), C>...>;
+	using checked_arg_index = boost::mp11::mp_list<std::integral_constant<decltype(C), C>...>;
 	using value_type = T;
 	T&& v;
 	explicit checked_arg_h(T&& val) : v{std::forward<T>(val)} {};
@@ -79,13 +79,13 @@ struct checked_arg_h<L<C...>, T>
 		return std::forward<T>(v);
 	}
 	template <typename U = T, typename = typename std::enable_if_t<std::is_array<U>::value> >
-	operator checked_arg<index, std::decay_t<T>*>()
+	operator checked_arg<checked_arg_index, std::decay_t<T>*>()
 	{
-		return checked_arg<index, std::decay_t<T>*>(v);
+		return checked_arg<checked_arg_index, std::decay_t<T>*>(v);
 	}
-	operator checked_arg<index, T>()
+	operator checked_arg<checked_arg_index, T>()
 	{
-		return checked_arg<index, T>(v);
+		return checked_arg<checked_arg_index, T>(v);
 	}
 };
 

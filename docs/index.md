@@ -24,4 +24,6 @@ value changes. See [Safe Initialization](safeinitialization.md).
 
 To learn how to write a custom indexer, see [Custom Indexer](customindexer.md).
 
-If you're worried about performance, see [Performance Considerations](performance.md)
+If you're worried about performance, see [Performance Considerations](performance.md).
+
+For a comparison with other ways to achieve similar results, see [Comparison](comparison.md)

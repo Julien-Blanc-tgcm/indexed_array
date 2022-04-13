@@ -102,3 +102,4 @@ cout << t[8]; // will output "6"
 cout << t.at(7); // will throw out_of_range
 ```
 
+Back to [index](index.md), or learn to write a [custom indexer](customindexer.md)

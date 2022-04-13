@@ -90,6 +90,16 @@ int f2(T1&& arg, T&&... args)
 	return sum2(static_cast<typename T1::value_type>(arg), static_cast<typename T::value_type>(args)...);
 }
 
+enum class Color
+{
+	Red = 0,
+	Green = 1,
+	Blue = 2,
+	White = 10,
+	Gray = 11,
+	Black = 12
+};
+
 int main(int argc, char** /*argv*/)
 {
 	static_assert(boost::describe::has_describe_enumerators<Toto>::value);
@@ -116,6 +126,11 @@ int main(int argc, char** /*argv*/)
 	static_assert(detail::is_contiguous_sequence<boost::describe::describe_enumerators<Toto2> >::value);
 
 	indexed_array<int, Toto2> idx{2, 3, 4, 5};
+
+	static_assert(std::is_same<detail::union_of<interval<2, 3>, interval<7, 8>>, 
+	                           integer_sequence<int, 2, 3, 7, 8>>::value, "Same type");
+
+	std::cout << typeid(detail::union_of<interval<2, 3>, interval<7, 8>>).name() << std::endl;
 
 	cout << "Toto2: " << idx[Toto2::Third] << endl;
 
@@ -177,6 +192,30 @@ int main(int argc, char** /*argv*/)
 	using crazy_list = std::integer_sequence<int, -3, -4, 4, -2, -2, 5, -4>;
 	indexed_array<int, crazy_list> t;
 	static_assert(t.size() == 5);
+
+	indexed_array<int, union_of<interval<Color::Red, Color::Green>, interval<Color::White, Color::Black>>> unarr;
+	static_assert(unarr.size() == 5);
+	unarr.at(Color::Red) = 1;
+	unarr.at(Color::Green) = 2;
+	unarr.at(Color::White) = 3;
+	unarr.at(Color::Gray) = 4;
+	unarr.at(Color::Black) = 5;
+	for(auto a : unarr)
+	{
+		std::cout << a;
+	}
+	std::cout << std::endl;
+	indexed_array<int, union_of<interval<Color::Red, Color::Blue>, single_value<Color::White>>> unarr2{
+	    safe_arg<Color::Red>(1),
+	    safe_arg<Color::Green>(2),
+	    safe_arg<Color::Blue>(3),
+	    safe_arg<Color::White>(4)};
+	static_assert(unarr2.size() == 4);
+	for(auto a : unarr2)
+	{
+		std::cout << a;
+	}
+	std::cout << std::endl;
 
 	//	std::array<int, 3> index{2, 3, 4};
 	//	cout << "Hello World ! (" << index[argc] << ")" << endl;

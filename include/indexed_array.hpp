@@ -9,6 +9,7 @@
 #include "detail/default_indexer.hpp"
 #include "detail/indexed_array.hpp"
 #include "detail/is_contiguous.hpp"
+#include "detail/union_of.hpp"
 
 namespace jbc::indexed_array
 {
@@ -19,6 +20,8 @@ using indexed_array = std::conditional_t<detail::has_member_size<detail::default
                                          detail::indexed_array<Value, Index> >;
 
 using detail::interval;
+using detail::single_value;
+using detail::union_of;
 
 template <auto C, typename T>
 auto safe_arg(T&& val)

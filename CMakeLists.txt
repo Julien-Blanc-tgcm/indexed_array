@@ -4,7 +4,11 @@
 
 cmake_minimum_required(VERSION 3.5)
 
+set(BOOSTROOT "$ENV{HOME}/development/boost_1.78" CACHE STRING "Where to find boost")
+
 project(indexed_array LANGUAGES CXX)
+
+find_package(Boost 1.78.0 REQUIRED)
 
 enable_testing()
 
@@ -20,6 +24,6 @@ add_executable(indexed_array "main.cpp"
 	"include/detail/union_of.hpp"
 )
 target_compile_options(indexed_array PRIVATE -Wall -Wextra -Werror)
-target_include_directories(indexed_array PRIVATE $ENV{HOME}/development/Describe_ref/describe/include)
+target_include_directories(indexed_array PRIVATE ${Boost_INCLUDE_DIRS})
 
 add_subdirectory(tests)

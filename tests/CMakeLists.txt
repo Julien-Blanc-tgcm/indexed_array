@@ -4,17 +4,12 @@
 
 cmake_minimum_required(VERSION 3.5)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-set(describe_directory $ENV{HOME}/development/Describe_ref/describe/include)
-
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
 function(add_single_test target)
 	add_executable(${target} ${ARGN})
 	target_link_libraries(${target} ${Boost_LIBRARIES} gcov)
-	target_include_directories(${target} PRIVATE "../include" ${describe_directory} ${Boost_INCLUDE_DIRS} )
+	target_include_directories(${target} PRIVATE "../include" ${Boost_INCLUDE_DIRS} )
 	target_compile_options(${target} PRIVATE "-fprofile-arcs" "-ftest-coverage" )
 	target_link_options(${target} PRIVATE "-fprofile-arcs" "-ftest-coverage" )
 	add_test(NAME test_${target} COMMAND ${target} )

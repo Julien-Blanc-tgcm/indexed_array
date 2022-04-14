@@ -30,7 +30,7 @@ jobs:
         # OPTIONAL: Specify a platform version
         platform_version: 20.04
         # OPTIONAL: Specify a custom install location
-        boost_install_dir: /home/runner/boost-1.78.0
+        # boost_install_dir: /home/runner/boost-1.78.0
         # OPTIONAL: Specify a toolset
         toolset: gcc
     - name: Configure CMake

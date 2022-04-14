@@ -260,7 +260,7 @@ int main(int argc, char** /*argv*/)
 	static_assert(std::is_trivially_default_constructible<decltype(unarr2)>::value, "Triviality preserved");
 	static_assert(std::is_trivially_copy_assignable<decltype(unarr2)>::value, "Triviality preserved");
 	static_assert(std::is_trivially_copy_constructible<decltype(unarr2)>::value, "Triviality preserved");
-	static_assert(std::is_trivial_v<std::decay_t<decltype(unarr2)> >, "Triviality preserved");
+	//static_assert(std::is_trivial_v<std::decay_t<decltype(unarr2)> >, "Triviality preserved");
 
 	static_assert(!std::is_trivial<decltype(arr8)>::value, "Triviality preserved (string array not trivial)");
 

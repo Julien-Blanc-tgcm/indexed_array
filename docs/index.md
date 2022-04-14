@@ -16,6 +16,15 @@ indexed_array<string, Foo> foo; // foo.size() == 3
 foo[Foo::Bar2] = "an example string"; // modify the second element of foo
 ```
 
+Multi-dimensional indexers are supported as well, you can write something like
+
+```cpp
+indexed_array<string, Foo, Foo> foo; // foo.size() == 9
+foo.at(Foo::Bar2, Foo::Bar2) = "an example string"; // modify the “central” element
+// will be supported when c++23 is out
+// foo[Foo::Bar2, Foo::Bar2] = "an example string";
+```
+
 See [Basic Usage](basicusage.md) for information on how to use the library.
 
 It also provide *safe initialization*, a compile time check that can be used

@@ -153,4 +153,44 @@ static_assert(! is_contiguous_sequence<std::integer_sequence<int, 0, 1, 2, 4>>::
 
 ### Indexing using a described enum
 
+The `describe` library is a compile time reflection library designed by Peter Dimov, and is part of `boost`.
+The `indexed_library` provides first class integration for enums who have compile time introspection using
+this library.
+
+To implement that, the required part is to convert a `describe_enumerators<Enum>` to an 
+`integer_sequence<Enum, Values...>`. After that is done, we can simply use the `default_indexer` for
+integer sequences. We benefit automatically from the optimization for contiguous sequences (supporting
+this use case was the main motivation for this optimization in the first place).
+
+Doing this conversion is pretty easy, and integrating enums is as simple as:
+
+```cpp
+template <typename... Args>
+struct describe_to_integer_sequence
+{
+};
+
+template <typename Enum, template <class...> typename L, typename... Args>
+struct describe_to_integer_sequence<Enum, L<Args...> >
+{
+	using type = std::integer_sequence<Enum, Args::value...>;
+};
+
+template <typename Enum>
+struct default_indexer<Enum, typename std::enable_if_t<boost::describe::has_describe_enumerators<Enum>::value, void> >
+{
+	using helper_list_type = typename describe_to_integer_sequence<Enum, describe::describe_enumerators<Enum> >::type;
+	using index = Enum;
+	static inline constexpr auto const size = default_indexer<helper_list_type>::size;
+	template <bool throws_on_error = false>
+	static constexpr auto at(Enum v) noexcept(!throws_on_error)
+	{
+		return default_indexer<helper_list_type>::template at<throws_on_error>(v);
+	}
+};
+```
+
+Adding support of other compile-time enum introspection mechanisms should be relatively simple as well.
+
+Back to the [Index](index.md)
 

@@ -6,7 +6,7 @@ https://www.boost.org/LICENSE_1_0.txt
 
 # Design principles
 
-## `indexed_array` type
+## The indexed\_array type
 
 The library is designed around a single template type, which gave its name to the library,
 `indexed_array`. It is defined as follows:
@@ -36,7 +36,7 @@ the inner array).
 
 The only challenging issue will be discussed in *going multidimensional*.
 
-## `default_indexer` type
+## The default\_indexer type
 
 Now that we have a basic generic array type, most of the work resides in providing indexers. The library
 provides an implementation, called `default_indexer`, which should be suitable for most purposes, and a
@@ -54,7 +54,7 @@ struct default_indexer
 In several situations (index computations), we want to handle integral types and enum types the same way. So,
 one of the first thing we do is define the following helper:
 
-```
+```cpp
 template·<typename·T,·T·value,·typename·U·=·void>
 struct·integral_value
 {
@@ -80,7 +80,7 @@ static·inline·constexpr·auto·const·integral_value_v·=·integral_value<decl
 This will allow us to convert enum values to their underlying integral type, both at compile and
 run time, while keeping integral value unchanged. This will help reduce boilerplate code.
 
-### Indexing using an integral interval
+### Indexing using an integral (or enum) interval
 
 The first thing that is needed is a type to represent such an interval (the term interval is used preferrably
 over range, to avoid any confusion with the C++20 range library).
@@ -109,7 +109,7 @@ struct default_indexer<
 };
 ```
 
-So this works for any integral type.
+So this works for any integral or enum type.
 
 ### Indexing using an integer sequence
 
@@ -139,22 +139,18 @@ struct default_indexer<
 };
 ```
 
-This require the definition of the `is_contiguous_sequence` helper.
-
-#### Contiguous integer sequences
-
-### Indexing using an enum interval
-
-Indexing with an enum is pretty much the same as indexing with an integral value. We just need to convert
-the enum values to their underlying type to do the arithmetic operations. So, we provide the following
-specialization:
+This require the definition of the `is_contiguous_sequence` helper. A design choice has been done here, a
+sequence is considered a valid contiguous sequence even if it contains duplicate values, as long as they
+are grouped together. This choice has been made to support aliases in enum values (see below, indexing
+with a `describe`-d enum). Which means that we have:
 
 ```cpp
-template <typename T, T min, T max>
-struct default_indexer<interval<min, max>, typename std::enable_if_t<std::is_enum<T>::value, void> >
-{
-	// ...
-};
+static_assert(is_contiguous_sequence<std::integer_sequence<int, 1, 2, 3, 4>>::value);
+static_assert(is_contiguous_sequence<std::integer_sequence<int, 0, 0, 1, 2>>::value);
+static_assert(! is_contiguous_sequence<std::integer_sequence<int, 0, 1, 0, 2>>::value);
+static_assert(! is_contiguous_sequence<std::integer_sequence<int, 0, 1, 2, 4>>::value);
 ```
+
+### Indexing using a described enum
 
 

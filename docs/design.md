@@ -29,6 +29,11 @@ The implementation is thus pretty straightforward:
 * a `at(typename Indexer::index)` (and respective `operator[]`) public member
 * all remaining interface from `std::array` wrapped
 
+To avoid code duplication, the `at` method is templated on a boolean parameter, which will tell if
+it needs to do bound check or not. It shall throw an `std::out_of_range` exception if requested to
+do bound checking, and the index given is invalid (`indexed_array` won't do bound check when accessing
+the inner array).
+
 The only challenging issue will be discussed in *going multidimensional*.
 
 ## `default_indexer` type
@@ -43,6 +48,37 @@ struct default_indexer
 { // default implementation is empty
 };
 ```
+
+### Handling integers and enum the same way
+
+In several situations (index computations), we want to handle integral types and enum types the same way. So,
+one of the first thing we do is define the following helper:
+
+```
+template·<typename·T,·T·value,·typename·U·=·void>
+struct·integral_value
+{
+};
+
+template·<typename·T,·T·v>
+struct·integral_value<T,·v,·std::enable_if_t<std::is_integral<T>::value,·void>·>
+{
+→   static·inline·constexpr·T·value·=·v;
+};
+
+template·<typename·T,·T·v>
+struct·integral_value<T,·v,·std::enable_if_t<std::is_enum<T>::value,·void>·>
+{
+→   static·inline·constexpr·typename·std::underlying_type<T>::type·value·=
+→   ····static_cast<typename·std::underlying_type<T>::type>(v);
+};
+
+template<auto·C>
+static·inline·constexpr·auto·const·integral_value_v·=·integral_value<decltype(C),·C>::value;
+```
+
+This will allow us to convert enum values to their underlying integral type, both at compile and
+run time, while keeping integral value unchanged. This will help reduce boilerplate code.
 
 ### Indexing using an integral interval
 
@@ -60,11 +96,65 @@ struct interval
 };
 ```
 
-Then we just have to write the following specialization:
+Then we just have to write the following specialization (see source code for actual implementation):
 ```cpp
 template <typename T, T min, T max>
-struct default_indexer<interval<min, max>, typename std::enable_if_t<std::is_integral<T>::value, void> >
+struct default_indexer<
+    interval<min, max>, 
+    typename std::enable_if_t<
+        std::is_integral<T>::value || std::is_enum<T>::value,
+        void>>
 {
 	// ...
 };
 ```
+
+So this works for any integral type.
+
+### Indexing using an integer sequence
+
+Such indexing provides a mapping between the value and the index in the sequence.
+
+The standard library already provides a type to represent such a sequence, it's called `std::integer_sequence`,
+so we just need to write a specialization for it. This is pretty straightforward, but there's a pretty cheap
+optimization we can do: detect if the sequence is contiguous, and in that case use an interval-like scheme.
+
+We thus provide two specializations:
+
+```cpp
+template <typename T, T... vals>
+struct default_indexer<
+    std::integer_sequence<T, vals...>,
+    typename std::enable_if_t<detail::is_contiguous_sequence<mp11::mp_list_c<T, vals...> >::value, void> >
+{
+	// ...
+};
+
+template <typename T, T... vals>
+struct default_indexer<
+    std::integer_sequence<T, vals...>,
+    typename std::enable_if_t<!detail::is_contiguous_sequence<mp11::mp_list_c<T, vals...> >::value, void> >
+{
+	// ...
+};
+```
+
+This require the definition of the `is_contiguous_sequence` helper.
+
+#### Contiguous integer sequences
+
+### Indexing using an enum interval
+
+Indexing with an enum is pretty much the same as indexing with an integral value. We just need to convert
+the enum values to their underlying type to do the arithmetic operations. So, we provide the following
+specialization:
+
+```cpp
+template <typename T, T min, T max>
+struct default_indexer<interval<min, max>, typename std::enable_if_t<std::is_enum<T>::value, void> >
+{
+	// ...
+};
+```
+
+

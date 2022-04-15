@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <type_traits>
 
+#include <boost/config.hpp> // for BOOST_UNLIKELY
 #include <boost/describe.hpp>
 #include <boost/mp11.hpp>
 
@@ -123,8 +124,8 @@ struct default_indexer<
     std::integer_sequence<T, vals...>,
     typename std::enable_if_t<detail::is_contiguous_sequence<mp11::mp_list_c<T, vals...> >::value, void> >
 {
-	static inline constexpr auto const size = static_cast<T>(mp11::mp_back<mp11::mp_list_c<T, vals...> >::value) -
-	                                          static_cast<T>(mp11::mp_front<mp11::mp_list_c<T, vals...> >::value) + 1;
+	static inline constexpr auto const size = integral_value_v<mp11::mp_back<mp11::mp_list_c<T, vals...> >::value> -
+	                                          integral_value_v<mp11::mp_front<mp11::mp_list_c<T, vals...> >::value> + 1;
 
 	using index = T;
 
@@ -133,12 +134,15 @@ struct default_indexer<
 	{
 		if constexpr (throws_on_error)
 		{
-			if (i < mp11::mp_front<mp11::mp_list_c<T, vals...> >::value)
+			if (static_cast<decltype(integral_value<T, T{}>::value)>(i) <
+			    integral_value_v<mp11::mp_front<mp11::mp_list_c<T, vals...> >::value>)
 				throw std::out_of_range("Invalid index");
-			if (i > mp11::mp_back<mp11::mp_list_c<T, vals...> >::value)
+			if (static_cast<decltype(integral_value<T, T{}>::value)>(i) >
+			    integral_value_v<mp11::mp_back<mp11::mp_list_c<T, vals...> >::value>)
 				throw std::out_of_range("Invalid index");
 		}
-		return i - mp11::mp_front<mp11::mp_list_c<T, vals...> >::value;
+		return static_cast<decltype(integral_value_v<T{}>)>(i) -
+		       integral_value_v<mp11::mp_front<mp11::mp_list_c<T, vals...> >::value>;
 	}
 };
 
@@ -175,38 +179,22 @@ struct default_indexer<
 };
 
 template <typename T, T min, T max>
-struct default_indexer<interval<min, max>, typename std::enable_if_t<std::is_integral<T>::value, void> >
+struct default_indexer<interval<min, max>,
+                       typename std::enable_if_t<std::is_integral<T>::value || std::is_enum<T>::value, void> >
 {
-	static inline constexpr auto const size = max - min + 1;
+	using integral_index_type = decltype(integral_value_v<T{}>);
+	static inline constexpr auto const size = integral_value_v<max> - integral_value_v<min> + 1;
 	using index = T;
 	template <bool throws_on_error = true>
 	static constexpr auto at(index v) noexcept(!throws_on_error)
 	{
 		if constexpr (throws_on_error)
 		{
-			if (v < min || v > max)
+			if (BOOST_UNLIKELY(static_cast<integral_index_type>(v) < integral_value_v<min> ||
+			                   static_cast<integral_index_type>(v) > integral_value_v<max>))
 				throw std::out_of_range("Invalid index");
 		}
-		return (v - min);
-	}
-};
-
-template <typename T, T min, T max>
-struct default_indexer<interval<min, max>, typename std::enable_if_t<std::is_enum<T>::value, void> >
-{
-	static inline constexpr auto const size =
-	    static_cast<std::underlying_type_t<T> >(max) - static_cast<std::underlying_type_t<T> >(min) + 1;
-	using index = T;
-	template <bool throws_on_error = false>
-	static constexpr auto at(index v) noexcept(!throws_on_error)
-	{
-		if constexpr (throws_on_error)
-		{
-			if (static_cast<std::underlying_type_t<T> >(v) < static_cast<std::underlying_type_t<T> >(min) ||
-			    static_cast<std::underlying_type_t<T> >(v) > static_cast<std::underlying_type_t<T> >(max))
-				throw std::out_of_range("Invalid index");
-		}
-		return (static_cast<std::underlying_type_t<T> >(v) - static_cast<std::underlying_type_t<T> >(min));
+		return (static_cast<integral_index_type>(v) - integral_value_v<min>);
 	}
 };
 

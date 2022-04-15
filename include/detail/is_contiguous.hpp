@@ -32,6 +32,9 @@ struct integral_value<T, v, std::enable_if_t<std::is_enum<T>::value, void> >
 	    static_cast<typename std::underlying_type<T>::type>(v);
 };
 
+template <auto C>
+static inline constexpr auto const integral_value_v = integral_value<decltype(C), C>::value;
+
 template <typename... Args>
 struct is_contiguous_sequence : public std::false_type
 {
@@ -41,9 +44,7 @@ template <typename Arg1, typename Arg2, typename... Args>
 struct is_contiguous_sequence<Arg1, Arg2, Args...> :
     public std::conditional<
         std::is_same<std::decay_t<decltype(Arg1::value)>, std::decay_t<decltype(Arg2::value)> >::value &&
-            (integral_value<std::decay_t<decltype(Arg2::value)>, Arg2::value>::value -
-             integral_value<std::decay_t<decltype(Arg1::value)>, Arg1::value>::value) <= 1 &&
-            Arg1::value <= Arg2::value,
+            (integral_value_v<Arg2::value> - integral_value_v<Arg1::value>) <= 1 && Arg1::value <= Arg2::value,
         is_contiguous_sequence<Arg2, Args...>,
         std::false_type>::type
 {

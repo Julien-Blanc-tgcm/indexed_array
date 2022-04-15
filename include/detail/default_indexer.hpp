@@ -52,71 +52,24 @@ struct default_indexer
 {
 };
 
-template <typename Enum>
-struct default_indexer<
-    Enum,
-    typename std::enable_if_t<boost::describe::has_describe_enumerators<Enum>::value &&
-                                  !detail::is_contiguous_sequence<describe::describe_enumerators<Enum> >::value,
-                              void> >
+template <typename T, T min, T max>
+struct default_indexer<interval<min, max>,
+                       typename std::enable_if_t<std::is_integral<T>::value || std::is_enum<T>::value, void> >
 {
-	static inline constexpr auto const size = mp11::mp_size<describe::describe_enumerators<Enum> >::value;
-
-	template <bool throws_on_error = false>
-	static constexpr auto at(Enum v) noexcept(!throws_on_error)
-	{
-		std::size_t ret = 0;
-		bool found = false;
-		mp11::mp_for_each<describe::describe_enumerators<Enum> >([v, &ret, &found](auto I) {
-			if (I.value == v)
-			{
-				found = true;
-			}
-			if (!found)
-				++ret;
-		});
-		if (!found)
-		{
-			if constexpr (throws_on_error)
-				throw std::out_of_range{"Invalid index"};
-			return std::numeric_limits<std::size_t>::max(); // return an invalid value
-		}
-		return ret;
-	}
-	using index = Enum;
-};
-
-template <typename Enum>
-struct default_indexer<
-    Enum,
-    typename std::enable_if_t<boost::describe::has_describe_enumerators<Enum>::value &&
-                                  detail::is_contiguous_sequence<boost::describe::describe_enumerators<Enum> >::value,
-                              void> >
-{
-	static inline constexpr auto const size = static_cast<typename std::underlying_type<Enum>::type>(
-	                                              mp11::mp_back<boost::describe::describe_enumerators<Enum> >::value) -
-	                                          static_cast<typename std::underlying_type<Enum>::type>(
-	                                              mp11::mp_front<boost::describe::describe_enumerators<Enum> >::value) +
-	                                          1;
-
-	template <bool throws_on_error = false>
-	static constexpr auto at(Enum v) noexcept(!throws_on_error)
+	using integral_index_type = decltype(integral_value_v<T{}>);
+	static inline constexpr auto const size = integral_value_v<max> - integral_value_v<min> + 1;
+	using index = T;
+	template <bool throws_on_error = true>
+	static constexpr auto at(index v) noexcept(!throws_on_error)
 	{
 		if constexpr (throws_on_error)
 		{
-			if (static_cast<std::underlying_type_t<Enum> >(v) <
-			    static_cast<underlying_type_t<Enum> >(
-			        mp11::mp_front<boost::describe::describe_enumerators<Enum> >::value))
-				throw std::out_of_range("Invalid index");
-			if (static_cast<std::underlying_type_t<Enum> >(v) >
-			    static_cast<underlying_type_t<Enum> >(
-			        mp11::mp_back<boost::describe::describe_enumerators<Enum> >::value))
+			if (BOOST_UNLIKELY(static_cast<integral_index_type>(v) < integral_value_v<min> ||
+			                   static_cast<integral_index_type>(v) > integral_value_v<max>))
 				throw std::out_of_range("Invalid index");
 		}
-		return static_cast<std::underlying_type_t<Enum> >(v) -
-		       static_cast<underlying_type_t<Enum> >(
-		           mp11::mp_front<boost::describe::describe_enumerators<Enum> >::value);
+		return (static_cast<integral_index_type>(v) - integral_value_v<min>);
 	}
-	using index = Enum;
 };
 
 template <typename T, T... vals>
@@ -178,23 +131,27 @@ struct default_indexer<
 	}
 };
 
-template <typename T, T min, T max>
-struct default_indexer<interval<min, max>,
-                       typename std::enable_if_t<std::is_integral<T>::value || std::is_enum<T>::value, void> >
+template <typename... Args>
+struct describe_to_integer_sequence
 {
-	using integral_index_type = decltype(integral_value_v<T{}>);
-	static inline constexpr auto const size = integral_value_v<max> - integral_value_v<min> + 1;
-	using index = T;
-	template <bool throws_on_error = true>
-	static constexpr auto at(index v) noexcept(!throws_on_error)
+};
+
+template <typename Enum, template <class...> typename L, typename... Args>
+struct describe_to_integer_sequence<Enum, L<Args...> >
+{
+	using type = std::integer_sequence<Enum, Args::value...>;
+};
+
+template <typename Enum>
+struct default_indexer<Enum, typename std::enable_if_t<boost::describe::has_describe_enumerators<Enum>::value, void> >
+{
+	using helper_list_type = typename describe_to_integer_sequence<Enum, describe::describe_enumerators<Enum> >::type;
+	using index = Enum;
+	static inline constexpr auto const size = default_indexer<helper_list_type>::size;
+	template <bool throws_on_error = false>
+	static constexpr auto at(Enum v) noexcept(!throws_on_error)
 	{
-		if constexpr (throws_on_error)
-		{
-			if (BOOST_UNLIKELY(static_cast<integral_index_type>(v) < integral_value_v<min> ||
-			                   static_cast<integral_index_type>(v) > integral_value_v<max>))
-				throw std::out_of_range("Invalid index");
-		}
-		return (static_cast<integral_index_type>(v) - integral_value_v<min>);
+		return default_indexer<helper_list_type>::template at<throws_on_error>(v);
 	}
 };
 

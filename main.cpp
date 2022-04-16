@@ -60,9 +60,9 @@ struct custom_index2
 	static constexpr auto at(int v1, int v2)
 	{
 		auto res = v1 * 2 + v2;
-		if constexpr(c)
+		if constexpr (c)
 		{
-			if(res < 0 || static_cast<std::size_t>(res) >= size)
+			if (res < 0 || static_cast<std::size_t>(res) >= size)
 				throw std::out_of_range("Invalid index");
 		}
 		return res;
@@ -77,9 +77,9 @@ struct custom_index3
 	static constexpr auto at(int v1, Toto2 v2)
 	{
 		auto res = v1 * 4 + static_cast<int>(v2) + 1;
-		if constexpr(c)
+		if constexpr (c)
 		{
-			if(res < 0 || static_cast<std::size_t>(res) >= size)
+			if (res < 0 || static_cast<std::size_t>(res) >= size)
 				throw std::out_of_range("Invalid index");
 		}
 		return res;
@@ -120,7 +120,7 @@ int f(T&&... args)
 template <typename T1, typename... T>
 int f2(T1&& arg, T&&... args)
 {
-	using indexer = detail::default_indexer<std::decay_t<decltype(T1::checked_arg_index::value)>>;
+	using indexer = detail::default_indexer<std::decay_t<decltype(T1::checked_arg_index::value)> >;
 	static_assert(detail::correct_index<indexer, typename T1::checked_arg_index, typename T::checked_arg_index...>(),
 	              "Args index must be consistent");
 	return sum2(static_cast<typename T1::value_type>(arg), static_cast<typename T::value_type>(args)...);
@@ -163,10 +163,11 @@ int main(int argc, char** /*argv*/)
 
 	indexed_array<int, Toto2> idx{2, 3, 4, 5};
 
-	static_assert(std::is_same<detail::union_of<interval<2, 3>, interval<7, 8>>, 
-	                           integer_sequence<int, 2, 3, 7, 8>>::value, "Same type");
+	static_assert(
+	    std::is_same<detail::union_of<interval<2, 3>, interval<7, 8> >, integer_sequence<int, 2, 3, 7, 8> >::value,
+	    "Same type");
 
-	std::cout << typeid(detail::union_of<interval<2, 3>, interval<7, 8>>).name() << std::endl;
+	std::cout << typeid(detail::union_of<interval<2, 3>, interval<7, 8> >).name() << std::endl;
 
 	cout << "Toto2: " << idx[Toto2::Third] << endl;
 
@@ -229,25 +230,22 @@ int main(int argc, char** /*argv*/)
 	indexed_array<int, crazy_list> t;
 	static_assert(t.size() == 5);
 
-	indexed_array<int, union_of<interval<Color::Red, Color::Green>, interval<Color::White, Color::Black>>> unarr;
+	indexed_array<int, union_of<interval<Color::Red, Color::Green>, interval<Color::White, Color::Black> > > unarr;
 	static_assert(unarr.size() == 5);
 	unarr.at(Color::Red) = 1;
 	unarr.at(Color::Green) = 2;
 	unarr.at(Color::White) = 3;
 	unarr.at(Color::Gray) = 4;
 	unarr.at(Color::Black) = 5;
-	for(auto a : unarr)
+	for (auto a : unarr)
 	{
 		std::cout << a;
 	}
 	std::cout << std::endl;
-	indexed_array<int, union_of<interval<Color::Red, Color::Blue>, single_value<Color::White>>> unarr2{
-	    safe_arg<Color::Red>(1),
-	    safe_arg<Color::Green>(2),
-	    safe_arg<Color::Blue>(3),
-	    safe_arg<Color::White>(4)};
+	indexed_array<int, union_of<interval<Color::Red, Color::Blue>, single_value<Color::White> > > unarr2{
+	    safe_arg<Color::Red>(1), safe_arg<Color::Green>(2), safe_arg<Color::Blue>(3), safe_arg<Color::White>(4)};
 	static_assert(unarr2.size() == 4);
-	for(auto a : unarr2)
+	for (auto a : unarr2)
 	{
 		std::cout << a;
 	}
@@ -260,27 +258,69 @@ int main(int argc, char** /*argv*/)
 	static_assert(std::is_trivially_default_constructible<decltype(unarr2)>::value, "Triviality preserved");
 	static_assert(std::is_trivially_copy_assignable<decltype(unarr2)>::value, "Triviality preserved");
 	static_assert(std::is_trivially_copy_constructible<decltype(unarr2)>::value, "Triviality preserved");
-	//static_assert(std::is_trivial_v<std::decay_t<decltype(unarr2)> >, "Triviality preserved");
+	// static_assert(std::is_trivial_v<std::decay_t<decltype(unarr2)> >, "Triviality preserved");
 
 	static_assert(!std::is_trivial<decltype(arr8)>::value, "Triviality preserved (string array not trivial)");
 
 	static_assert(std::is_trivial_v<std::array<int, 12> >, "array is trivial");
 
 	indexed_array<int, custom_index2> multidim{
-	    safe_arg<0,0>(10),
-	    safe_arg<0, 1>(20),
-	    safe_arg<1, 0>(30),
-	    safe_arg<1, 1>(40)};
+	    safe_arg<0, 0>(10), safe_arg<0, 1>(20), safe_arg<1, 0>(30), safe_arg<1, 1>(40)};
 	std::cout << multidim.at(0, 0) << multidim.at(0, 1) << multidim[{1, 0}] << multidim[{1, 1}] << std::endl;
-	try {
+	try
+	{
 		std::cout << multidim.at(2, 0) << multidim.at(0, 1) << multidim[{1, 0}] << multidim[{1, 1}] << std::endl;
 	}
-	catch(std::out_of_range&) {
+	catch (std::out_of_range&)
+	{
 		std::cout << "catched" << multidim[{0, 1}] << multidim[{1, 0}] << multidim[{1, 1}] << std::endl;
 	}
 	//	std::array<int, 3> index{2, 3, 4};
 	//	cout << "Hello World ! (" << index[argc] << ")" << endl;
-	indexed_array<int, custom_index3> multidim2{0,1,2,3,4,5,6,7};
+	indexed_array<int, custom_index3> multidim2{0, 1, 2, 3, 4, 5, 6, 7};
 	std::cout << multidim2.at(0, Toto2::First) << multidim2.at(1, Toto2::Second) << std::endl;
+
+	indexed_array<int, interval<0, 2>, interval<0, 2>, interval<3, 4> > multidim3;
+	static_assert(multidim3.size() == 18);
+	int i = 0;
+	for (auto& c : multidim3)
+		c = i++;
+
+	for (i = 0; i <= 2; ++i)
+	{
+		for (int j = 0; j <= 2; ++j)
+		{
+			std::cout << "(";
+			for (int k = 3; k <= 4; ++k)
+			{
+				std::cout << multidim3.at(i, j, k) << " ";
+			}
+			std::cout << ")";
+		}
+		std::cout << std::endl;
+	}
+	std::cout << multidim3.at(0, 0, 3) << " " << multidim3.at(1, 1, 4) << std::endl;
+
+	indexed_array<int, Toto2, interval<4, 8>, union_of<interval<1, 2>, single_value<4> > > ttt;
+	static_assert(ttt.size() == 4 * 5 * 3, "Correct size");
+	i = 0;
+	for (auto& c : ttt)
+	{
+		c = i++;
+	}
+	std::cout << ttt.at(Toto2::Last, 6, 4) << " " << ttt.at(Toto2::First, 4, 1) << std::endl;
+	std::cout << (static_cast<int>(Toto2::Last) + 1) * 5 * 3 + (6 - 4) * 3 + 2 << std::endl;
+
+	indexed_array<int, Toto2> ttt3;
+	static_assert(ttt3.size() == 4);
+
+	indexed_array<int, std::integer_sequence<Toto2, Toto2::First, Toto2::Second> > ttt5{3, 4};
+	static_assert(ttt5.size() == 2);
+	std::cout << ttt5[Toto2::First] << " " << ttt5.at(Toto2::Second) << std::endl;
+
+	static_assert(detail::is_contiguous_sequence<std::integral_constant<Toto2, Toto2::First>,
+	                                             std::integral_constant<Toto2, Toto2::Second>,
+	                                             std::integral_constant<Toto2, Toto2::Third> >::value,
+	              "contiguous");
 	return 0;
 }

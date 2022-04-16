@@ -21,7 +21,8 @@ struct has_member_index : public std::false_type
 };
 
 template <typename T>
-struct has_member_index<T, std::enable_if_t<std::is_class<typename T::checked_arg_index>::value, void> > : public std::true_type
+struct has_member_index<T, std::enable_if_t<std::is_class<typename T::checked_arg_index>::value, void> > :
+    public std::true_type
 {
 };
 

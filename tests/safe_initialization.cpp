@@ -41,3 +41,17 @@ BOOST_AUTO_TEST_CASE(safe_arg_unique_ptr)
 	BOOST_TEST(*arr[Color::Green] == 123);
 	BOOST_TEST(*arr[Color::Blue] == -1);
 }
+
+BOOST_AUTO_TEST_CASE(safe_arg_holes)
+{
+	auto p = std::make_unique<int>(123);
+	indexed_array<std::unique_ptr<int>, union_of<single_value<Color::Red>, interval<Color::Blue, Color::Black> > > arr{
+	    safe_arg<Color::Red>(std::make_unique<int>(12)), //
+	    safe_arg<Color::Blue>(std::move(p)),            //
+	    safe_arg<Color::Black>(std::make_unique<int>(-1)) //
+	};
+	BOOST_TEST(arr.size() == 3);
+	BOOST_TEST(*arr[Color::Red] == 12);
+	BOOST_TEST(*arr[Color::Blue] == 123);
+	BOOST_TEST(*arr[Color::Black] == -1);
+}

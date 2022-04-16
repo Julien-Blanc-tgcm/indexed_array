@@ -29,12 +29,8 @@ The implementation is thus pretty straightforward:
 * a `at(typename Indexer::index)` (and respective `operator[]`) public member
 * all remaining interface from `std::array` wrapped
 
-To avoid code duplication, the `at` method is templated on a boolean parameter, which will tell if
-it needs to do bound check or not. It shall throw an `std::out_of_range` exception if requested to
-do bound checking, and the index given is invalid (`indexed_array` won't do bound check when accessing
-the inner array).
-
-The only challenging issue will be discussed in *going multidimensional*.
+It resides in the namespace `indexed_array::detail`, and a smart using directive is used in the namespace
+`indexed_array` to allow using `indexed_array::detail::indexed_array` with the correct template arguments.
 
 ## The default\_indexer type
 
@@ -48,6 +44,11 @@ struct default_indexer
 { // default implementation is empty
 };
 ```
+
+In all indexers, to avoid code duplication, the `at` method is templated on a boolean parameter, which will tell if
+it needs to do bound check or not. It shall throw an `std::out_of_range` exception if requested to
+do bound checking, and the index given is invalid (`indexed_array` won't do bound check when accessing
+the inner array).
 
 ### Handling integers and enum the same way
 
@@ -191,6 +192,177 @@ struct default_indexer<Enum, typename std::enable_if_t<boost::describe::has_desc
 ```
 
 Adding support of other compile-time enum introspection mechanisms should be relatively simple as well.
+
+## Going multidimensional
+
+### Adapting indexed\_array
+
+Now that we have a container that can be arbitrarily indexed, it makes a lot of sense to have some indexes, not
+in the form of just one value, but in the form of a set of values. As long as these values can be safely
+converted into an integer in the range `[0 - (size -1)]`, everything is fine. This can be done easily by
+defining the following indexer:
+
+```cpp
+struct custom_multidimensional_index
+{
+	using index = mp11::mp_list<int, Foo>;
+	inline static constexpr size_t const size = 8;
+	template <bool c = true>
+	static constexpr auto at(int v1, Foo v2)
+	{
+		auto res = v1 * 4 + static_cast<int>(v2) + 1;
+		if constexpr(c)
+		{
+			if(res < 0 || static_cast<std::size_t>(res) >= size)
+				throw std::out_of_range("Invalid index");
+		}
+		return res;
+	}
+};
+```
+
+The problem resides with the definition of the `at()` and `operator[]` methods. They can't take an `Indexer::index`
+anymore. We need to split that into separate arguments, so that we can write:
+
+```cpp
+auto value = my_multidim_array.at(2, Foo::bar);
+auto value2 = my_multidim_array[{1, Foo::bar}]; // notice the {}, won't be needed in C++23
+```
+
+To allow this, the trick here is to inherit from a base class, that we can specialize, and which will define these operators.
+
+```cpp
+template <typename Value, typename Indexer, typename Owner, typename Index>
+class indexed_array_helper
+{
+	// ...
+	constexpr reference at(Index index);
+};
+```
+
+And we specialize it when `index` is a typelist:
+
+```cpp
+template <typename Value, typename Indexer, typename Owner, template <class...> class Index, typename... Args>
+class indexed_array_helper<Value, Indexer, Owner, Index<Args...> >
+{
+	constexpr reference at(Args... index);
+}
+```
+
+This allows to inject the correct interface into `indexed_array` (see the code for more implementation details).
+
+### Adapting default\_indexer
+
+The default indexer now needs to be adapted, so that we can write:
+
+```cpp
+indexed_array<string, range<4, 8>, my_custom_index, Foo> my_data;
+```
+
+What we need is just a bit of machinery to transform that into:
+```cpp
+indexed_array<string, 
+             default_indexer<mp_list<
+                 default_indexer<range<4,8>>,
+                 my_custom_index,
+                 default_indexer<Foo>
+             >>>
+```
+
+And then specialize default\_indexer when taking an mp\_list of indexers:
+
+```cpp
+template <typename... Args>
+struct default_indexer<boost::mp11::mp_list<Args...>,
+                       typename std::enable_if_t<boost::mp11::mp_all<has_member_size<Args>...>::value, void> >
+{
+	using index = boost::mp11::mp_list<typename Args::index...>;
+	static inline constexpr auto const size = product_v<Args::size...>;
+
+	template <bool throws_on_error = false>
+	static constexpr auto at(typename Args::index... args) noexcept
+	{
+		return at_computation_helper<Args...>::template at<throws_on_error>(args...);
+	}
+};
+```
+
+`product_v` is a compile time helper that will gives the product of all given values. `at` function is
+implemented in a quite classical way:
+
+```cpp
+template <typename Arg, typename... Args>
+struct at_computation_helper
+{
+	template <bool c>
+	static constexpr auto at(typename Arg::index idx, typename Args::index... rem)
+	{
+		return Arg::template at<c>(idx) * product_v<Args::size...> +
+		       at_computation_helper<Args...>::template at<c>(rem...);
+	}
+};
+template <typename Arg>
+struct at_computation_helper<Arg>
+{
+	template <bool c>
+	static constexpr auto at(typename Arg::index idx)
+	{
+		return Arg::template at<c>(idx);
+	}
+};
+```
+
+## Safe initialization
+
+The `safe_arg` template class is used, during initialization, to assert that:
+
+* the correct number of arguments is given for the array (not less, not more)
+* the order of the arguments matches the one of the indexer
+
+So, we got two assertions to check:
+
+* `at(idx) == <index in initializer list>` (for each item in the list)
+* `Indexer::size == <size of initializer list>`
+
+The first assertion is checked recursively for each argument:
+
+```cpp
+template <typename Indexer, std::size_t X, typename u, typename... v>
+constexpr bool correct_index_()
+{
+	static_assert(X == at_helper<Indexer, u>::at(), "Invalid value for initializer");
+	return X == at_helper<Indexer, u>::at() && correct_index_<Indexer, X + 1, v...>();
+}
+```
+
+A `typename u` is used here, instead of a direct value. This allow us to support multidimensional
+indexers. `at_helper` is here for that: call the indexer with the correct arguments.
+
+And the terminal case is pretty straightforward:
+
+```cpp
+template <typename Indexer, std::size_t X>
+constexpr bool correct_index_()
+{
+	static_assert(!(X < Indexer::size), "Not enough initializers provided");
+	static_assert(!(X > Indexer::size), "Too many initializers provided");
+	return X == Indexer::size;
+}
+```
+
+Now we just have to add the constructor in `indexed_array`:
+
+```cpp
+	// safe_arg constructor
+	template <
+	    typename... Args,
+	    std::enable_if_t<has_member_index<boost::mp11::mp_first<boost::mp11::mp_list<Args...> > >::value, bool> = true>
+	constexpr indexed_array(Args&&... args) : data_{static_cast<Value>(args)...}
+	{
+		static_assert(detail::correct_index<Indexer, typename Args::checked_arg_index...>(), "Argument mismatch");
+	}
+```
 
 Back to the [Index](index.md)
 

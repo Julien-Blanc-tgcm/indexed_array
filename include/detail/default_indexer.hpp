@@ -155,6 +155,76 @@ struct default_indexer<Enum, typename std::enable_if_t<boost::describe::has_desc
 	}
 };
 
+template <auto Arg, auto... Args>
+struct product
+{
+	static constexpr const auto value = Arg * product<Args...>::value;
+};
+
+template <auto Arg>
+struct product<Arg>
+{
+	static constexpr const auto value = Arg;
+};
+
+template <auto... Args>
+inline constexpr const auto product_v = product<Args...>::value;
+
+template <typename Arg, typename... Args>
+struct at_computation_helper
+{
+	template <bool c>
+	static constexpr auto at(typename Arg::index idx, typename Args::index... rem)
+	{
+		return Arg::template at<c>(idx) * product_v<Args::size...> +
+		       at_computation_helper<Args...>::template at<c>(rem...);
+	}
+};
+template <typename Arg>
+struct at_computation_helper<Arg>
+{
+	template <bool c>
+	static constexpr auto at(typename Arg::index idx)
+	{
+		return Arg::template at<c>(idx);
+	}
+};
+
+template <typename... Args>
+struct default_indexer<boost::mp11::mp_list<Args...>,
+                       typename std::enable_if_t<boost::mp11::mp_all<has_member_size<Args>...>::value, void> >
+{
+	using index = boost::mp11::mp_list<typename Args::index...>;
+	static inline constexpr auto const size = product_v<Args::size...>;
+
+	template <bool throws_on_error = false>
+	static constexpr auto at(typename Args::index... args) noexcept
+	{
+		return at_computation_helper<Args...>::template at<throws_on_error>(args...);
+	}
+};
+
+template <typename Arg>
+struct wrong_indexer
+{
+	static_assert(std::is_same_v<Arg, std::true_type>, "There is a problem with the indexer");
+};
+
+template <typename Arg>
+struct add_default_indexer
+{
+	using type = default_indexer<Arg>;
+};
+
+template <typename Arg>
+struct add_default_indexer<default_indexer<Arg> >
+{
+	using type = default_indexer<Arg>;
+};
+
+template <typename Arg>
+using add_default_indexer_t = typename add_default_indexer<Arg>::type;
+
 } // namespace jbc::indexed_array::detail
 
 #endif // JBC_DETAIL_DEFAULT_INDEXER_H

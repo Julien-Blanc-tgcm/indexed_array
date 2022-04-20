@@ -2,10 +2,11 @@
 //·Distributed·under·the·Boost·Software·License,·Version·1.0.
 //·https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef JBC_DETAIL_DEFAULT_INDEXER_H
-#define JBC_DETAIL_DEFAULT_INDEXER_H
+#ifndef JBC_INDEXED_ARRAY_DETAIL_DEFAULT_INDEXER_H
+#define JBC_INDEXED_ARRAY_DETAIL_DEFAULT_INDEXER_H
 
 #include "is_contiguous.hpp"
+#include "is_indexer.hpp"
 
 #include <stdexcept>
 #include <type_traits>
@@ -28,16 +29,6 @@ struct type_identity
 
 template <class T>
 using type_identity_t = typename type_identity<T>::type;
-
-template <typename T, typename T2 = void>
-struct has_member_size : public std::false_type
-{
-};
-
-template <typename T>
-struct has_member_size<T, std::enable_if_t<std::is_integral<decltype(T::size)>::value, void> > : public std::true_type
-{
-};
 
 template <auto minInclusive, type_identity_t<decltype(minInclusive)> maxInclusive>
 struct interval
@@ -190,18 +181,51 @@ struct at_computation_helper<Arg>
 	}
 };
 
-template <typename... Args>
-struct default_indexer<boost::mp11::mp_list<Args...>,
-                       typename std::enable_if_t<boost::mp11::mp_all<has_member_size<Args>...>::value, void> >
+template <typename T, typename = void>
+struct add_default_handler_if_needed
 {
-	using index = boost::mp11::mp_list<typename Args::index...>;
-	static inline constexpr auto const size = product_v<Args::size...>;
+	using type = default_indexer<T>;
+};
+template <typename T>
+struct add_default_handler_if_needed<T, std::enable_if_t<is_indexer<T>::value, void> >
+{
+	using type = T;
+};
+
+template <typename T>
+using add_default_handler_if_needed_t = typename add_default_handler_if_needed<T>::type;
+
+template <typename... Args>
+struct to_single_indexer
+{
+	using type = default_indexer<boost::mp11::mp_list<add_default_handler_if_needed_t<Args>...> >;
+};
+
+template <typename Arg>
+struct to_single_indexer<Arg>
+{
+	using type = add_default_handler_if_needed_t<Arg>;
+};
+
+template <typename... Args>
+using to_single_indexer_t = typename to_single_indexer<Args...>::type;
+
+template <typename Arg, typename... Args>
+struct default_indexer<
+    boost::mp11::mp_list<Arg, Args...>,
+    typename std::enable_if_t<boost::mp11::mp_all<is_indexer<Arg>, is_indexer<Args>...>::value, void> >
+{
+	using index = boost::mp11::mp_list<typename Arg::index, typename Args::index...>;
+	static inline constexpr auto const size = product_v<Arg::size, Args::size...>;
 
 	template <bool throws_on_error = false>
-	static constexpr auto at(typename Args::index... args) noexcept
+	static constexpr auto at(typename Arg::index arg, typename Args::index... args) noexcept
 	{
-		return at_computation_helper<Args...>::template at<throws_on_error>(args...);
+		return at_computation_helper<Arg, Args...>::template at<throws_on_error>(arg, args...);
 	}
+
+	using slice_indexer = to_single_indexer_t<Args...>;
+	using root_indexer = Arg;
 };
 
 template <typename Arg>
@@ -227,4 +251,4 @@ using add_default_indexer_t = typename add_default_indexer<Arg>::type;
 
 } // namespace jbc::indexed_array::detail
 
-#endif // JBC_DETAIL_DEFAULT_INDEXER_H
+#endif // JBC_INDEXED_ARRAY_DETAIL_DEFAULT_INDEXER_H

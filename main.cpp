@@ -67,6 +67,8 @@ struct custom_index2
 		}
 		return res;
 	}
+	using slice_indexer = detail::add_default_indexer_t<interval<0, 1>>;
+	using root_indexer = detail::add_default_indexer_t<interval<0, 1>>;
 };
 
 struct custom_index3
@@ -84,6 +86,8 @@ struct custom_index3
 		}
 		return res;
 	}
+	using slice_indexer = detail::add_default_indexer_t<Toto2>;
+	using root_indexer = detail::add_default_indexer_t<interval<-1, 0>>;
 };
 template <typename T1>
 int sum(T1&& v)

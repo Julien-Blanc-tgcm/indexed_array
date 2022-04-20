@@ -19,8 +19,11 @@ add_executable(indexed_array "main.cpp"
 	"include/indexed_array.hpp"
 	"include/detail/checked_arg.hpp"
 	"include/detail/default_indexer.hpp"
+	"include/detail/has_member_index.hpp"
 	"include/detail/indexed_array.hpp"
+	"include/detail/indexed_span.hpp"
 	"include/detail/is_contiguous.hpp"
+	"include/detail/is_indexer.hpp"
 	"include/detail/union_of.hpp"
 )
 target_compile_options(indexed_array PRIVATE -Wall -Wextra -Werror)

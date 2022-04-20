@@ -2,10 +2,11 @@
 //·Distributed·under·the·Boost·Software·License,·Version·1.0.
 //·https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef JBC_DETAIL_INDEXED_ARRAY_H
-#define JBC_DETAIL_INDEXED_ARRAY_H
+#ifndef JBC_INDEXED_ARRAY_DETAIL_INDEXED_ARRAY_H
+#define JBC_INDEXED_ARRAY_DETAIL_INDEXED_ARRAY_H
 
 #include "checked_arg.hpp"
+#include "indexed_span.hpp"
 
 #include <boost/mp11.hpp>
 
@@ -52,7 +53,7 @@ class indexed_array_helper
 
 template <typename Value, typename Indexer>
 class indexed_array :
-    private indexed_array_helper<Value, Indexer, indexed_array<Value, Indexer>, typename Indexer::index>
+    public indexed_array_helper<Value, Indexer, indexed_array<Value, Indexer>, typename Indexer::index>
 {
 	template <typename V, typename I, typename Owner, typename Idx>
 	friend class indexed_array_helper;
@@ -270,7 +271,6 @@ template <typename Value, typename Indexer, typename Owner, template <class...> 
 class indexed_array_helper<Value, Indexer, Owner, Index<Args...> >
 {
   protected:
-  protected:
 	indexed_array_helper() noexcept = default;
 	~indexed_array_helper() noexcept = default;
 	indexed_array_helper(indexed_array_helper&&) noexcept = default;
@@ -301,6 +301,18 @@ class indexed_array_helper<Value, Indexer, Owner, Index<Args...> >
 		auto i = std::apply(indexer::template at<false>, idx);
 		return static_cast<Owner const&>(*this).data_[i];
 	}
+	constexpr indexed_span<Value, typename Indexer::slice_indexer> slice(typename Indexer::root_indexer::index idx)
+	{
+		return indexed_span<Value, typename Indexer::slice_indexer>(
+		    static_cast<Owner&>(*this).data_.data() + Indexer::root_indexer::at(idx) * Indexer::slice_indexer::size);
+	}
+	constexpr indexed_span<Value const, typename Indexer::slice_indexer>
+	slice(typename Indexer::root_indexer::index idx) const
+	{
+		return indexed_span<Value const, typename Indexer::slice_indexer>(
+		    static_cast<Owner const&>(*this).data_.data() +
+		    Indexer::root_indexer::at(idx) * Indexer::slice_indexer::size);
+	}
 };
 
 // ADL-versions for at. Supports only single argument
@@ -317,4 +329,4 @@ constexpr decltype(auto) at(indexed_array<Value, Indexer> const& arr, typename I
 
 } // namespace jbc::indexed_array::detail
 
-#endif // JBC_DETAIL_INDEXED_ARRAY_H
+#endif // JBC_INDEXED_ARRAY_DETAIL_INDEXED_ARRAY_H

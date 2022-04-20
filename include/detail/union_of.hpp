@@ -2,8 +2,8 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef JBC_DETAIL_UNION_OF_H
-#define JBC_DETAIL_UNION_OF_H
+#ifndef JBC_INDEXED_ARRAY_DETAIL_UNION_OF_H
+#define JBC_INDEXED_ARRAY_DETAIL_UNION_OF_H
 
 #include "default_indexer.hpp"
 
@@ -94,4 +94,4 @@ using single_value = std::integral_constant<decltype(T1), T1>;
 
 } // namespace jbc::indexed_array::detail
 
-#endif // JBC_DETAIL_UNION_OF_H
+#endif // JBC_INDEXED_ARRAY_DETAIL_UNION_OF_H

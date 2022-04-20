@@ -2,8 +2,8 @@
 //·Distributed·under·the·Boost·Software·License,·Version·1.0.
 //·https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef IS_CONTIGUOUS_HPP
-#define IS_CONTIGUOUS_HPP
+#ifndef JBC_INDEXED_ARRAY_DETAIL_IS_CONTIGUOUS_HPP
+#define JBC_INDEXED_ARRAY_DETAIL_IS_CONTIGUOUS_HPP
 
 #include <boost/mp11.hpp>
 
@@ -62,4 +62,4 @@ struct is_contiguous_sequence<List<Args...> > : public is_contiguous_sequence<Ar
 
 } // namespace jbc::indexed_array::detail
 
-#endif // IS_CONTIGUOUS_HPP
+#endif // JBC_INDEXED_ARRAY_DETAIL_IS_CONTIGUOUS_HPP

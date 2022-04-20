@@ -2,8 +2,8 @@
 //·Distributed·under·the·Boost·Software·License,·Version·1.0.
 //·https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef JBC_DETAIL_CHECKED_ARG_H
-#define JBC_DETAIL_CHECKED_ARG_H
+#ifndef JBC_INDEXED_ARRAY_DETAIL_CHECKED_ARG_H
+#define JBC_INDEXED_ARRAY_DETAIL_CHECKED_ARG_H
 
 #include <boost/mp11.hpp>
 
@@ -38,8 +38,8 @@ struct checked_arg
 	using checked_arg_index = C;
 	using value_type = T;
 	T&& v;
-	explicit checked_arg(T&& val) : v{std::forward<T>(val)} {};
-	explicit operator T&&()
+	explicit constexpr checked_arg(T&& val) : v{std::forward<T>(val)} {};
+	explicit constexpr operator T&&()
 	{
 		return std::forward<T>(v);
 	}
@@ -51,17 +51,17 @@ struct checked_arg_h
 	using checked_arg_index = C;
 	using value_type = T;
 	T&& v;
-	explicit checked_arg_h(T&& val) : v{std::forward<T>(val)} {};
-	operator T&&()
+	explicit constexpr checked_arg_h(T&& val) : v{std::forward<T>(val)} {};
+	constexpr operator T&&()
 	{
 		return std::forward<T>(v);
 	}
 	template <typename U = T, typename = typename std::enable_if_t<std::is_array<U>::value> >
-	operator checked_arg<C, std::decay_t<T>*>()
+	constexpr operator checked_arg<C, std::decay_t<T>*>()
 	{
 		return checked_arg<C, std::decay_t<T>*>(v);
 	}
-	operator checked_arg<C, T>()
+	constexpr operator checked_arg<C, T>()
 	{
 		return checked_arg<C, T>(v);
 	}
@@ -73,17 +73,17 @@ struct checked_arg_h<L<C...>, T>
 	using checked_arg_index = boost::mp11::mp_list<std::integral_constant<decltype(C), C>...>;
 	using value_type = T;
 	T&& v;
-	explicit checked_arg_h(T&& val) : v{std::forward<T>(val)} {};
-	operator T&&()
+	explicit constexpr checked_arg_h(T&& val) : v{std::forward<T>(val)} {};
+	constexpr operator T&&()
 	{
 		return std::forward<T>(v);
 	}
 	template <typename U = T, typename = typename std::enable_if_t<std::is_array<U>::value> >
-	operator checked_arg<checked_arg_index, std::decay_t<T>*>()
+	constexpr operator checked_arg<checked_arg_index, std::decay_t<T>*>()
 	{
 		return checked_arg<checked_arg_index, std::decay_t<T>*>(v);
 	}
-	operator checked_arg<checked_arg_index, T>()
+	constexpr operator checked_arg<checked_arg_index, T>()
 	{
 		return checked_arg<checked_arg_index, T>(v);
 	}
@@ -112,4 +112,4 @@ constexpr bool correct_index()
 
 } // namespace jbc::indexed_array::detail
 
-#endif // JBC_DETAIL_CHECKED_ARG_H
+#endif // JBC_INDEXED_ARRAY_DETAIL_CHECKED_ARG_H

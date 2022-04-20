@@ -339,7 +339,7 @@ constexpr bool correct_index_()
 A `typename u` is used here, instead of a direct value. This allow us to support multidimensional
 indexers. `at_helper` is here for that: call the indexer with the correct arguments.
 
-And the terminal case is pretty straightforward:
+And the terminal case is pretty straightforward. This one also checks the number of arguments:
 
 ```cpp
 template <typename Indexer, std::size_t X>

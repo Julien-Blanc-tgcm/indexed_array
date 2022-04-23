@@ -38,3 +38,5 @@ If you're worried about performance, see [Performance Considerations](performanc
 See [Design Principles](design.md) for details about the internals of the library.
 
 For a comparison with other ways to achieve similar results, see [Comparison](comparison.md)
+
+And finally, the [Reference](reference.md).

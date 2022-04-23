@@ -77,10 +77,20 @@ class indexed_array :
 
 	~indexed_array() noexcept = default;
 
+	constexpr indexed_array(indexed_array<Value, Indexer> const& other) = default;
+
+	constexpr indexed_array(indexed_array<Value, Indexer>&& other) = default;
+
+	constexpr indexed_array& operator=(indexed_array<Value, Indexer> const& other) = default;
+
+	constexpr indexed_array& operator=(indexed_array<Value, Indexer>&& other) = default;
+
 	// standard constructor
 	template <
 	    typename... Args,
-	    std::enable_if_t<!has_member_index<boost::mp11::mp_first<boost::mp11::mp_list<Args...> > >::value, bool> = true>
+	    std::enable_if_t<
+	        !has_member_index<boost::mp11::mp_first<boost::mp11::mp_list<Args...> > >::value &&
+	        !std::is_invocable_v<indexed_array(indexed_array const&), Args&&...>, bool> = true>
 	constexpr indexed_array(Args&&... list) : data_{std::forward<Args>(list)...}
 	{
 	}
@@ -92,14 +102,6 @@ class indexed_array :
 	{
 		static_assert(detail::correct_index<Indexer, typename Args::checked_arg_index...>(), "Argument mismatch");
 	}
-
-	constexpr indexed_array(indexed_array const& other) = default;
-
-	constexpr indexed_array(indexed_array&& other) = default;
-
-	constexpr indexed_array& operator=(indexed_array const& other) = default;
-
-	constexpr indexed_array& operator=(indexed_array&& other) = default;
 
 	// at and [] operators. Use inheritance to get correct signature
 	using indexed_array_helper<Value, Indexer, indexed_array<Value, Indexer>, typename Indexer::index>::at;

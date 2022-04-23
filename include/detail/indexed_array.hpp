@@ -91,14 +91,14 @@ class indexed_array :
 	    std::enable_if_t<
 	        !has_member_index<boost::mp11::mp_first<boost::mp11::mp_list<Args...> > >::value &&
 	        !std::is_invocable_v<indexed_array(indexed_array const&), Args&&...>, bool> = true>
-	constexpr indexed_array(Args&&... list) : data_{std::forward<Args>(list)...}
+	constexpr explicit indexed_array(Args&&... list) : data_{std::forward<Args>(list)...}
 	{
 	}
 	// safe_arg constructor
 	template <
 	    typename... Args,
 	    std::enable_if_t<has_member_index<boost::mp11::mp_first<boost::mp11::mp_list<Args...> > >::value, bool> = true>
-	constexpr indexed_array(Args&&... args) : data_{static_cast<Value>(args)...}
+	constexpr explicit indexed_array(Args&&... args) : data_{static_cast<Value>(args)...}
 	{
 		static_assert(detail::correct_index<Indexer, typename Args::checked_arg_index...>(), "Argument mismatch");
 	}

@@ -134,3 +134,26 @@ BOOST_AUTO_TEST_CASE(multidimensional_slices)
 	BOOST_TEST(*slice2[-3] == "50");
 	BOOST_TEST(*slice2[6] == "59");
 }
+
+BOOST_AUTO_TEST_CASE(multidimensional_const_slices)
+{
+	indexed_array<std::unique_ptr<std::string>, Color, Material, interval<-3, 6> > arr{};
+	int i = 0;
+	for (auto& a : arr)
+	{
+		a = std::make_unique<std::string>(std::to_string(i++));
+	}
+	auto const& ref = arr;
+	i = 0;
+	for (auto& a : ref)
+	{
+		BOOST_TEST(*a == std::to_string(i++));
+	}
+	auto slice1 = ref.slice(Color::Green);
+	BOOST_TEST(slice1.size() == 40);
+	BOOST_TEST(*slice1.at(Material::Wood, 0) == "43");
+	auto slice2 = slice1.slice(Material::Metal);
+	BOOST_TEST(slice2.size() == 10);
+	BOOST_TEST(*slice2[-3] == "50");
+	BOOST_TEST(*slice2[6] == "59");
+}

@@ -46,7 +46,7 @@ class indexed_span : private indexed_span_helper<Value, Indexer, indexed_span<Va
 	template <typename V, typename I, typename Owner, typename Idx>
 	friend class indexed_span_helper;
 
-	Value* data_;
+	Value* data_{nullptr};
 
   public:
 	// standard array members
@@ -61,7 +61,7 @@ class indexed_span : private indexed_span_helper<Value, Indexer, indexed_span<Va
 	// specific
 	using indexer = Indexer;
 
-	indexed_span() noexcept = default;
+	indexed_span() noexcept = delete;
 
 	~indexed_span() noexcept = default;
 

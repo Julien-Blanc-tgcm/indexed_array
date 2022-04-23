@@ -35,6 +35,11 @@ BOOST_AUTO_TEST_CASE(iteration)
 	{
 		BOOST_TEST(b == std::to_string(i++));
 	}
+	i = 0;
+	for (auto it = b1.cbegin(); it != b1.cend(); ++it)
+	{
+		BOOST_TEST(*it == std::to_string(i++));
+	}
 	BOOST_TEST(b1 == b2);
 	BOOST_TEST(!(b1 != b2));
 	BOOST_TEST(b1 >= b2);
@@ -82,4 +87,20 @@ BOOST_AUTO_TEST_CASE(front_back)
 	Base const b2(b1);
 	BOOST_TEST(b2.front() == "0");
 	BOOST_TEST(b2.back() == std::to_string(i - 1));
+}
+
+BOOST_AUTO_TEST_CASE(reverse_const_iteration)
+{
+	using Base = indexed_array<std::string, Color, interval<3, 8>, interval<-2, 4> >;
+	Base b1;
+	int i = 0;
+	for (auto& b : b1)
+	{
+		b = std::to_string(i++);
+	}
+	auto const& b2 = b1;
+	for (auto it = b2.rbegin(); it != b2.rend(); ++it)
+	{
+		BOOST_TEST(*it == std::to_string(--i));
+	}
 }

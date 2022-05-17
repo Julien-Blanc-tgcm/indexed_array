@@ -53,3 +53,57 @@ BOOST_AUTO_TEST_CASE(indexed_span_foreach)
 	auto s2 = s.slice(1);
 	BOOST_TEST(s2 == "33");
 }
+
+BOOST_AUTO_TEST_CASE(indexed_span_slice)
+{
+	indexed_array<int, interval<2, 4>, interval<3, 5>> arr{0, 1, 2, 3, 4, 5, 6, 7, 8};
+	BOOST_TEST((std::is_same_v<decltype(arr.slice_at(2)), indexed_span<int, interval<3, 5>>>));
+	BOOST_TEST((std::is_same_v<decltype(arr.slice(2)), indexed_span<int, interval<3, 5>>>));
+	BOOST_TEST((arr[{2, 4}] == 1));
+	arr.slice(2).slice(4) = 10;
+	BOOST_TEST((arr[{2, 4}] == 10));
+}
+
+BOOST_AUTO_TEST_CASE(indexed_span_slice_at)
+{ // test that slice_at correctly raise exceptions
+	indexed_array<int, interval<2, 4>, interval<3, 5>> arr;
+	BOOST_TEST((std::is_same_v<decltype(arr.slice_at(2)), indexed_span<int, interval<3, 5>>>));
+	BOOST_TEST((std::is_same_v<decltype(arr.slice(2)), indexed_span<int, interval<3, 5>>>));
+	BOOST_CHECK_THROW(arr.slice_at(0), std::out_of_range);
+	auto v = arr.slice_at(3); // does not throw
+	BOOST_CHECK_THROW(v.slice_at(0), std::out_of_range);
+}
+
+BOOST_AUTO_TEST_CASE(indexed_span_slice_at2)
+{ // test that slice_at correctly raise exceptions
+	indexed_array<int, interval<2, 4>, interval<3, 5>> const arr{};
+	BOOST_CHECK_THROW(arr.slice_at(1), std::out_of_range);
+}
+
+BOOST_AUTO_TEST_CASE(indexed_span_slice_const)
+{
+	indexed_array<int, interval<2, 4>, interval<3, 5>> const arr{0, 1, 2, 3, 4, 5, 6, 7, 8};
+	bool catched = false;
+	BOOST_TEST((std::is_same_v<decltype(arr.slice_at(2)), indexed_span<int const, interval<3, 5>>>));
+	BOOST_TEST((std::is_same_v<decltype(arr.slice(2)), indexed_span<int const, interval<3, 5>>>));
+	BOOST_TEST(arr.slice(2)[5] == 2);
+}
+
+BOOST_AUTO_TEST_CASE(indexed_span_reverse_iterator)
+{ // test that reverse iteration is ok
+	indexed_array<int, interval<2, 4>, interval<3, 5>> const arr{0, 1, 2, 3, 4, 5, 6, 7, 8};
+	auto v = arr.slice(3);
+	int i = 0;
+	for(auto it = v.rbegin(); it != v.rend(); ++it, ++i)
+	{
+		BOOST_TEST(*it == 5 - i);
+	}
+	// also check const version
+	auto const arr2 = arr;
+	auto v2 = arr2.slice(4);
+	i = 0;
+	for(auto it = v2.rbegin(); it != v2.rend(); ++it, ++i)
+	{
+		BOOST_TEST(*it == 8 - i);
+	}
+}

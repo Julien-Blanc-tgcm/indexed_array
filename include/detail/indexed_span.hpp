@@ -34,9 +34,21 @@ class indexed_span_helper
 	constexpr const_reference at(Index index) const;
 	constexpr reference operator[](Index idx);
 	constexpr const_reference operator[](Index idx) const;
-	constexpr value_type slice(Index idx)
+	constexpr reference slice(Index idx)
 	{
 		return operator[](idx);
+	}
+	constexpr const_reference slice(Index idx) const
+	{
+		return operator[](idx);
+	}
+	constexpr reference slice_at(Index idx)
+	{
+		return at(idx);
+	}
+	constexpr const_reference slice_at(Index idx) const
+	{
+		return at(idx);
 	}
 };
 
@@ -82,6 +94,12 @@ class indexed_span : private indexed_span_helper<Value, Indexer, indexed_span<Va
 	using indexed_span_helper<Value, Indexer, indexed_span<Value, Indexer>, typename Indexer::index>::at;
 	using indexed_span_helper<Value, Indexer, indexed_span<Value, Indexer>, typename Indexer::index>::operator[];
 	using indexed_span_helper<Value, Indexer, indexed_span<Value, Indexer>, typename Indexer::index>::slice;
+	using indexed_span_helper<Value, Indexer, indexed_span<Value, Indexer>, typename Indexer::index>::slice_at;
+
+	using iterator = Value*;
+	using const_iterator = Value const*;
+	using reverse_iterator = std::reverse_iterator<Value*>;
+	using reverse_const_iterator = std::reverse_iterator<Value const*>;
 
 	// standard array operations
 	auto begin()
@@ -100,22 +118,23 @@ class indexed_span : private indexed_span_helper<Value, Indexer, indexed_span<Va
 	{
 		return data_ + Indexer::size;
 	}
-	//	auto rbegin()
-	//	{
-	//		return data_.rbegin();
-	//	}
-	//	auto rbegin() const
-	//	{
-	//		return data_.rbegin();
-	//	}
-	//	auto rend()
-	//	{
-	//		return data_.rend();
-	//	}
-	//	auto rend() const
-	//	{
-	//		return data_.rend();
-	//	}
+
+	auto rbegin()
+	{
+		return std::make_reverse_iterator(end());
+	}
+	auto rbegin() const
+	{
+		return std::make_reverse_iterator(end());
+	}
+	auto rend()
+	{
+		return std::make_reverse_iterator(data_);
+	}
+	auto rend() const
+	{
+		return std::make_reverse_iterator(data_);
+	}
 
 	constexpr reference front()
 	{
@@ -207,10 +226,35 @@ class indexed_span_helper<Value, Indexer, Owner, Index<Args...> >
 		auto i = std::apply(indexer::template at<false>, idx);
 		return *(static_cast<Owner const&>(*this).data_ + i);
 	}
-	constexpr indexed_span<Value, typename Indexer::slice_indexer> slice(typename Indexer::root_indexer::index idx)
+	constexpr indexed_span<Value, typename Indexer::slice_indexer>
+	slice(typename Indexer::root_indexer::index idx) noexcept
 	{
-		return indexed_span<Value, typename Indexer::slice_indexer>(
-		    static_cast<Owner&>(*this).data_ + Indexer::root_indexer::at(idx) * Indexer::slice_indexer::size);
+		return indexed_span<Value, typename Indexer::slice_indexer>(static_cast<Owner&>(*this).data_ +
+		                                                            Indexer::root_indexer::template at<false>(idx) *
+		                                                                Indexer::slice_indexer::size);
+	}
+
+	constexpr indexed_span<Value const, typename Indexer::slice_indexer>
+	slice(typename Indexer::root_indexer::index idx) const noexcept
+	{
+		return indexed_span<Value const, typename Indexer::slice_indexer>(
+		    static_cast<Owner&>(*this).data_ +
+		    Indexer::root_indexer::template at<false>(idx) * Indexer::slice_indexer::size);
+	}
+
+	constexpr indexed_span<Value, typename Indexer::slice_indexer> slice_at(typename Indexer::root_indexer::index idx)
+	{
+		return indexed_span<Value, typename Indexer::slice_indexer>(static_cast<Owner&>(*this).data_ +
+		                                                            Indexer::root_indexer::template at<true>(idx) *
+		                                                                Indexer::slice_indexer::size);
+	}
+
+	constexpr indexed_span<Value const, typename Indexer::slice_indexer>
+	slice_at(typename Indexer::root_indexer::index idx) const
+	{
+		return indexed_span<Value const, typename Indexer::slice_indexer>(
+		    static_cast<Owner&>(*this).data_ +
+		    Indexer::root_indexer::template at<true>(idx) * Indexer::slice_indexer::size);
 	}
 };
 

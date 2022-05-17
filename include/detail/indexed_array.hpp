@@ -32,13 +32,13 @@ struct has_member_index<T, std::enable_if_t<std::is_class<typename T::checked_ar
 template <typename Value, typename Indexer, typename Owner, typename Index>
 class indexed_array_helper
 {
-  protected:
-	indexed_array_helper() noexcept = default;
+  public:
+	constexpr indexed_array_helper() noexcept = default;
 	~indexed_array_helper() noexcept = default;
-	indexed_array_helper(indexed_array_helper&&) noexcept = default;
-	indexed_array_helper(indexed_array_helper const&) noexcept = default;
-	indexed_array_helper& operator=(indexed_array_helper&&) = default;
-	indexed_array_helper& operator=(indexed_array_helper const&) = default;
+	constexpr indexed_array_helper(indexed_array_helper&&) noexcept = default;
+	constexpr indexed_array_helper(indexed_array_helper const&) noexcept = default;
+	constexpr indexed_array_helper& operator=(indexed_array_helper&&) = default;
+	constexpr indexed_array_helper& operator=(indexed_array_helper const&) = default;
 
   public:
 	using value_type = Value;
@@ -73,7 +73,7 @@ class indexed_array :
 	// specific
 	using indexer = Indexer;
 
-	indexed_array() noexcept = default;
+	constexpr indexed_array() noexcept = default;
 
 	~indexed_array() noexcept = default;
 
@@ -86,11 +86,10 @@ class indexed_array :
 	constexpr indexed_array& operator=(indexed_array<Value, Indexer>&& other) = default;
 
 	// standard constructor
-	template <
-	    typename... Args,
-	    std::enable_if_t<
-	        !has_member_index<boost::mp11::mp_first<boost::mp11::mp_list<Args...> > >::value &&
-	        !std::is_invocable_v<indexed_array(indexed_array const&), Args&&...>, bool> = true>
+	template <typename... Args,
+	          std::enable_if_t<!has_member_index<boost::mp11::mp_first<boost::mp11::mp_list<Args...> > >::value &&
+	                               !std::is_invocable_v<indexed_array(indexed_array const&), Args&&...>,
+	                           bool> = true>
 	constexpr explicit indexed_array(Args&&... list) : data_{std::forward<Args>(list)...}
 	{
 	}
@@ -273,12 +272,12 @@ template <typename Value, typename Indexer, typename Owner, template <class...> 
 class indexed_array_helper<Value, Indexer, Owner, Index<Args...> >
 {
   protected:
-	indexed_array_helper() noexcept = default;
+	constexpr indexed_array_helper() noexcept = default;
 	~indexed_array_helper() noexcept = default;
-	indexed_array_helper(indexed_array_helper&&) noexcept = default;
-	indexed_array_helper(indexed_array_helper const&) noexcept = default;
-	indexed_array_helper& operator=(indexed_array_helper&&) = default;
-	indexed_array_helper& operator=(indexed_array_helper const&) = default;
+	constexpr indexed_array_helper(indexed_array_helper&&) noexcept = default;
+	constexpr indexed_array_helper(indexed_array_helper const&) noexcept = default;
+	constexpr indexed_array_helper& operator=(indexed_array_helper&&) = default;
+	constexpr indexed_array_helper& operator=(indexed_array_helper const&) = default;
 
   public:
 	using value_type = Value;
@@ -303,17 +302,32 @@ class indexed_array_helper<Value, Indexer, Owner, Index<Args...> >
 		auto i = std::apply(indexer::template at<false>, idx);
 		return static_cast<Owner const&>(*this).data_[i];
 	}
-	constexpr indexed_span<Value, typename Indexer::slice_indexer> slice(typename Indexer::root_indexer::index idx)
+	constexpr indexed_span<Value, typename Indexer::slice_indexer>
+	slice(typename Indexer::root_indexer::index idx) noexcept
 	{
-		return indexed_span<Value, typename Indexer::slice_indexer>(
-		    static_cast<Owner&>(*this).data_.data() + Indexer::root_indexer::at(idx) * Indexer::slice_indexer::size);
+		return indexed_span<Value, typename Indexer::slice_indexer>(static_cast<Owner&>(*this).data_.data() +
+		                                                            Indexer::root_indexer::template at<false>(idx) *
+		                                                                Indexer::slice_indexer::size);
 	}
 	constexpr indexed_span<Value const, typename Indexer::slice_indexer>
-	slice(typename Indexer::root_indexer::index idx) const
+	slice(typename Indexer::root_indexer::index idx) const noexcept
 	{
 		return indexed_span<Value const, typename Indexer::slice_indexer>(
 		    static_cast<Owner const&>(*this).data_.data() +
-		    Indexer::root_indexer::at(idx) * Indexer::slice_indexer::size);
+		    Indexer::root_indexer::template at<false>(idx) * Indexer::slice_indexer::size);
+	}
+	constexpr indexed_span<Value, typename Indexer::slice_indexer> slice_at(typename Indexer::root_indexer::index idx)
+	{
+		return indexed_span<Value, typename Indexer::slice_indexer>(static_cast<Owner&>(*this).data_.data() +
+		                                                            Indexer::root_indexer::template at<true>(idx) *
+		                                                                Indexer::slice_indexer::size);
+	}
+	constexpr indexed_span<Value const, typename Indexer::slice_indexer>
+	slice_at(typename Indexer::root_indexer::index idx) const
+	{
+		return indexed_span<Value const, typename Indexer::slice_indexer>(
+		    static_cast<Owner const&>(*this).data_.data() +
+		    Indexer::root_indexer::template at<true>(idx) * Indexer::slice_indexer::size);
 	}
 };
 

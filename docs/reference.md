@@ -142,7 +142,9 @@ Returns a slice of the span, at the given index. For multidimensional spans of e
 `indexed_span` of extent `n-1`. For single dimension span, it returns the element at the given
 index. `slice` does not do any bound checking, `slice_at` throws `std::out_of_range` on error.
 
-## sets of value
+## Sets of value
+
+### interval
 
 ```cpp
 template <auto minInclusive, type_identity_t<decltype(minInclusive)> maxInclusive>
@@ -153,13 +155,17 @@ Represent a contiguous inclusive interval of all values between `minInclusive` a
 `maxInclusive` (thus, it contains `maxInclusive - minInclusive + 1` elements). This
 type is a marker meant to be used with `default_indexer`.
 
+### union\_of
+
 ```cpp
 template <typename... Args>
 /* */ union_of = typename to_integer_sequence<typename union_of_helper<Args...>::type>::type;
 ```
 
-Represent the union of several sets of value (either `interval` or `integer_sequence`). The
+Represent the union of several sets of value (either `interval`, `integer_sequence` or `single_value`). The
 result is always an `integer_sequence`.
+
+### single\_value
 
 ```cpp
 template <auto T1>

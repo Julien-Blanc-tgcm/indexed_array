@@ -12,7 +12,7 @@ The library is designed around a single template type, which gave its name to th
 `indexed_array`. It is defined as follows:
 
 ```cpp
-template<typename Value, typename Indexer>
+template <typename Value, typename Indexer>
 class indexed_array
 ```
 
@@ -39,7 +39,7 @@ provides an implementation, called `default_indexer`, which should be suitable f
 few helper types used to customize the `default_indexer`.
 
 ```cpp
-template<typename Index, typename T = void>
+template <typename Index, typename T = void>
 struct default_indexer
 { // default implementation is empty
 };
@@ -56,26 +56,26 @@ In several situations (index computations), we want to handle integral types and
 one of the first thing we do is define the following helper:
 
 ```cpp
-template·<typename·T,·T·value,·typename·U·=·void>
-struct·integral_value
+template <typename T, T value, typename U = void>
+struct integral_value
 {
 };
 
-template·<typename·T,·T·v>
-struct·integral_value<T,·v,·std::enable_if_t<std::is_integral<T>::value,·void>·>
+template <typename T, T v>
+struct integral_value<T, v, std::enable_if_t<std::is_integral<T>::value, void> >
 {
-→   static·inline·constexpr·T·value·=·v;
+	static inline constexpr T value = v;
 };
 
-template·<typename·T,·T·v>
-struct·integral_value<T,·v,·std::enable_if_t<std::is_enum<T>::value,·void>·>
+template <typename T, T v>
+struct integral_value<T, v, std::enable_if_t<std::is_enum<T>::value, void> >
 {
-→   static·inline·constexpr·typename·std::underlying_type<T>::type·value·=
-→   ····static_cast<typename·std::underlying_type<T>::type>(v);
+	static inline constexpr typename std::underlying_type<T>::type value =
+	    static_cast<typename std::underlying_type<T>::type>(v);
 };
 
-template<auto·C>
-static·inline·constexpr·auto·const·integral_value_v·=·integral_value<decltype(C),·C>::value;
+template<auto C>
+static inline constexpr auto const integral_value_v = integral_value<decltype(C), C>::value;
 ```
 
 This will allow us to convert enum values to their underlying integral type, both at compile and

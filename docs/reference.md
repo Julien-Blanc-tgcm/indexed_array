@@ -9,7 +9,7 @@ https://www.boost.org/LICENSE_1_0.txt
 ## indexed\_array
 
 ```cpp
-template<typename Value, typename Indexer>
+template <typename Value, typename Indexer>
 /* */ indexed_array
 ```
 
@@ -173,3 +173,6 @@ template <auto T1>
 ```
 
 Represent a single value, meant to be used with `union_of` helper.
+
+
+Back to the [Index](index.md)

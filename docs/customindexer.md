@@ -42,3 +42,26 @@ struct reverse_fibonnaci_index
 	}
 };
 ```
+
+## Multidimensional indexer
+
+The multidimensional indexer must provide two additional members:
+
+* `root_indexer`, which is the indexer for the top-level dimensions
+* `slice_indexer`, which is the indexer for the remaining dimensions
+
+```
+// 3-dimensional indexer with top-level reverse fibonnaci indexing
+struct fib_multidim_indexer
+{
+	using index = mp_list<int, int, int>;
+	using root_indexer = reverse_fibonnaci_index;
+	using slice_indexer = make_default_indexer<interval<3, 12>, interval<-3, 2>>;
+	inline static constexpr size_t const size = root_indexer::size * slice_indexer::size;
+	template<bool b>
+	static constexpr auto at(int v1, int v2, int v3) noexcept(!b)
+	{
+		return root_indexer::at<b>(v1) * slice_indexer::size + slice_indexer::at<b>(v2, v3);
+	};
+};
+```

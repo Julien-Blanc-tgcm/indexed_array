@@ -174,5 +174,27 @@ template <auto T1>
 
 Represent a single value, meant to be used with `union_of` helper.
 
+## make\_default\_indexer
+
+```cpp
+template <typename... Args>
+/* */ make_default_indexer
+```
+
+The `make_default_indexer` template is an helper class to define indexers. Its usage is not necessary
+when using `indexed_array` or `indexed_span`, but is when defining a custom indexer (see 
+[Custom index](customindexer.md).
+
+`indexed_array<int, X>` is an alias for `indexed_array<int, make_default_indexer<X>>` if `X` is not
+already itself an indexer. The following must hold:
+
+```cpp
+static_assert(std::is_same<
+    indexed_array<char, interval<-2, 3>>,
+    indexed_array<char, make_default_indexer<interval<-2, 3>>>
+    >::value);
+```
+
+`default_indexer` is defined for `describe`-d enums, `interval`s and `integer_sequence`s.
 
 Back to the [Index](index.md)

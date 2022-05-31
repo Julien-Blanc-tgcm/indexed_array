@@ -204,7 +204,7 @@ way to define a multidimensional indexer (and is what is used by variadic `index
 using multidim_indexer = make_default_indexer<interval<-2, 3>, interval<-5, 6>, my_described_enum>;
 static_assert(std::is_same<
     indexed_array<char, multidim_indexer>,
-    indexed_array<char, make_default_indexer<interval<-2, 3>, interval<-5, 6>, my_described_enum>>
+    indexed_array<char, interval<-2, 3>, interval<-5, 6>, my_described_enum>
     >::value);
 ```
 

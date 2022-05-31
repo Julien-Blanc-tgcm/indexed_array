@@ -19,20 +19,26 @@ it is given an invalid index. This method may be `noexcept(!b)`.
 This is an example of a custom index:
 
 ```cpp
-struct custom_index
+struct reverse_fibonnaci_index
 {
 	using index = int;
-	inline static constexpr size_t const size = 4;
-	template <bool>
-	static constexpr auto at(index v) noexcept
+	inline static constexpr size_t const size = 5;
+	template <bool b>
+	static constexpr auto at(index v) noexcept(!b)
 	{
-		if (v <= 0)
+		if (v == 1)
 			return 0;
-		if (v < 10)
+		if (v == 2)
 			return 1;
-		if (v < 20)
+		if (v == 3)
 			return 2;
-		return 3;
+		if (v == 5)
+			return 3;
+		if (v == 8)
+			return 4;
+		if constexpr(b)
+			throw std::out_of_range("invalid index");
+		return -1; // this value may be catched by other tools when accessing underlying array
 	}
 };
 ```

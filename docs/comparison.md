@@ -47,24 +47,29 @@ you don't have any control on the order of the elements.
 * there is no triviality propagation
 * there are no guarantees on the size of the data structure. An `unordered_map` of 4 pairs of int values
 takes already more than 150 bytes.
+* being inherently a map, it stores both the keys and the values. This is different from `indexed_array`,
+which stores only the values.
 * there is no unchecked access, only the throwing at() function is provided
 
 # Feature table comparison
 
-| Feature \ Library | `indexed_array` | `std::array` | `std::unordered_map` | Boost.MultiIndex | Frozen |
-|:------------------|:---------------:|:------------:|:--------------------:|:----------------:|:------:|
-| Index via arbitrary values |    ✓  |  -            |    ✓                 |    ✓             |   ✓    |
-| Contiguity of elements     |    ✓  |  ✓            |    -                 |    -             |   -    |
-| Triviality propagation     |    ✓  |  ✓            |    -                 |    -             |   -    |
-| No heap allocation         |    ✓  |  ✓            |    -                 |    -             |   ✓    |
-| Can reside in ro sections / flash memory |  ✓  | ✓ |    -                 |    -             |   ?³   |
-| No size overhead  |      ✓         |   ✓           |    -                 |    -             |   -    |
-| Safe initialization |    ✓         |     -         |      partial²        |     -            |   ✓    |
-| Multidimensional support | ✓       |     -         |        -             |     ✓            |   -    |
-| Dynamic size     |    -            |     -         |        ✓             |     ✓            |   -    |
-| Guaranted O(1) access | ✓/-¹   |     ✓         |        ✓             |     ✓            |   ✓    |
-| Minimum C++ version |  `C++17`      |  `C++11`      |    `C++03`           |  `C++03`         | `C++14` |
-
+| Feature \ Library | `indexed_array` | `std::array` | `std::unordered_map` | Boost.MultiIndex | Frozen  |
+|:------------------|:---------------:|:------------:|:--------------------:|:----------------:|:-------:|
+| Index via arbitrary values |    ✓  |  -            |    ✓                 |    ✓             |   ✓     |
+| Sparse indexes             |    ✓  |          -    |    ✓                 |    ✓             |   ✓     |
+| Contiguity of elements     |    ✓  |  ✓            |    -                 |    -             |   -     |
+| Triviality propagation     |    ✓  |  ✓            |    -                 |    -             |   -     |
+| No heap allocation         |    ✓  |  ✓            |    -                 |    -             |   ✓     |
+| Can reside in ro sections / flash memory |  ✓  | ✓ |    -                 |    -             |   ?³    |
+| No size overhead  |      ✓         |   ✓           |    -                 |    -             |   -     |
+| Safe initialization |    ✓         |     -         |      partial²        |     -            |   ✓     |
+| Multidimensional support | ✓       |     -         |        -             |     ✓            |   -     |
+| Dynamic size     |    -            |     -         |        ✓             |     ✓            |   -     |
+| Guaranted O(1) access     | ✓/-¹   |     ✓         |        ✓             |     ✓            |   ✓     |
+| Iterate both key/values   |  -     |     -         |        ✓             |     ✓            |   ✓     |
+| Raw access to underlying buffer | ✓ |    ✓         |        -             |     -            |   -     |
+| Type safe indexes⁴  |    ✓         |     -         |        ✓             |     ✓            |   ✓     |
+| Minimum C++ version |  `C++17`     |  `C++11`      |    `C++03`           |  `C++03`         | `C++14` |
 
 ¹: Access guarantees depends on indexer template parameter. O(1) access is guaranted by the default indexer
 if the index is a contiguous range of elements (no gaps between the successive values). If that's not the
@@ -72,7 +77,11 @@ case, the current implementation use O(n) access. This could be improved to O(lo
 for great values of n.
 
 ²: `std::unordered_map` initialization mechanism will prevent any order fiasco, with the value being associated
-to the wrong key due to a refactory. However, you don't have any size check.
+to the wrong key due to a refactor. However, you don't have any size check.
 
 ³: I think it could theoretically reside in ro section, but for some reasons that does not seem to be the case
 with the tests i made. I'm leaving it as unsure for now, as it may just be some bad usage.
+
+⁴: Type safe index means that you cannot access the content using a value of a wrong type. While technically,
+you can't access an `std::array` content with anything else than a `size_t`, this is a too generic type to be
+considered type safe.

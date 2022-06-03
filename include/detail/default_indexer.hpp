@@ -17,7 +17,6 @@
 
 namespace jbc::indexed_array::detail
 {
-using namespace std;
 namespace describe = boost::describe;
 namespace mp11 = boost::mp11;
 

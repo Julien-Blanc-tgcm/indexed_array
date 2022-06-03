@@ -53,16 +53,16 @@ takes already more than 150 bytes.
 
 | Feature \ Library | `indexed_array` | `std::array` | `std::unordered_map` | Boost.MultiIndex | Frozen |
 |:------------------|:---------------:|:------------:|:--------------------:|:----------------:|:------:|
-| Index via arbitrary values |    -  |  ✓            |    ✓                 |    ✓             |   ✓    |
+| Index via arbitrary values |    ✓  |  -            |    ✓                 |    ✓             |   ✓    |
 | Contiguity of elements     |    ✓  |  ✓            |    -                 |    -             |   -    |
 | Triviality propagation     |    ✓  |  ✓            |    -                 |    -             |   -    |
 | No heap allocation         |    ✓  |  ✓            |    -                 |    -             |   ✓    |
-| Can reside in ro sections / flash memory |  ✓  | ✓ |    -                 |    -             |   ?    |
+| Can reside in ro sections / flash memory |  ✓  | ✓ |    -                 |    -             |   ?³   |
 | No size overhead  |      ✓         |   ✓           |    -                 |    -             |   -    |
-| Safe initialization |    ✓         |     -         |      partial         |     -            |   ✓    |
+| Safe initialization |    ✓         |     -         |      partial²        |     -            |   ✓    |
 | Multidimensional support | ✓       |     -         |        -             |     ✓            |   -    |
 | Dynamic size     |    -            |     -         |        ✓             |     ✓            |   -    |
-| Guaranted O(1) access | partial¹   |     ✓         |        ✓             |     ✓            |   ✓    |
+| Guaranted O(1) access | ✓/-¹   |     ✓         |        ✓             |     ✓            |   ✓    |
 | Minimum C++ version |  `C++17`      |  `C++11`      |    `C++03`           |  `C++03`         | `C++14` |
 
 
@@ -71,3 +71,8 @@ if the index is a contiguous range of elements (no gaps between the successive v
 case, the current implementation use O(n) access. This could be improved to O(log(n)) in a further release,
 for great values of n.
 
+²: `std::unordered_map` initialization mechanism will prevent any order fiasco, with the value being associated
+to the wrong key due to a refactory. However, you don't have any size check.
+
+³: I think it could theoretically reside in ro section, but for some reasons that does not seem to be the case
+with the tests i made. I'm leaving it as unsure for now, as it may just be some bad usage.

@@ -45,7 +45,8 @@ auto& val = my_data[index];
 ```
 
 This makes it clear both what the index is (being a strongly typed enum), the range of acceptable
-values, and avoids any mistakes like forgetting to apply an offset.
+values, and avoids any mistakes like forgetting to apply an offset or incorrectly using a wrongly
+typed variable as the index.
 
 Non-contiguous indexing is a nice feature if you need to handle special values, or are handling both
 normative values and manufacturer specific extensions.
@@ -111,7 +112,8 @@ We can, of course, associate nearly anything this way, including function object
 further customize a reply.
 
 One important feature is that if someone decide that we now must handle the `304 NotModified` status code,
-and add it to the `http_status` enum, the `http_messages` array will now fail to compile.
+and add it to the `http_status` enum, the `http_messages` array will now fail to compile until we add the
+relevant error message.
 
 ### Storing base addresses for different devices
 
@@ -188,6 +190,61 @@ And use it like that in our driver
 auto address = i2c_base_address[{current_chip, current_device}] + 
                i2c_register_offset[{current_chip, i2c_register::set_clock}];
 ```
+
+### Strongly typed index for multidimensional arrays
+
+Let's say we have the following class, with multiple 3-dimensional array:
+
+```cpp
+// xyz indexing
+std::array<std::array<std::array<float, 100>, 200>, 300> initial_data;
+// beware: for performance reason, this array is indexed differently (z is first, zyx)
+std::array<std::array<std::array<float, 300>, 200>, 100> calculation_result;
+```
+
+So, we now have a recipe for disasters. Two arrays with different indexing schemes at
+the same place. We assume a good design, this is not visible in the public interface. But
+what about preventing mistakes when someone touches the implementation? Making it impossible
+to write something like:
+
+```cpp
+float get_calculation_result(int coord_x, int coord_y, int coord_z)
+{
+	return calculation_result[coord_x][coord_y][coord_z]; // oops
+}
+```
+
+Let's make that more explicit:
+
+```cpp
+enum class x_coordinate : std::size_t {}; // strongly typed alias
+enum class y_coordinate : std::size_t {};
+enum class z_coordinate : std::size_t {};
+
+indexed_array<float, interval<x_coordinate{0}, x_coordinate{299}>, 
+                     interval<y_coordinate{0}, y_coordinate{199}>,
+                     interval<z_coordinate{0}, z_coordinate{99}>> initial_data;
+indexed_array<float, interval<z_coordinate{0}, z_coordinate{99}>, 
+                     interval<y_coordinate{0}, y_coordinate{199}>,
+                     interval<x_coordinate{0}, x_coordinate{299}>> calculation_result;
+
+// for convenience, we add this into our cpp file
+using x = x_coordinate;
+using y = y_coordinate;
+using z = z_coordinate;
+```
+
+Now, accesses to array content must be done using the following syntax:
+
+```cpp
+float get_calculation_result(int coord_x, int coord_y, int coord_z)
+{
+	// return calculation_result[{x{coord_x}, y{coord_y}, z{coord_z}}]; // does not compile
+	return calculation_result[{z{coord_z}, y{coord_y}, x{coord_x}}]; // we fixed the bug
+}
+```
+
+This check is done purely at compile time, and will not incurs any runtime cost.
 
 ## Supported Compilers
 

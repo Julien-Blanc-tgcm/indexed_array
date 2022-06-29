@@ -246,6 +246,17 @@ float get_calculation_result(int coord_x, int coord_y, int coord_z)
 
 This check is done purely at compile time, and will not incurs any runtime cost.
 
+## Integration with enum reflection libraries
+
+Out of the box, `indexed_array` has support for the following enum reflection libraries:
+
+* [Boost Describe](https://www.boost.org/doc/libs/1_79_0/libs/describe/doc/html/describe.html)
+* [Magic Enum](https://github.com/Neargye/magic_enum)
+* [Wise Enum](https://github.com/quicknir/wise_enum)
+
+To enable the integration, you must define the relevant `INDEXED_ARRAY_HAS_[DESCRIBE|MAGIC_ENUM|WISE_ENUM]` macro
+when compiling.
+
 ## Supported Compilers
 
 * GCC 9 and later

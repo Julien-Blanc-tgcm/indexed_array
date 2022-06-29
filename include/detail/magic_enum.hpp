@@ -43,6 +43,6 @@ struct default_indexer<Enum, typename std::enable_if_t<has_magic_enum<Enum>::val
 	}
 };
 
-} // jbc::indexed_array::detail
-#endif // JBC_INDEXED_ARRAY_MAGIC_ENUM_H
+} // namespace jbc::indexed_array::detail
 
+#endif // JBC_INDEXED_ARRAY_MAGIC_ENUM_H

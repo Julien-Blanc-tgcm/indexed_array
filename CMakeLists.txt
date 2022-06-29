@@ -5,6 +5,7 @@
 cmake_minimum_required(VERSION 3.5)
 
 set(BOOSTROOT "$ENV{HOME}/development/boost_1.78" CACHE STRING "Where to find boost")
+set(MAGICENUM "$ENV{HOME}/development/magic_enum" CACHE STRING "Where to find magic enum")
 
 project(indexed_array LANGUAGES CXX)
 
@@ -14,6 +15,7 @@ enable_testing()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 
 add_executable(indexed_array "main.cpp" 
 	"include/indexed_array.hpp"
@@ -27,6 +29,7 @@ add_executable(indexed_array "main.cpp"
 	"include/detail/union_of.hpp"
 )
 target_compile_options(indexed_array PRIVATE -Wall -Wextra -Werror)
-target_include_directories(indexed_array PRIVATE ${Boost_INCLUDE_DIRS})
+target_include_directories(indexed_array PRIVATE ${Boost_INCLUDE_DIRS} ${MAGICENUM}/include )
+target_compile_definitions(indexed_array PRIVATE -DINDEXED_ARRAY_HAS_DESCRIBE)
 
 add_subdirectory(tests)

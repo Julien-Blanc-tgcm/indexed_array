@@ -11,6 +11,17 @@
 #include "detail/is_contiguous.hpp"
 #include "detail/union_of.hpp"
 
+#if defined(INDEXED_ARRAY_HAS_MAGIC_ENUM) && defined(INDEXED_ARRAY_HAS_DESCRIBE)
+#error "Compiling with both describe and magic enum support is not supported"
+#endif
+
+#ifdef INDEXED_ARRAY_HAS_DESCRIBE
+#include "detail/describe.hpp"
+#endif
+#ifdef INDEXED_ARRAY_HAS_MAGIC_ENUM
+#include "detail/magic_enum.hpp"
+#endif
+
 namespace jbc::indexed_array
 {
 

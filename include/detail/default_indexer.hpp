@@ -12,12 +12,10 @@
 #include <type_traits>
 
 #include <boost/config.hpp> // for BOOST_UNLIKELY
-#include <boost/describe.hpp>
 #include <boost/mp11.hpp>
 
 namespace jbc::indexed_array::detail
 {
-namespace describe = boost::describe;
 namespace mp11 = boost::mp11;
 
 template <class T>
@@ -118,30 +116,6 @@ struct default_indexer<
 			return std::numeric_limits<std::size_t>::max(); // return an invalid value
 		}
 		return ret;
-	}
-};
-
-template <typename... Args>
-struct describe_to_integer_sequence
-{
-};
-
-template <typename Enum, template <class...> typename L, typename... Args>
-struct describe_to_integer_sequence<Enum, L<Args...> >
-{
-	using type = std::integer_sequence<Enum, Args::value...>;
-};
-
-template <typename Enum>
-struct default_indexer<Enum, typename std::enable_if_t<boost::describe::has_describe_enumerators<Enum>::value, void> >
-{
-	using helper_list_type = typename describe_to_integer_sequence<Enum, describe::describe_enumerators<Enum> >::type;
-	using index = Enum;
-	static inline constexpr auto const size = default_indexer<helper_list_type>::size;
-	template <bool throws_on_error = false>
-	static constexpr auto at(Enum v) noexcept(!throws_on_error)
-	{
-		return default_indexer<helper_list_type>::template at<throws_on_error>(v);
 	}
 };
 

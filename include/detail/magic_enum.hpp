@@ -12,16 +12,20 @@
 namespace jbc::indexed_array::detail
 {
 
-/*template <typename... Args>
-struct magic_enum_to_integer_sequence
+template <typename E, typename I>
+struct values_sequence_helper
 {
 };
 
-template <typename Enum, template <class...> typename L, typename... Args>
-struct magic_enum_to_integer_sequence<Enum, L<Args...> >
+template <typename E, std::size_t... I>
+struct values_sequence_helper<E, std::integer_sequence<std::size_t, I...> >
 {
-	using type = std::integer_sequence<Enum, Args::value...>;
-}; */
+	using type = std::integer_sequence<E, magic_enum::enum_value<E>(I)...>;
+};
+
+template <typename E>
+using values_sequence =
+    typename values_sequence_helper<E, std::make_index_sequence<magic_enum::enum_count<E>()> >::type;
 
 template <typename T>
 using has_magic_enum = std::is_enum<T>;
@@ -29,7 +33,7 @@ using has_magic_enum = std::is_enum<T>;
 template <typename Enum>
 struct default_indexer<Enum, typename std::enable_if_t<has_magic_enum<Enum>::value, void> >
 {
-	using helper_list_type = magic_enum::values_sequence<Enum>;
+	using helper_list_type = values_sequence<Enum>;
 	using index = Enum;
 	static inline constexpr auto const size = default_indexer<helper_list_type>::size;
 	template <bool throws_on_error = false>

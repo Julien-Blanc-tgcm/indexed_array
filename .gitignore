@@ -1,3 +1,4 @@
 *.backup
 CMakeLists.txt.user
 *.swp
+magic_enum

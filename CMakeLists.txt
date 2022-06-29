@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.5)
 
 set(BOOSTROOT "$ENV{HOME}/development/boost_1.78" CACHE STRING "Where to find boost")
-set(MAGICENUM "$ENV{HOME}/development/magic_enum" CACHE STRING "Where to find magic enum")
+set(MAGICENUM "${CMAKE_CURRENT_SOURCE_DIR}/magic_enum" CACHE STRING "Where to find magic enum")
 
 project(indexed_array LANGUAGES CXX)
 
@@ -26,6 +26,7 @@ add_executable(indexed_array "main.cpp"
 	"include/detail/indexed_span.hpp"
 	"include/detail/is_contiguous.hpp"
 	"include/detail/is_indexer.hpp"
+	"include/detail/magic_enum.hpp"
 	"include/detail/union_of.hpp"
 )
 target_compile_options(indexed_array PRIVATE -Wall -Wextra -Werror)

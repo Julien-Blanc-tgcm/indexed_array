@@ -14,12 +14,18 @@
 #if defined(INDEXED_ARRAY_HAS_MAGIC_ENUM) && defined(INDEXED_ARRAY_HAS_DESCRIBE)
 #error "Compiling with both describe and magic enum support is not supported"
 #endif
+#if defined(INDEXED_ARRAY_HAS_MAGIC_ENUM) && defined(INDEXED_ARRAY_HAS_WISE_ENUM)
+#error "Compiling with both wise enum and magic enum support is not supported"
+#endif
 
 #ifdef INDEXED_ARRAY_HAS_DESCRIBE
 #include "detail/describe.hpp"
 #endif
 #ifdef INDEXED_ARRAY_HAS_MAGIC_ENUM
 #include "detail/magic_enum.hpp"
+#endif
+#ifdef INDEXED_ARRAY_HAS_WISE_ENUM
+#include "detail/wise_enum.hpp"
 #endif
 
 namespace jbc::indexed_array

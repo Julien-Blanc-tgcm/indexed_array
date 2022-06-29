@@ -16,6 +16,8 @@ here to distinguish between throwing (`b` is `true`)/ non-throwing (`b` is `fals
 versions. The indexer shall raise an `out_of_range` exception when `b` is `true` and
 it is given an invalid index. This method may be `noexcept(!b)`.
 
+## Example
+
 This is an example of a custom index:
 
 ```cpp
@@ -65,3 +67,5 @@ struct fib_multidim_indexer
 	};
 };
 ```
+
+## Customizing with a custom enum-like type

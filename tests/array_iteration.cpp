@@ -104,3 +104,32 @@ BOOST_AUTO_TEST_CASE(reverse_const_iteration)
 		BOOST_TEST(*it == std::to_string(--i));
 	}
 }
+
+using Base = indexed_array<int, Color>;
+
+constexpr decltype(auto) third_item(Base const& b)
+{
+	return b.begin() + 2;
+}
+
+
+BOOST_AUTO_TEST_CASE(constexpr_iteration)
+{
+	constexpr Base b{0, 1, 2, 3, 4};
+	static_assert(*third_item(b) == 2);
+	BOOST_TEST(*third_item(b) == 2);
+	static_assert(std::distance(b.begin(), b.end()) == 5);
+	BOOST_TEST(std::distance(b.begin(), b.end()) == 5);
+}
+
+constexpr int f(Base b)
+{
+	b[Color::Blue] = 12;
+	return b[Color::Blue];
+}
+
+BOOST_AUTO_TEST_CASE(constexpr_alteration)
+{
+	static_assert(f(Base{0, 1, 2, 3, 4}) == 12);
+	BOOST_TEST(f(Base{0, 1, 2, 3, 4}) == 12);
+}

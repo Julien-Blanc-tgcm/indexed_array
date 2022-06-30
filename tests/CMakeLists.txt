@@ -29,6 +29,7 @@ add_single_test(indexer indexer.cpp)
 add_single_test(indexed_span indexed_span.cpp)
 add_single_test(array_operations array_operations.cpp)
 add_single_test(copy_operations copy_operations.cpp)
+add_single_test(non_default_constructible non_default_constructible.cpp)
 
 set(definitions -DINDEXED_ARRAY_HAS_MAGIC_ENUM)
 add_single_test(magic_enum magic_enum.cpp)

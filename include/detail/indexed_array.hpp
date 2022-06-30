@@ -107,51 +107,51 @@ class indexed_array :
 	using indexed_array_helper<Value, Indexer, indexed_array<Value, Indexer>, typename Indexer::index>::operator[];
 
 	// standard array operations
-	auto begin()
+	constexpr decltype(auto) begin()
 	{
 		return data_.begin();
 	}
-	auto begin() const
+	constexpr decltype(auto) begin() const
 	{
 		return data_.begin();
 	}
-	auto cbegin() const
+	constexpr decltype(auto) cbegin() const
 	{
 		return data_.cbegin();
 	}
-	auto end()
+	constexpr decltype(auto) end()
 	{
 		return data_.end();
 	}
-	auto end() const
+	constexpr decltype(auto) end() const
 	{
 		return data_.end();
 	}
-	auto cend() const
+	constexpr decltype(auto) cend() const
 	{
 		return data_.cend();
 	}
-	auto rbegin()
+	constexpr decltype(auto) rbegin()
 	{
 		return data_.rbegin();
 	}
-	auto rbegin() const
+	constexpr decltype(auto) rbegin() const
 	{
 		return data_.rbegin();
 	}
-	auto crbegin() const
+	constexpr decltype(auto) crbegin() const
 	{
 		return data_.crbegin();
 	}
-	auto rend()
+	constexpr decltype(auto) rend()
 	{
 		return data_.rend();
 	}
-	auto rend() const
+	constexpr decltype(auto) rend() const
 	{
 		return data_.rend();
 	}
-	auto crend() const
+	constexpr decltype(auto) crend() const
 	{
 		return data_.crend();
 	}

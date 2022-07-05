@@ -26,7 +26,8 @@ struct describe_to_integer_sequence<Enum, L<Args...> >
 template <typename Enum>
 struct default_indexer<Enum, typename std::enable_if_t<boost::describe::has_describe_enumerators<Enum>::value, void> >
 {
-	using helper_list_type = typename describe_to_integer_sequence<Enum, boost::describe::describe_enumerators<Enum> >::type;
+	using helper_list_type =
+	    typename describe_to_integer_sequence<Enum, boost::describe::describe_enumerators<Enum> >::type;
 	using index = Enum;
 	static inline constexpr auto const size = default_indexer<helper_list_type>::size;
 	template <bool throws_on_error = false>
@@ -36,5 +37,12 @@ struct default_indexer<Enum, typename std::enable_if_t<boost::describe::has_desc
 	}
 };
 
-} // jbc::indexed_array::detail
+template <typename Enum>
+struct create_list_helper<
+    default_indexer<Enum, typename std::enable_if_t<boost::describe::has_describe_enumerators<Enum>::value, void> > >
+{
+	using type = typename create_list_helper<default_indexer<typename default_indexer<Enum>::helper_list_type> >::type;
+};
+
+} // namespace jbc::indexed_array::detail
 #endif // JBC_INDEXED_ARRAY_DETAIL_DESCRIBE_H

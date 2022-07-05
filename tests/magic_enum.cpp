@@ -28,3 +28,15 @@ BOOST_AUTO_TEST_CASE(subindexer)
 	BOOST_TEST(b[Color::Red] == 1);
 	BOOST_TEST(b[Color::Black] == 4);
 }
+
+BOOST_AUTO_TEST_CASE(foreach)
+{
+	using Base = indexed_array<int, Color>;
+	Base b{1, 2, 3, 4, 5};
+	int i = 1;
+	for_each(b, [&i, &b](Color key, int& val) {
+		BOOST_TEST(val == i);
+		BOOST_TEST(b[key] == i);
+		i += 1;
+	});
+}

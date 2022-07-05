@@ -43,6 +43,12 @@ struct default_indexer<Enum, typename std::enable_if_t<has_magic_enum<Enum>::val
 	}
 };
 
+template <typename Enum>
+struct create_list_helper<default_indexer<Enum, typename std::enable_if_t<has_magic_enum<Enum>::value, void> > >
+{
+	using type = typename create_list_helper<default_indexer<typename default_indexer<Enum>::helper_list_type> >::type;
+};
+
 } // namespace jbc::indexed_array::detail
 
 #endif // JBC_INDEXED_ARRAY_MAGIC_ENUM_H

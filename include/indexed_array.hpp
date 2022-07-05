@@ -7,6 +7,7 @@
 
 #include "detail/checked_arg.hpp"
 #include "detail/default_indexer.hpp"
+#include "detail/foreach.hpp"
 #include "detail/indexed_array.hpp"
 #include "detail/is_contiguous.hpp"
 #include "detail/union_of.hpp"
@@ -42,6 +43,12 @@ using indexed_span = detail::indexed_span<Value, detail::to_single_indexer_t<Ind
 
 template <typename... Args>
 using make_default_indexer = detail::to_single_indexer_t<Args...>;
+
+template <typename T, typename Func>
+void for_each(T&& container, Func&& func)
+{
+	return detail::for_each_<std::decay_t<T>, Func>::apply(std::forward<Func>(func), std::forward<T>(container));
+}
 
 namespace detail
 {

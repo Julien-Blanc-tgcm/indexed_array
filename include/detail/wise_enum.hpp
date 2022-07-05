@@ -40,6 +40,13 @@ struct default_indexer<Enum, typename std::enable_if_t<wise_enum::is_wise_enum<E
 	}
 };
 
+template <typename Enum>
+struct create_list_helper<
+    default_indexer<Enum, typename std::enable_if_t<wise_enum::is_wise_enum<Enum>::value, void> > >
+{
+	using type = typename create_list_helper<default_indexer<typename default_indexer<Enum>::helper_list_type> >::type;
+};
+
 } // namespace jbc::indexed_array::detail
 
 #endif // JBC_INDEXED_ARRAY_WISE_ENUM_H

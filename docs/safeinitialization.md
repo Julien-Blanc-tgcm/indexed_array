@@ -16,8 +16,8 @@ a long explanation:
 BOOST_DEFINE_ENUM_CLASS(Color, red, blue, green, black);
 indexed_array<int, interval<Color>> values { 
     0xFF0000,
-    0x00FF00, // whoops
-    0x0000FF, // whoops
+    0x00FF00, // whoops, this is the value for green
+    0x0000FF, // whoops, this is the value for blue
     0x0 };
 ```
 

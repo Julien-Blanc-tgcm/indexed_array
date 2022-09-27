@@ -54,14 +54,14 @@ template <auto T1, int T2>
 static inline constexpr auto sum_of_v = sum_of<T1, T2>::value;
 
 template <typename... Args>
-struct to_integer_sequence
+struct to_value_sequence
 {
 };
 
 template <typename T, T... values>
-struct to_integer_sequence<mp11::mp_list<std::integral_constant<T, values>...> >
+struct to_value_sequence<mp11::mp_list<std::integral_constant<T, values>...> >
 {
-	using type = std::integer_sequence<T, values...>;
+	using type = value_sequence<T, values...>;
 };
 
 template <typename... Args>
@@ -87,7 +87,7 @@ struct union_of_helper<std::integral_constant<decltype(T1), T1>, Args...>
 };
 
 template <typename... Args>
-using union_of = typename to_integer_sequence<typename union_of_helper<Args...>::type>::type;
+using union_of = typename to_value_sequence<typename union_of_helper<Args...>::type>::type;
 
 template <auto T1>
 using single_value = std::integral_constant<decltype(T1), T1>;

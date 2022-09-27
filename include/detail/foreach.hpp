@@ -20,7 +20,7 @@ struct create_list_helper
 };
 
 template <auto first, type_identity_t<decltype(first)>... idx>
-struct create_list_helper<default_indexer<std::integer_sequence<decltype(first), first, idx...> > >
+struct create_list_helper<default_indexer<value_sequence<decltype(first), first, idx...> > >
 {
 	using type = boost::mp11::mp_list<std::integral_constant<decltype(first), first>,
 	                                  std::integral_constant<decltype(first), idx>...>;

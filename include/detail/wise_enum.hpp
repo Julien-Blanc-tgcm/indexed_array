@@ -20,7 +20,7 @@ struct wise_enum_values_sequence_helper
 template <typename E, std::size_t... I>
 struct wise_enum_values_sequence_helper<E, std::integer_sequence<std::size_t, I...> >
 {
-	using type = std::integer_sequence<E, wise_enum::enumerators<E>::range[I].value...>;
+	using type = value_sequence<E, wise_enum::enumerators<E>::range[I].value...>;
 };
 
 template <typename E>

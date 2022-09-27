@@ -13,21 +13,21 @@ namespace jbc::indexed_array::detail
 {
 
 template <typename... Args>
-struct describe_to_integer_sequence
+struct describe_to_value_sequence
 {
 };
 
 template <typename Enum, template <class...> typename L, typename... Args>
-struct describe_to_integer_sequence<Enum, L<Args...> >
+struct describe_to_value_sequence<Enum, L<Args...> >
 {
-	using type = std::integer_sequence<Enum, Args::value...>;
+	using type = value_sequence<Enum, Args::value...>;
 };
 
 template <typename Enum>
 struct default_indexer<Enum, typename std::enable_if_t<boost::describe::has_describe_enumerators<Enum>::value, void> >
 {
 	using helper_list_type =
-	    typename describe_to_integer_sequence<Enum, boost::describe::describe_enumerators<Enum> >::type;
+	    typename describe_to_value_sequence<Enum, boost::describe::describe_enumerators<Enum> >::type;
 	using index = Enum;
 	static inline constexpr auto const size = default_indexer<helper_list_type>::size;
 	template <bool throws_on_error = false>

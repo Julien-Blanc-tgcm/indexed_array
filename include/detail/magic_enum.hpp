@@ -20,7 +20,7 @@ struct values_sequence_helper
 template <typename E, std::size_t... I>
 struct values_sequence_helper<E, std::integer_sequence<std::size_t, I...> >
 {
-	using type = std::integer_sequence<E, magic_enum::enum_value<E>(I)...>;
+	using type = value_sequence<E, magic_enum::enum_value<E>(I)...>;
 };
 
 template <typename E>

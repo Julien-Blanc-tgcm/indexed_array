@@ -92,4 +92,9 @@ BOOST_AUTO_TEST_CASE(integerlist_contiguous_indexing)
 	BOOST_TEST(arr[4] == "toto");
 }
 
+BOOST_AUTO_TEST_CASE(integerlist_empty_sequence)
+{
+	indexed_array<std::string, std::integer_sequence<int>> arr{};
+	BOOST_TEST(arr.size() == 0);
+}
 

@@ -7,6 +7,7 @@
 
 #include "is_contiguous.hpp"
 #include "is_indexer.hpp"
+#include "value_sequence.hpp"
 
 #include <stdexcept>
 #include <type_traits>
@@ -33,6 +34,8 @@ struct interval
 	using type = decltype(minInclusive);
 	static inline constexpr type const min = minInclusive;
 	static inline constexpr type const max = maxInclusive;
+	static_assert(integral_value_v<minInclusive> <= integral_value_v<maxInclusive>,
+	              "Bounds must form a non-empty interval, min <= max");
 };
 
 template <typename index, typename T = void>
@@ -62,7 +65,7 @@ struct default_indexer<interval<min, max>,
 
 template <typename T, T... vals>
 struct default_indexer<
-    std::integer_sequence<T, vals...>,
+    value_sequence<T, vals...>,
     typename std::enable_if_t<detail::is_contiguous_sequence<mp11::mp_list_c<T, vals...> >::value, void> >
 {
 	static inline constexpr auto const size = integral_value_v<mp11::mp_back<mp11::mp_list_c<T, vals...> >::value> -
@@ -89,7 +92,7 @@ struct default_indexer<
 
 template <typename T, T... vals>
 struct default_indexer<
-    std::integer_sequence<T, vals...>,
+    value_sequence<T, vals...>,
     typename std::enable_if_t<!detail::is_contiguous_sequence<mp11::mp_list_c<T, vals...> >::value, void> >
 {
 	static inline constexpr auto size = mp11::mp_size<mp11::mp_unique<mp11::mp_list_c<T, vals...> > >::value;
@@ -117,6 +120,12 @@ struct default_indexer<
 		}
 		return ret;
 	}
+};
+
+template <typename T, T... values>
+struct default_indexer<std::integer_sequence<T, values...> > :
+    public default_indexer<value_sequence<T, values...> >
+{
 };
 
 template <auto Arg, auto... Args>

@@ -66,3 +66,10 @@ BOOST_AUTO_TEST_CASE(interval_enum_out_of_bound)
 	}
 	BOOST_TEST(catched);
 }
+
+BOOST_AUTO_TEST_CASE(interval_enum_empty)
+{
+	indexed_array<int, interval<Foo::bar, Foo::bar> > arr{3};
+	BOOST_TEST(arr.size() == 1);
+	BOOST_TEST(arr[Foo::bar] == 3);
+}

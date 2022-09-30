@@ -13,9 +13,9 @@ the same way you would declare an `std::array`, but the size parameter is replac
 *type* used as the index.
 
 ```cpp
-BOOST_DEFINE_ENUM_CLASS(Foo,·bar1,·bar2,·bar3,·bar4,·bar5);
+BOOST_DEFINE_ENUM_CLASS(Foo, bar1, bar2, bar3, bar4, bar5);
 
-indexed_array<string,·Foo>·data;·//·data.size()·==·5
+indexed_array<string, Foo> data; // data.size() == 5
 
 for (auto& s : data)
 {

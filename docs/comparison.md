@@ -24,7 +24,9 @@ which can be used on top of it.
 
 `std::unordered_map` provides the same convenience of access as `indexed_array`. However, it
 is a dynamically sized container. It does not provide the triviality guarantees, nor does it
-provides safe initialization.
+provides safe initialization. It also requires dynamic allocation. Its size is dynamic, and
+items are not contiguous. It stores both the “key” and the “value”, whereas `indexed_array`
+stores only the value.
 
 ## Boost.MultiIndex
 
@@ -76,11 +78,11 @@ if the index is a contiguous range of elements (no gaps between the successive v
 case, the current implementation use O(n) access. This could be improved to O(log(n)) in a further release,
 for great values of n.
 
-²: `std::unordered_map` initialization mechanism will prevent any order fiasco, with the value being associated
-to the wrong key due to a refactor. However, you don't have any size check.
+²: `std::unordered_map` initialization mechanism will prevent any order fiasco, with the value 
+being associated to the wrong key due to a refactor. However, you don't have any size check.
 
-³: I think it could theoretically reside in ro section, but for some reasons that does not seem to be the case
-with the tests i made. I'm leaving it as unsure for now, as it may just be some bad usage.
+³: I think it could theoretically reside in ro section, but for some reasons that does not seem
+to be the case with the tests i made. I'm leaving it as unsure for now, as it may just be some bad usage.
 
 ⁴: Type safe index means that you cannot access the content using a value of a wrong type. While technically,
 you can't access an `std::array` content with anything else than a `size_t`, this is a too generic type to be

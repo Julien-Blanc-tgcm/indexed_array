@@ -174,6 +174,21 @@ template <auto T1>
 
 Represent a single value, meant to be used with `union_of` helper.
 
+### value\_sequence
+```cpp
+template <typename T, T...>
+struct value_sequence
+{
+	static_assert(std::is_enum<T>::value || std::is_integral<T>::value);
+};
+```
+
+Represent a sequence of values. Use like this:
+
+```cpp
+value_sequence<my_enum, my_enum::v1, my_enum::v2, ... >
+```
+
 ## make\_default\_indexer
 
 ```cpp

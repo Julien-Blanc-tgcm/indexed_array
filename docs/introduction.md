@@ -43,7 +43,7 @@ Another example comes from the lift industry. Floors are, in the DS417 specifica
 list of active calls for a floor, it is much more convenient to use 1-based indexing than 0-based,
 for consistency accross the program.
 
-# The old solution: unscoped integers (or defines)
+# The old solution: unscoped enums (or defines)
 
 To add semantic, we can since a long time use unscoped enums instead of integers.
 

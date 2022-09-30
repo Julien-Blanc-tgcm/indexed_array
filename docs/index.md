@@ -25,18 +25,16 @@ foo.at(Foo::Bar2, Foo::Bar2) = "an example string"; // modify the “central” 
 // foo[Foo::Bar2, Foo::Bar2] = "an example string";
 ```
 
-See [Basic Usage](basicusage.md) for information on how to use the library.
+# Table of content
 
-It also provide *safe initialization*, a compile time check that can be used
-to detect code errors, and comes in very handy to detect breakage when on enum
-value changes. See [Safe Initialization](safeinitialization.md).
+* [Introduction](introduction.md) for the rationale of the library.
+* [Tutorial](tutorial.md) for simple usage
+* [Advanced usage](advancedusage.md)
+* [Multidimensional array](multidimensional.md)
+* [Safe initialization](safeinitialization.md)
+* [Performance considerations](performance.md)
+* [Integrations and extensions](extensions.md)
+* [Reference](reference.md)
+* [Design principles](design.md)
+* [Comparison with other libraries](comparison.md)
 
-To learn how to write a custom indexer, see [Custom Indexer](customindexer.md).
-
-If you're worried about performance, see [Performance Considerations](performance.md).
-
-See [Design Principles](design.md) for details about the internals of the library.
-
-For a comparison with other ways to achieve similar results, see [Comparison](comparison.md)
-
-And finally, the [Reference](reference.md).

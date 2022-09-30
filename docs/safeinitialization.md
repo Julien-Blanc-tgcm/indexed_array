@@ -68,3 +68,5 @@ in the constructor argument list, starting at 0.
 `safe_arg` is compatible with any indexer, and fully supports holes and duplicate values, 
 which, since they are ignored, should not be provided more than once in the initializer
 list (failure to do so will result in a compile time error).
+
+Back to the [index](index.md) or continue to [performance considerations](performance.md)

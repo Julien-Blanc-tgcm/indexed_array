@@ -38,3 +38,9 @@ foo.at(Foo::Bar2, Foo::Bar2) = "an example string"; // modify the “central” 
 * [Design principles](design.md)
 * [Comparison with other libraries](comparison.md)
 
+# Requirements
+
+The library has the following requirements
+
+* A `C++17` capable compiler
+* `boost::mp11`

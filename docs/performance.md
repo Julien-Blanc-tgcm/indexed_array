@@ -296,3 +296,5 @@ indexed_array<int, std::integer_sequence<int, 3, 4, 5, 6, 7>> arr2;
 Accesses to `arr1` and `arr2` will incur the same single offset calculation. This makes it
 possible to use the library efficiently with `describe`-d enums, which are always resolved as an
 `integer_sequence`.
+
+Back to [index](index.md) or continue with [Integrations and extensions](extensions.md)

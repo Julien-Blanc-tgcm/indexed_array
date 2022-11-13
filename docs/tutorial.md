@@ -6,6 +6,19 @@ https://www.boost.org/LICENSE_1_0.txt
 
 # Tutorial
 
+## Using the library
+
+The library is header-only. Adding `indexed_array/include` to your
+include path, and 
+
+```
+#include <indexed_array.hpp>
+```
+
+should be enough to use the library. To use describe enum reflection integrations, it is
+necessary to add the following compile definition: `INDEXED_ARRAY_HAS_DESCRIBE`, or to
+include `detail/describe.hpp` manually.
+
 ## A simple example with describe
 
 Usage with a `describe`-d enum is pretty straightforward. You declare an `indexed_array`
@@ -16,6 +29,8 @@ the same way you would declare an `std::array`, but the size parameter is replac
 BOOST_DEFINE_ENUM_CLASS(Foo, bar1, bar2, bar3, bar4, bar5);
 
 indexed_array<string, Foo> data; // data.size() == 5
+
+assert(data[Foo::bar1].empty()); // default constructed
 
 for (auto& s : data)
 {
@@ -165,6 +180,21 @@ d1[0] = 0; // undefined behaviour
 d1[123] = 0; // undefined behaviour
 ```
 
+## Iterating both keys and values
+
+The library offers an helper function that allows to iterate through both the keys and the values.
+This is not a real iteration, as the keys are known at compile-time, not run-time. This is more
+a convenience helper:
+
+```cpp
+indexed_array<int, interval<1, 10>> d1;
+for_each(d, [](int key, int& val)
+{
+	val = key;
+}
+assert(d[2] == 2);
+```
+
 ## Multidimensional indexing
 
 The library also supports multidimensional indexing. Declaring a multidimensional indexed array
@@ -196,5 +226,8 @@ int v3 = second_row[Foo::bar3];
 ```
 
 There is no limit on the number of dimensions.
+
+*Note: iteration on both keys and values is currently not implemented for multidimensional arrays*
+
 
 Back to [index](index.md), or see [advanced usage](advancedusage.md)

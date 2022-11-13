@@ -54,6 +54,14 @@ indexed_array<int, Color> values {
     safe_arg<Color::white>(0xFFFFFF)}; // compiles without error
 ```
 
+A parallel can be done between *safe-initialization* and *designated initializers*.
+*designated initializers* are used to initialize an aggregate using the field names,
+*safe-initialization* is used to initialize an indexed array using the array indices.
+
+It is, however, a bit stricter than *designated initializiers* in that it requires both
+the order to be respected (like *designated initializers*) and all elements to be initialized
+(unlike *designated initializers*).
+
 ## Safe Arg
 
 `safe_arg` is a tag type, that allows static checking of order of arguments. The constructor 
@@ -68,5 +76,10 @@ in the constructor argument list, starting at 0.
 `safe_arg` is compatible with any indexer, and fully supports holes and duplicate values, 
 which, since they are ignored, should not be provided more than once in the initializer
 list (failure to do so will result in a compile time error).
+
+## Compile-time and run-time penalty
+
+`safe_arg` should be completely optimized away by the compiler, and will not incur any
+run-time penalty. It does, however, add some compile-time penalty.
 
 Back to the [index](index.md) or continue to [performance considerations](performance.md)

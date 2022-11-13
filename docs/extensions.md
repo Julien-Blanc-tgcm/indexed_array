@@ -31,4 +31,17 @@ to gain compile time check of array accesses. That would require writing a custo
 
 ## Indexed array and perfect hashing
 
+Despite being inherently an array, `indexed_array` has some properties that
+resembles a map. The main difference with a map is that only values are stored,
+but because it does actually a mapping between a key and an index, it can virtually
+be used with anything as a key.
+
+If you have a perfect hashing function, which maps a set of n values in the
+range `[0..n-1]`, then it can be used as the indexer to create an `indexed_array`.
+It can be used, for example, to index an `indexed_array` with a set of known
+strings (as `string_view`).
+
+Such uses show the versatility the design of `indexed_array` offers, but providing such an
+indexer is clearly outside the scope of the library.
+
 Back to [index](index.md), or see [advanced usage](advancedusage.md)

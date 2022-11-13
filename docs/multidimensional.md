@@ -102,7 +102,7 @@ assert(v[5] == 9);
 ```
 
 This call returns an `indexed_span<int, interval<1, 5>>`. This is a view
-(a non-owning structure) on the data hold in the `indexed_array`, which
+(a non-owning structure) on the data held in the `indexed_array`, which
 follows the same accessing scheme.
 
 `indexed_span` provides an interface similar to `std::span` (with static

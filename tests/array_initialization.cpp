@@ -2,7 +2,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/describe.hpp>
 
-#include "indexed_array.hpp"
+#include "jbc/indexed_array.hpp"
 
 using namespace jbc::indexed_array;
 

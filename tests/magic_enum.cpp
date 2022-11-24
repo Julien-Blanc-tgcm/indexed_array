@@ -2,7 +2,7 @@
 #include <boost/test/unit_test.hpp>
 #include <magic_enum.hpp>
 
-#include "indexed_array.hpp"
+#include "jbc/indexed_array.hpp"
 
 #include <type_traits>
 

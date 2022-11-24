@@ -23,16 +23,18 @@ find_package(Boost 1.78.0 REQUIRED)
 enable_testing()
 
 add_executable(indexed_array "main.cpp" 
-	"include/indexed_array.hpp"
-	"include/detail/checked_arg.hpp"
-	"include/detail/default_indexer.hpp"
-	"include/detail/has_member_index.hpp"
-	"include/detail/indexed_array.hpp"
-	"include/detail/indexed_span.hpp"
-	"include/detail/is_contiguous.hpp"
-	"include/detail/is_indexer.hpp"
-	"include/detail/magic_enum.hpp"
-	"include/detail/union_of.hpp"
+	"include/jbc/indexed_array.hpp"
+	"include/jbc/indexed_array/describe.hpp"
+	"include/jbc/indexed_array/magic_enum.hpp"
+	"include/jbc/indexed_array/wise_enum.hpp"
+	"include/jbc/indexed_array/detail/checked_arg.hpp"
+	"include/jbc/indexed_array/detail/default_indexer.hpp"
+	"include/jbc/indexed_array/detail/has_member_index.hpp"
+	"include/jbc/indexed_array/detail/indexed_array.hpp"
+	"include/jbc/indexed_array/detail/indexed_span.hpp"
+	"include/jbc/indexed_array/detail/is_contiguous.hpp"
+	"include/jbc/indexed_array/detail/is_indexer.hpp"
+	"include/jbc/indexed_array/detail/union_of.hpp"
 )
 target_compile_options(indexed_array PRIVATE -Wall -Wextra -Werror)
 target_include_directories(indexed_array PRIVATE ${Boost_INCLUDE_DIRS} ${MAGICENUM}/include ${WISE_ENUM} )

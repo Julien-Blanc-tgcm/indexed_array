@@ -2,7 +2,7 @@
 #include <boost/test/unit_test.hpp>
 #include <wise_enum/wise_enum.h>
 
-#include "indexed_array.hpp"
+#include "jbc/indexed_array.hpp"
 
 #include <type_traits>
 

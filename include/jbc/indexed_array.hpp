@@ -5,12 +5,12 @@
 #ifndef JBC_INDEXED_ARRAY_H
 #define JBC_INDEXED_ARRAY_H
 
-#include "detail/checked_arg.hpp"
-#include "detail/default_indexer.hpp"
-#include "detail/foreach.hpp"
-#include "detail/indexed_array.hpp"
-#include "detail/is_contiguous.hpp"
-#include "detail/union_of.hpp"
+#include "indexed_array/detail/checked_arg.hpp"
+#include "indexed_array/detail/default_indexer.hpp"
+#include "indexed_array/detail/foreach.hpp"
+#include "indexed_array/detail/indexed_array.hpp"
+#include "indexed_array/detail/is_contiguous.hpp"
+#include "indexed_array/detail/union_of.hpp"
 
 #if defined(INDEXED_ARRAY_HAS_MAGIC_ENUM) && defined(INDEXED_ARRAY_HAS_DESCRIBE)
 #error "Compiling with both describe and magic enum support is not supported"
@@ -20,13 +20,13 @@
 #endif
 
 #ifdef INDEXED_ARRAY_HAS_DESCRIBE
-#include "detail/describe.hpp"
+#include "indexed_array/describe.hpp"
 #endif
 #ifdef INDEXED_ARRAY_HAS_MAGIC_ENUM
-#include "detail/magic_enum.hpp"
+#include "indexed_array/magic_enum.hpp"
 #endif
 #ifdef INDEXED_ARRAY_HAS_WISE_ENUM
-#include "detail/wise_enum.hpp"
+#include "indexed_array/wise_enum.hpp"
 #endif
 
 namespace jbc::indexed_array

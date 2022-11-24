@@ -5,7 +5,7 @@
 #ifndef JBC_INDEXED_ARRAY_DETAIL_DESCRIBE_H
 #define JBC_INDEXED_ARRAY_DETAIL_DESCRIBE_H
 
-#include "default_indexer.hpp"
+#include "detail/default_indexer.hpp"
 
 #include <boost/describe.hpp>
 

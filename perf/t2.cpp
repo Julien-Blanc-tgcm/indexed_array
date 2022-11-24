@@ -1,4 +1,4 @@
-#include "indexed_array.hpp"
+#include "jbc/indexed_array.hpp"
 
 using namespace jbc::indexed_array;
 

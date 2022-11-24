@@ -16,7 +16,7 @@ This is also error prone, as it is easy to inadvertently use an incorrect value 
 the index. While the use of `.at()` can detect it at run-time, it would be better if
 we could diagnose it at compile time.
 
-Last, but not least, not every value set starts at 0. This is an extract the linux documentation:
+Last, but not least, not every value set starts at 0. This is an extract of the linux documentation:
 
 ```
 struct tm {
@@ -40,8 +40,8 @@ means applying the offset everywhere.
 
 Another example comes from the lift industry. Floors are, in the DS417 specification, defined from
 1 to 254, 0 being reserved to indicate the car (255 indicating all floors). If we are storing the
-list of active calls for a floor, it is much more convenient to use 1-based indexing than 0-based,
-for consistency accross the program.
+list of active calls for every floor in a table, it is much more convenient to use 1-based indexing
+than 0-based, for consistency accross the program.
 
 # The old solution: unscoped enums (or defines)
 

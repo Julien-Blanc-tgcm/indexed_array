@@ -13,7 +13,7 @@ a non-contiguous index is the sequence `{1, 2, 4, 8}`. This sequence can be mapp
 `{0, 1, 2, 3}` which can then be used as the internal index for the internal array.
 
 Using non-contiguous indexes with integer values is highly non-recommended. But using them
-with enums addresses a few use cases in an elegant way.
+with enums addresses a few uncommon use cases in a simple and elegant way.
 
 An important note to consider is that when using non-contiguous indexes, access to the
 elements in the `indexed_array` is no longer `O(1)` but becomes `O(N)`. This is because the

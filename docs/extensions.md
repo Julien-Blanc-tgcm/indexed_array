@@ -44,4 +44,4 @@ strings (as `string_view`).
 Such uses show the versatility the design of `indexed_array` offers, but providing such an
 indexer is clearly outside the scope of the library.
 
-Back to [index](index.md), or see [reference](reference.md)
+Back to [index](index.md), or see [Use cases](usecases.md)

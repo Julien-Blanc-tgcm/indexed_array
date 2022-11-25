@@ -74,3 +74,24 @@ BOOST_AUTO_TEST_CASE(foreach4)
 	BOOST_TEST(t[5] == 10);
 	BOOST_TEST(t[10] == 20);
 }
+
+/*
+Not implemented yet. Uncomment this when foreach is implemented for
+multidimensional arrays
+using Test5 = indexed_array<int, interval<1, 5>, interval<10, 15> >;
+
+BOOST_AUTO_TEST_CASE(foreach5)
+{
+	Test5 t{};
+	int i = 0;
+	for (auto& v : t)
+		v = i++;
+
+	for_each(t, [](int key1, auto& val) {
+		for_each(val, [key1](int key, int& v) {
+			v = key1 * 100 + key;
+		});
+	});
+	BOOST_TEST(t.at(2, 11) == 211);
+}
+*/

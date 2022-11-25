@@ -34,13 +34,20 @@ foo.at(Foo::Bar2, Foo::Bar2) = "an example string"; // modify the “central” 
 * [Safe initialization](safeinitialization.md)
 * [Performance considerations](performance.md)
 * [Integrations and extensions](extensions.md)
+* [Example use cases](usecases.md)
 * [Reference](reference.md)
 * [Design principles](design.md)
 * [Comparison with other libraries](comparison.md)
 
 # Requirements
 
-The library has the following requirements
+The library has the following requirements:
 
 * A `C++17` capable compiler
 * `boost::mp11`
+
+Optionnaly, but strongly recommended, is one of the following:
+
+* `boost::describe`
+* `magic_enum`
+* `wise_enum`

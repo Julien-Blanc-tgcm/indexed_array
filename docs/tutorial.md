@@ -12,12 +12,14 @@ The library is header-only. Adding `indexed_array/include` to your
 include path, and 
 
 ```
-#include <indexed_array.hpp>
+#include <jbc/indexed_array.hpp>
 ```
 
 should be enough to use the library. To use describe enum reflection integrations, it is
 necessary to add the following compile definition: `INDEXED_ARRAY_HAS_DESCRIBE`, or to
-include `detail/describe.hpp` manually.
+include `jbc/indexed_array/describe.hpp` manually.
+
+Compiling must be done using at least `C++17` mode.
 
 ## A simple example with describe
 
@@ -37,7 +39,7 @@ for (auto& s : data)
 	s = "Hello";
 }
 
-assert(data[Foo::bar1] == "Hello");
+assert(data[Foo::bar3] == "Hello");
 ```
 
 This declares an array of five string objects, which can be accessed using Foo

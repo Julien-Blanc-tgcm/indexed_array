@@ -73,9 +73,9 @@ class indexed_array :
 	// specific
 	using indexer = Indexer;
 
-	constexpr indexed_array() noexcept = default;
+	constexpr indexed_array() = default;
 
-	~indexed_array() noexcept = default;
+	~indexed_array() = default;
 
 	constexpr indexed_array(indexed_array<Value, Indexer> const& other) = default;
 
@@ -86,20 +86,27 @@ class indexed_array :
 	constexpr indexed_array& operator=(indexed_array<Value, Indexer>&& other) = default;
 
 	// standard constructor
-	template <typename... Args,
-	          std::enable_if_t<!has_member_index<boost::mp11::mp_first<boost::mp11::mp_list<Args...> > >::value &&
-	                               !std::is_invocable_v<indexed_array(indexed_array const&), Args&&...>,
+	template <typename Arg,
+	          typename... Args,
+	          std::enable_if_t<!has_member_index<boost::mp11::mp_first<boost::mp11::mp_list<Arg, Args...> > >::value &&
+	                               !std::is_invocable_v<indexed_array(indexed_array const&), Arg&&, Args&&...>,
 	                           bool> = true>
-	constexpr explicit indexed_array(Args&&... list) : data_{std::forward<Args>(list)...}
+	constexpr explicit indexed_array(Arg&& head, Args&&... list) noexcept(std::is_nothrow_copy_constructible_v<Value>) :
+	    data_{std::forward<Arg>(head), std::forward<Args>(list)...}
 	{
 	}
+
 	// safe_arg constructor
-	template <
-	    typename... Args,
-	    std::enable_if_t<has_member_index<boost::mp11::mp_first<boost::mp11::mp_list<Args...> > >::value, bool> = true>
-	constexpr explicit indexed_array(Args&&... args) : data_{static_cast<Value>(args)...}
+	template <typename Arg,
+	          typename... Args,
+	          std::enable_if_t<has_member_index<boost::mp11::mp_first<boost::mp11::mp_list<Arg, Args...> > >::value,
+	                           bool> = true>
+	constexpr explicit indexed_array(Arg&& head, Args&&... args) noexcept(std::is_nothrow_copy_constructible_v<Value>) :
+	    data_{static_cast<Value>(head), static_cast<Value>(args)...}
 	{
-		static_assert(detail::correct_index<Indexer, typename Args::checked_arg_index...>(), "Argument mismatch");
+		static_assert(
+		    detail::correct_index<Indexer, typename Arg::checked_arg_index, typename Args::checked_arg_index...>(),
+		    "Argument mismatch");
 	}
 
 	// at and [] operators. Use inheritance to get correct signature

@@ -364,5 +364,5 @@ Now we just have to add the constructor in `indexed_array`:
 	}
 ```
 
-Back to the [Index](index.md)
+Back to the [Index](index.md), or continue to [Comparison with other libraries](comparison.md)
 

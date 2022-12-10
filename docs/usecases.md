@@ -200,7 +200,13 @@ Now, accesses to array content must be done using the following syntax:
 return calculation_result[{z{coord_z}, y{coord_y}, x{coord_x}}]; // we fixed the bug
 ```
 
-This check is done purely at compile time, and will not incurs any runtime cost. Of course,
+This check is done purely at compile time, and will not incurs any runtime cost.
 
+## Migrating code from other languages that uses 1-based indexing
+
+When migrating old code from a language that uses 1-based indexing (Visual Basic comes to
+mind), using `indexed_array` can provide a great help, in that it allows keeping the
+algorithms untouched, by using the same indexing scheme as the one they were originally
+written with.
 
 Back to the [Index](index.md), or continue to [Reference](reference.md)

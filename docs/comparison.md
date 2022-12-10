@@ -68,7 +68,7 @@ which stores only the values.
 | Multidimensional support | ✓       |     -         |        -             |     ✓            |   -     |
 | Dynamic size     |    -            |     -         |        ✓             |     ✓            |   -     |
 | Guaranted O(1) access     | ✓/-¹   |     ✓         |        ✓             |     ✓            |   ✓     |
-| Iterate both key/values   |  -     |     -         |        ✓             |     ✓            |   ✓     |
+| Iterate both key/values   | partial⁵ |     -         |        ✓             |     ✓            |   ✓     |
 | Raw access to underlying buffer | ✓ |    ✓         |        -             |     -            |   -     |
 | Type safe indexes⁴  |    ✓         |     -         |        ✓             |     ✓            |   ✓     |
 | Minimum C++ version |  `C++17`     |  `C++11`      |    `C++03`           |  `C++03`         | `C++14` |
@@ -87,3 +87,9 @@ to be the case with the tests i made. I'm leaving it as unsure for now, as it ma
 ⁴: Type safe index means that you cannot access the content using a value of a wrong type. While technically,
 you can't access an `std::array` content with anything else than a `size_t`, this is a too generic type to be
 considered type safe.
+
+⁵: Iterating through both keys and values is supported via an helper function, for single dimensional
+arrays only. This helper is, however, not suitable for large size arrays, as it would generate a lot
+of code.
+
+Back to [Index](index.md)

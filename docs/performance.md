@@ -156,7 +156,8 @@ _Z8test_idxRKN3jbc13indexed_array6detail13indexed_arrayIiNS1_15default_indexerIS
         .cfi_endproc
 ```
 
-Run-time indexes, however, are resolved in linear time
+Run-time indexes, however, are resolved in linear time, since the library must iterate
+through all possible values.
 
 ```cpp
 int test_idx2(color c)

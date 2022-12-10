@@ -142,6 +142,10 @@ Returns a slice of the span, at the given index. For multidimensional spans of e
 `indexed_span` of extent `n-1`. For single dimension span, it returns the element at the given
 index. `slice` does not do any bound checking, `slice_at` throws `std::out_of_range` on error.
 
+Note that there is no `first/last/subspan` methods. They do not fit well with the concept of
+custom indexing, because the return type shall be known at compile time, as it would depend
+on the parameters.
+
 ## Sets of value
 
 ### interval
@@ -159,10 +163,10 @@ type is a marker meant to be used with `default_indexer`.
 
 ```cpp
 template <typename... Args>
-/* */ union_of = typename to_integer_sequence<typename union_of_helper<Args...>::type>::type;
+/* */ union_of = typename to_value_sequence<typename union_of_helper<Args...>::type>::type;
 ```
 
-Represent the union of several sets of value (either `interval`, `integer_sequence` or `single_value`). The
+Represent the union of several sets of value (either `interval`, `value_sequence` or `single_value`). The
 result is always an `integer_sequence`.
 
 ### single\_value
@@ -188,6 +192,8 @@ Represent a sequence of values. Use like this:
 ```cpp
 value_sequence<my_enum, my_enum::v1, my_enum::v2, ... >
 ```
+
+_This is equivalent to `std::integer_sequence`, but accepts enum as constant values, which is not the case for standard integer sequence._
 
 ## make\_default\_indexer
 
@@ -223,4 +229,4 @@ static_assert(std::is_same<
     >::value);
 ```
 
-Back to the [Index](index.md)
+Back to the [Index](index.md), or continue to [Design principles](design.md)

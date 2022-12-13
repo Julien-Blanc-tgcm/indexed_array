@@ -49,6 +49,11 @@ class indexed_array_helper
 	constexpr const_reference at(Index index) const;
 	constexpr reference operator[](Index idx);
 	constexpr const_reference operator[](Index idx) const;
+
+	static constexpr bool in_range(Index idx)
+	{
+		return Indexer::in_range(idx);
+	}
 };
 
 template <typename Value, typename Indexer>
@@ -112,6 +117,8 @@ class indexed_array :
 	// at and [] operators. Use inheritance to get correct signature
 	using indexed_array_helper<Value, Indexer, indexed_array<Value, Indexer>, typename Indexer::index>::at;
 	using indexed_array_helper<Value, Indexer, indexed_array<Value, Indexer>, typename Indexer::index>::operator[];
+
+	static constexpr bool is_o1 = Indexer::is_o1;
 
 	// standard array operations
 	constexpr decltype(auto) begin()
@@ -335,6 +342,11 @@ class indexed_array_helper<Value, Indexer, Owner, Index<Args...> >
 		return indexed_span<Value const, typename Indexer::slice_indexer>(
 		    static_cast<Owner const&>(*this).data_.data() +
 		    Indexer::root_indexer::template at<true>(idx) * Indexer::slice_indexer::size);
+	}
+
+	static constexpr bool in_range(Args... index)
+	{
+		return Indexer::in_range(std::forward<Args>(index)...);
 	}
 };
 

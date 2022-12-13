@@ -1,9 +1,11 @@
-//·Copyright·2022·Julien Blanc
-//·Distributed·under·the·Boost·Software·License,·Version·1.0.
-//·https://www.boost.org/LICENSE_1_0.txt
+// ·Copyright·2022·Julien Blanc
+// ·Distributed·under·the·Boost·Software·License,·Version·1.0.
+// ·https://www.boost.org/LICENSE_1_0.txt
 
 #ifndef JBC_INDEXED_ARRAY_DETAIL_IS_CONTIGUOUS_HPP
 #define JBC_INDEXED_ARRAY_DETAIL_IS_CONTIGUOUS_HPP
+
+#include "value_sequence.hpp"
 
 #include <boost/mp11.hpp>
 
@@ -40,23 +42,34 @@ struct is_contiguous_sequence : public std::false_type
 {
 };
 
+template <typename... Args>
+struct is_contiguous_sequence_ : public std::false_type
+{
+};
+
 template <typename Arg1, typename Arg2, typename... Args>
-struct is_contiguous_sequence<Arg1, Arg2, Args...> :
+struct is_contiguous_sequence_<Arg1, Arg2, Args...> :
     public std::conditional<
         std::is_same<std::decay_t<decltype(Arg1::value)>, std::decay_t<decltype(Arg2::value)> >::value &&
             (integral_value_v<Arg2::value> - integral_value_v<Arg1::value>) <= 1 && Arg1::value <= Arg2::value,
-        is_contiguous_sequence<Arg2, Args...>,
+        is_contiguous_sequence_<Arg2, Args...>,
         std::false_type>::type
 {
 };
 
 template <typename Last>
-struct is_contiguous_sequence<Last> : public std::true_type
+struct is_contiguous_sequence_<Last> : public std::true_type
 {
 };
 
 template <template <typename...> class List, typename... Args>
-struct is_contiguous_sequence<List<Args...> > : public is_contiguous_sequence<Args...>
+struct is_contiguous_sequence<List<Args...> > : public is_contiguous_sequence_<Args...>
+{
+};
+
+template <typename T, T... vals>
+struct is_contiguous_sequence<value_sequence<T, vals...> > :
+    public is_contiguous_sequence<boost::mp11::mp_list_c<T, vals...> >
 {
 };
 

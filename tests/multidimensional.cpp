@@ -157,3 +157,25 @@ BOOST_AUTO_TEST_CASE(multidimensional_const_slices)
 	BOOST_TEST(*slice2[-3] == "50");
 	BOOST_TEST(*slice2[6] == "59");
 }
+
+BOOST_AUTO_TEST_CASE(multidimensional_o1)
+{
+	using T = indexed_array<int, interval<-2, 5>, interval<10, 15>, interval<4, 8> >;
+	BOOST_TEST(T::is_o1);
+	using T2 = indexed_array<int, union_of<interval<-2, 5>, interval<10, 15> >, interval<4, 8> >;
+	BOOST_TEST(!T2::is_o1);
+	using T3 = indexed_array<int, union_of<interval<0, 5>, interval<5, 10> > >;
+	BOOST_TEST(T3::is_o1);
+}
+
+BOOST_AUTO_TEST_CASE(multidimensional_in_range)
+{
+	using T = indexed_array<std::unique_ptr<std::string>, Color, Material, interval<-3, 6> >;
+	BOOST_TEST(T::in_range(Color::Black, Material::Wood, 4));
+	BOOST_TEST(!T::in_range(static_cast<Color>(-5), Material::Wood, 4));
+	BOOST_TEST(!T::in_range(Color::White, Material::Wood, 8));
+	BOOST_TEST(!T::in_range(Color::White, Material::Wood, -4));
+	BOOST_TEST(T::in_range(Color::White, Material::Wood, 6));
+	BOOST_TEST(T::in_range(Color::White, Material::Wood, -3));
+}
+

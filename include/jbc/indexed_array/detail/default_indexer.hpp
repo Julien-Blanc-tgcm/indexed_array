@@ -1,6 +1,6 @@
-//·Copyright·2022·Julien Blanc
-//·Distributed·under·the·Boost·Software·License,·Version·1.0.
-//·https://www.boost.org/LICENSE_1_0.txt
+// ·Copyright·2022·Julien Blanc
+// ·Distributed·under·the·Boost·Software·License,·Version·1.0.
+// ·https://www.boost.org/LICENSE_1_0.txt
 
 #ifndef JBC_INDEXED_ARRAY_DETAIL_DEFAULT_INDEXER_H
 #define JBC_INDEXED_ARRAY_DETAIL_DEFAULT_INDEXER_H
@@ -49,17 +49,24 @@ struct default_indexer<interval<min, max>,
 {
 	using integral_index_type = decltype(integral_value_v<T{}>);
 	static inline constexpr auto const size = integral_value_v<max> - integral_value_v<min> + 1;
+
+	static constexpr bool is_o1 = true;
+
 	using index = T;
 	template <bool throws_on_error = true>
 	static constexpr auto at(index v) noexcept(!throws_on_error)
 	{
 		if constexpr (throws_on_error)
 		{
-			if (BOOST_UNLIKELY(static_cast<integral_index_type>(v) < integral_value_v<min> ||
-			                   static_cast<integral_index_type>(v) > integral_value_v<max>))
+			if (BOOST_UNLIKELY(!in_range(v)))
 				throw std::out_of_range("Invalid index");
 		}
 		return (static_cast<integral_index_type>(v) - integral_value_v<min>);
+	}
+	static constexpr auto in_range(index v) noexcept
+	{
+		return !(static_cast<integral_index_type>(v) < integral_value_v<min> ||
+		         static_cast<integral_index_type>(v) > integral_value_v<max>);
 	}
 };
 
@@ -71,6 +78,8 @@ struct default_indexer<
 	static inline constexpr auto const size = integral_value_v<mp11::mp_back<mp11::mp_list_c<T, vals...> >::value> -
 	                                          integral_value_v<mp11::mp_front<mp11::mp_list_c<T, vals...> >::value> + 1;
 
+	static constexpr bool is_o1 = true;
+
 	using index = T;
 
 	template <bool throws_on_error = false>
@@ -78,15 +87,19 @@ struct default_indexer<
 	{
 		if constexpr (throws_on_error)
 		{
-			if (static_cast<decltype(integral_value<T, T{}>::value)>(i) <
-			    integral_value_v<mp11::mp_front<mp11::mp_list_c<T, vals...> >::value>)
-				throw std::out_of_range("Invalid index");
-			if (static_cast<decltype(integral_value<T, T{}>::value)>(i) >
-			    integral_value_v<mp11::mp_back<mp11::mp_list_c<T, vals...> >::value>)
+			if (!in_range(i))
 				throw std::out_of_range("Invalid index");
 		}
 		return static_cast<decltype(integral_value_v<T{}>)>(i) -
 		       integral_value_v<mp11::mp_front<mp11::mp_list_c<T, vals...> >::value>;
+	}
+
+	static constexpr bool in_range(index i)
+	{
+		return (static_cast<decltype(integral_value<T, T{}>::value)>(i) >=
+		        integral_value_v<mp11::mp_front<mp11::mp_list_c<T, vals...> >::
+		                             value>)&&(static_cast<decltype(integral_value<T, T{}>::value)>(i) <=
+		                                       integral_value_v<mp11::mp_back<mp11::mp_list_c<T, vals...> >::value>);
 	}
 };
 
@@ -98,6 +111,8 @@ struct default_indexer<
 	static inline constexpr auto size = mp11::mp_size<mp11::mp_unique<mp11::mp_list_c<T, vals...> > >::value;
 
 	using index = T;
+
+	static constexpr bool is_o1 = false;
 
 	template <bool throws_on_error = false>
 	static constexpr auto at(index v)
@@ -120,11 +135,22 @@ struct default_indexer<
 		}
 		return ret;
 	}
+
+	static constexpr bool in_range(index v) noexcept
+	{
+		bool found = false;
+		mp11::mp_for_each<mp11::mp_unique<mp11::mp_list_c<T, vals...> > >([v, &found](auto I) {
+			if (I.value == v)
+			{
+				found = true;
+			}
+		});
+		return found;
+	}
 };
 
 template <typename T, T... values>
-struct default_indexer<std::integer_sequence<T, values...> > :
-    public default_indexer<value_sequence<T, values...> >
+struct default_indexer<std::integer_sequence<T, values...> > : public default_indexer<value_sequence<T, values...> >
 {
 };
 
@@ -201,13 +227,20 @@ struct default_indexer<
 	static inline constexpr auto const size = product_v<Arg::size, Args::size...>;
 
 	template <bool throws_on_error = false>
-	static constexpr auto at(typename Arg::index arg, typename Args::index... args) noexcept
+	static constexpr auto at(typename Arg::index arg, typename Args::index... args) noexcept(!throws_on_error)
 	{
 		return at_computation_helper<Arg, Args...>::template at<throws_on_error>(arg, args...);
 	}
 
 	using slice_indexer = to_single_indexer_t<Args...>;
 	using root_indexer = Arg;
+
+	static constexpr bool is_o1 = root_indexer::is_o1 && slice_indexer::is_o1;
+
+	static constexpr bool in_range(typename Arg::index arg, typename Args::index... args) noexcept
+	{
+		return root_indexer::in_range(arg) && slice_indexer::in_range(std::forward<typename Args::index>(args)...);
+	}
 };
 
 template <typename Arg>

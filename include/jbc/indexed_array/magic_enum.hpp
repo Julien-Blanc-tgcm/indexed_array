@@ -41,6 +41,11 @@ struct default_indexer<Enum, typename std::enable_if_t<has_magic_enum<Enum>::val
 	{
 		return default_indexer<helper_list_type>::template at<throws_on_error>(v);
 	}
+	static constexpr auto in_range(Enum v) noexcept
+	{
+		return default_indexer<helper_list_type>::in_range(v);
+	}
+	static constexpr bool is_o1 = default_indexer<helper_list_type>::is_o1;
 };
 
 template <typename Enum>

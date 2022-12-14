@@ -1,6 +1,6 @@
 #define BOOST_TEST_MODULE Indexed Array
-#include <boost/test/unit_test.hpp>
 #include <boost/describe.hpp>
+#include <boost/test/unit_test.hpp>
 
 #include "jbc/indexed_array.hpp"
 
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(reverse_iteration)
 	using Base = indexed_array<std::string, Color, interval<3, 8>, interval<-2, 4> >;
 
 	Base b1;
-	int i = 0;
+	std::size_t i = 0;
 	for (auto& b : b1)
 	{
 		b = std::to_string(i++);
@@ -111,7 +111,6 @@ constexpr decltype(auto) third_item(Base const& b)
 {
 	return b.begin() + 2;
 }
-
 
 BOOST_AUTO_TEST_CASE(constexpr_iteration)
 {

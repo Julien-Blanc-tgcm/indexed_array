@@ -6,12 +6,17 @@ cmake_minimum_required(VERSION 3.5)
 
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
+message("Boost libraries found : ${Boost_LIBRARIES}")
+
 function(add_single_test target )
 	add_executable(${target} ${ARGN})
-	target_link_libraries(${target} ${Boost_LIBRARIES} gcov)
 	target_include_directories(${target} PRIVATE "../include" ${Boost_INCLUDE_DIRS} ${MAGICENUM}/include ${WISEENUM} )
+if (${ENABLE_COVERAGE})
 	target_compile_options(${target} PRIVATE "-fprofile-arcs" "-ftest-coverage" )
 	target_link_options(${target} PRIVATE "-fprofile-arcs" "-ftest-coverage" )
+	set(Gcov_LIBRARIES gcov)
+endif()
+	target_link_libraries(${target} ${Boost_LIBRARIES} ${Gcov_LIBRARIES} )
 	target_compile_definitions(${target} PRIVATE ${definitions})
 	add_test(NAME test_${target} COMMAND ${target} )
 endfunction()

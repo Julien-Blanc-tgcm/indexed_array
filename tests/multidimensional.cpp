@@ -65,10 +65,15 @@ struct custom_indexer
 	{
 		if constexpr (c)
 		{
-			if (v < 3 || v > 10)
+			if (!in_range(v))
 				throw std::out_of_range("Invalid index");
 		}
 		return v - 3;
+	}
+	static constexpr bool is_o1 = true;
+	static constexpr bool in_range(int v)
+	{
+		return v >= 3 && v <= 10;
 	}
 };
 

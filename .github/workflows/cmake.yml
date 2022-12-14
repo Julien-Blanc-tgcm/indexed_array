@@ -15,12 +15,14 @@ jobs:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-    runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        os: [{name: "ubuntu-22.04", toolset: "gcc", link: "shared", platform: ""}, {name: "windows-2022", toolset: "msvc", link: "static", platform: "2022"}]
+    runs-on: ${{ matrix.os.name }}
     steps:
     - uses: actions/checkout@v3
     - name: Install boost
-      uses: MarkusJx/install-boost@v2.1.0
+      uses: MarkusJx/install-boost@v2.4.1
       id: install-boost
       with:
         # REQUIRED: Specify the required boost version
@@ -28,11 +30,13 @@ jobs:
         # https://github.com/actions/boost-versions/blob/main/versions-manifest.json
         boost_version: 1.78.0
         # OPTIONAL: Specify a platform version
-        platform_version: 20.04
+        platform_version: ${{ matrix.os.platform }}
         # OPTIONAL: Specify a custom install location
         # boost_install_dir: /home/runner/boost-1.78.0
         # OPTIONAL: Specify a toolset
-        toolset: gcc
+        toolset: ${{ matrix.os.toolset }}
+        link: ${{ matrix.os.link }}
+
     - name: Install magic enum
       uses: actions/checkout@v3
       with:

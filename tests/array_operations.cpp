@@ -1,6 +1,6 @@
 #define BOOST_TEST_MODULE Indexed Array
-#include <boost/test/unit_test.hpp>
 #include <boost/describe.hpp>
+#include <boost/test/unit_test.hpp>
 
 #include "jbc/indexed_array.hpp"
 
@@ -110,4 +110,21 @@ BOOST_AUTO_TEST_CASE(swap)
 	{
 		BOOST_TEST(b == std::to_string(i++));
 	}
+}
+
+BOOST_AUTO_TEST_CASE(slice)
+{
+	using T = indexed_array<int, Color>;
+	T t;
+	t[Color::Black] = 12;
+	t[Color::Red] = 15;
+	BOOST_TEST(t.slice(Color::Black) == 12);
+	BOOST_TEST(t.slice_at(Color::Red) == 15);
+
+	BOOST_CHECK_THROW(t.slice_at(static_cast<Color>(-10)), std::out_of_range);
+
+	T const t2{0, 1, 2, 3, 4};
+	BOOST_TEST(t2.slice(Color::Black) == 3);
+	BOOST_TEST(t2.slice_at(Color::Red) == 0);
+	BOOST_CHECK_THROW(t2.slice_at(static_cast<Color>(12)), std::out_of_range);
 }

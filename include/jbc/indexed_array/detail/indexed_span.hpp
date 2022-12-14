@@ -50,6 +50,11 @@ class indexed_span_helper
 	{
 		return at(idx);
 	}
+
+	static constexpr bool in_range(Index idx) noexcept
+	{
+		return indexer::in_range(idx);
+	}
 };
 
 template <typename Value, typename Indexer>
@@ -95,11 +100,14 @@ class indexed_span : private indexed_span_helper<Value, Indexer, indexed_span<Va
 	using indexed_span_helper<Value, Indexer, indexed_span<Value, Indexer>, typename Indexer::index>::operator[];
 	using indexed_span_helper<Value, Indexer, indexed_span<Value, Indexer>, typename Indexer::index>::slice;
 	using indexed_span_helper<Value, Indexer, indexed_span<Value, Indexer>, typename Indexer::index>::slice_at;
+	using indexed_span_helper<Value, Indexer, indexed_span<Value, Indexer>, typename Indexer::index>::in_range;
 
 	using iterator = Value*;
 	using const_iterator = Value const*;
 	using reverse_iterator = std::reverse_iterator<Value*>;
 	using reverse_const_iterator = std::reverse_iterator<Value const*>;
+
+	static constexpr bool is_o1 = Indexer::is_o1;
 
 	// standard array operations
 	auto begin()
@@ -255,6 +263,11 @@ class indexed_span_helper<Value, Indexer, Owner, Index<Args...> >
 		return indexed_span<Value const, typename Indexer::slice_indexer>(
 		    static_cast<Owner&>(*this).data_ +
 		    Indexer::root_indexer::template at<true>(idx) * Indexer::slice_indexer::size);
+	}
+
+	static constexpr bool in_range(Args... index)
+	{
+		return Indexer::in_range(std::forward<Args>(index)...);
 	}
 };
 

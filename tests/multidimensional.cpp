@@ -1,6 +1,6 @@
 #define BOOST_TEST_MODULE Indexed Array
-#include <boost/test/unit_test.hpp>
 #include <boost/describe.hpp>
+#include <boost/test/unit_test.hpp>
 
 #include "jbc/indexed_array.hpp"
 
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(bidimensional3)
 	indexed_array<std::string, Color, interval<3, 8> > arr;
 	BOOST_TEST(arr.size() == 30);
 	int i = 0;
-	for(auto& a : arr)
+	for (auto& a : arr)
 	{
 		a = std::to_string(i++);
 	}
@@ -60,10 +60,10 @@ struct custom_indexer
 {
 	using index = int;
 	static inline constexpr std::size_t size = 8;
-	template<bool c>
+	template <bool c>
 	static constexpr std::size_t at(int v)
 	{
-		if constexpr(c)
+		if constexpr (c)
 		{
 			if (v < 3 || v > 10)
 				throw std::out_of_range("Invalid index");
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(multidimensional)
 	indexed_array<std::unique_ptr<std::string>, Color, interval<3, 8>, custom_indexer, Material> arr;
 	BOOST_TEST(arr.size() == 5 * 6 * 8 * 4);
 	int i = 0;
-	for(auto & a : arr)
+	for (auto& a : arr)
 	{
 		a = std::make_unique<std::string>(std::to_string(i++));
 	}
@@ -86,15 +86,15 @@ BOOST_AUTO_TEST_CASE(multidimensional)
 
 BOOST_AUTO_TEST_CASE(multidimensional_init)
 {
-	indexed_array<std::unique_ptr<std::string>, interval<3, 4>, interval<5, 6>, interval<7, 8>> arr {
-		std::make_unique<std::string>("357"),
-		std::make_unique<std::string>("358"),
-		std::make_unique<std::string>("367"),
-		std::make_unique<std::string>("368"),
-		std::make_unique<std::string>("457"),
-		std::make_unique<std::string>("458"),
-		std::make_unique<std::string>("467"),
-		std::make_unique<std::string>("468"),
+	indexed_array<std::unique_ptr<std::string>, interval<3, 4>, interval<5, 6>, interval<7, 8> > arr{
+	    std::make_unique<std::string>("357"),
+	    std::make_unique<std::string>("358"),
+	    std::make_unique<std::string>("367"),
+	    std::make_unique<std::string>("368"),
+	    std::make_unique<std::string>("457"),
+	    std::make_unique<std::string>("458"),
+	    std::make_unique<std::string>("467"),
+	    std::make_unique<std::string>("468"),
 	};
 	BOOST_TEST(*arr.at(4, 5, 7) == "457");
 }
@@ -102,17 +102,17 @@ BOOST_AUTO_TEST_CASE(multidimensional_init)
 BOOST_AUTO_TEST_CASE(multidimensional_safe_initialization)
 {
 	auto blue3 = std::make_unique<std::string>("Blue3");
-	indexed_array<std::unique_ptr<std::string>, Color, interval<3, 4>> arr {
-		safe_arg<Color::Red, 3>(std::make_unique<std::string>("Red3")),
-		safe_arg<Color::Red, 4>(std::make_unique<std::string>("Red4")),
-		safe_arg<Color::Green, 3>(std::make_unique<std::string>("Green3")),
-		safe_arg<Color::Green, 4>(std::make_unique<std::string>("Green4")),
-		safe_arg<Color::Blue, 3>(std::move(blue3)),
-		safe_arg<Color::Blue, 4>(std::make_unique<std::string>("Blue4")),
-		safe_arg<Color::Black, 3>(std::make_unique<std::string>("Black3")),
-		safe_arg<Color::Black, 4>(std::make_unique<std::string>("Black4")),
-		safe_arg<Color::White, 3>(std::make_unique<std::string>("White3")),
-		safe_arg<Color::White, 4>(std::make_unique<std::string>("White4")),
+	indexed_array<std::unique_ptr<std::string>, Color, interval<3, 4> > arr{
+	    safe_arg<Color::Red, 3>(std::make_unique<std::string>("Red3")),
+	    safe_arg<Color::Red, 4>(std::make_unique<std::string>("Red4")),
+	    safe_arg<Color::Green, 3>(std::make_unique<std::string>("Green3")),
+	    safe_arg<Color::Green, 4>(std::make_unique<std::string>("Green4")),
+	    safe_arg<Color::Blue, 3>(std::move(blue3)),
+	    safe_arg<Color::Blue, 4>(std::make_unique<std::string>("Blue4")),
+	    safe_arg<Color::Black, 3>(std::make_unique<std::string>("Black3")),
+	    safe_arg<Color::Black, 4>(std::make_unique<std::string>("Black4")),
+	    safe_arg<Color::White, 3>(std::make_unique<std::string>("White3")),
+	    safe_arg<Color::White, 4>(std::make_unique<std::string>("White4")),
 	};
 	BOOST_TEST(*arr.at(Color::Blue, 4) == "Blue4");
 	BOOST_TEST(*arr.at(Color::Blue, 3) == "Blue3");
@@ -120,9 +120,9 @@ BOOST_AUTO_TEST_CASE(multidimensional_safe_initialization)
 
 BOOST_AUTO_TEST_CASE(multidimensional_slices)
 {
-	indexed_array<std::unique_ptr<std::string>, Color, Material, interval<-3, 6>> arr{};
+	indexed_array<std::unique_ptr<std::string>, Color, Material, interval<-3, 6> > arr{};
 	int i = 0;
-	for(auto & a : arr)
+	for (auto& a : arr)
 	{
 		a = std::make_unique<std::string>(std::to_string(i++));
 	}
@@ -178,4 +178,3 @@ BOOST_AUTO_TEST_CASE(multidimensional_in_range)
 	BOOST_TEST(T::in_range(Color::White, Material::Wood, 6));
 	BOOST_TEST(T::in_range(Color::White, Material::Wood, -3));
 }
-

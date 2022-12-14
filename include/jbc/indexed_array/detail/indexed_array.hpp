@@ -50,6 +50,22 @@ class indexed_array_helper
 	constexpr reference operator[](Index idx);
 	constexpr const_reference operator[](Index idx) const;
 
+	constexpr reference slice_at(Index index)
+	{
+		return at(index);
+	}
+	constexpr const_reference slice_at(Index index) const
+	{
+		return at(index);
+	}
+	constexpr reference slice(Index index)
+	{
+		return operator[](index);
+	}
+	constexpr const_reference slice(Index index) const
+	{
+		return operator[](index);
+	}
 	static constexpr bool in_range(Index idx)
 	{
 		return Indexer::in_range(idx);
@@ -58,7 +74,7 @@ class indexed_array_helper
 
 template <typename Value, typename Indexer>
 class indexed_array :
-    public indexed_array_helper<Value, Indexer, indexed_array<Value, Indexer>, typename Indexer::index>
+    private indexed_array_helper<Value, Indexer, indexed_array<Value, Indexer>, typename Indexer::index>
 {
 	template <typename V, typename I, typename Owner, typename Idx>
 	friend class indexed_array_helper;
@@ -117,6 +133,9 @@ class indexed_array :
 	// at and [] operators. Use inheritance to get correct signature
 	using indexed_array_helper<Value, Indexer, indexed_array<Value, Indexer>, typename Indexer::index>::at;
 	using indexed_array_helper<Value, Indexer, indexed_array<Value, Indexer>, typename Indexer::index>::operator[];
+	using indexed_array_helper<Value, Indexer, indexed_array<Value, Indexer>, typename Indexer::index>::slice;
+	using indexed_array_helper<Value, Indexer, indexed_array<Value, Indexer>, typename Indexer::index>::slice_at;
+	using indexed_array_helper<Value, Indexer, indexed_array<Value, Indexer>, typename Indexer::index>::in_range;
 
 	static constexpr bool is_o1 = Indexer::is_o1;
 

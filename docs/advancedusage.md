@@ -20,6 +20,10 @@ elements in the `indexed_array` is no longer `O(1)` but becomes `O(N)`. This is 
 indexer must iterate through all values, incrementing the inner index, to retrieve the
 corresponding value.
 
+`indexed_array` provides the static member `is_o1` which is true if the `indexed_array` has `O(1)`
+access, and false otherwise. This allows putting a `static_assert` in case `O(1)` access is a
+requirement, or to enable some optimizations based on this property.
+
 ### Non contiguous enum values
 
 Sometimes enum values are not contiguous, because some value is reserved or no longer in use.
@@ -148,6 +152,10 @@ translation between interface index and internal container index. The boolean is
 here to distinguish between throwing (`b` is `true`)/ non-throwing (`b` is `false`)
 versions. The indexer shall raise an `out_of_range` exception when `b` is `true` and
 it is given an invalid index. This method may be `noexcept(!b)`.
+* a static `is_o1` boolean value, which tells if the indexer is `O(1)`. This is optional,
+but is provided by standard indexers, and may be used to optimize some algorithms.
+* a static `in_range(index)` boolean method, which returns true if the given index
+is in the range of possible values (ie, `at(index)` won't throw).
 
 This is an unrealistic example of a custom index:
 
@@ -172,6 +180,11 @@ struct reverse_fibonnaci_index
 		if constexpr(b)
 			throw std::out_of_range("invalid index");
 		return -1; // this value may be catched by other tools when accessing underlying array
+	}
+	static constexpr bool is_o1 = false;
+	static constexpr bool in_range(index v) noexcept
+	{
+		return at<false>(v) != -1;
 	}
 };
 ```

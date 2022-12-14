@@ -19,7 +19,9 @@ should be enough to use the library. To use describe enum reflection integration
 necessary to add the following compile definition: `INDEXED_ARRAY_HAS_DESCRIBE`, or to
 include `jbc/indexed_array/describe.hpp` manually.
 
-Compiling must be done using at least `C++17` mode.
+Compiling must be done using at least `C++17` mode. For clarity, the examples in this
+documentation assume a `using namespace jbc::indexed_array` directive, and a
+`using namespace std` as well.
 
 ## A simple example with describe
 

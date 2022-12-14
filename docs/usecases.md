@@ -209,4 +209,52 @@ mind), using `indexed_array` can provide a great help, in that it allows keeping
 algorithms untouched, by using the same indexing scheme as the one they were originally
 written with.
 
+## A faster `enum_to_string`
+
+Describe provides an helper function to convert an enum to a string. This function, however,
+iterate through all enums, not taking the advantage of the contiguity of enum values, if
+applicable. We can thus make it a bit faster, by using an indexed array to store the strings
+associated to each enum value.
+
+First we need to create the list of values:
+```
+template <class E, template<class... T> class L, class... T>
+constexpr jbc::indexed_array::indexed_array<char const*, E> describe_enumerators_as_indexed_array_impl(L<T...>)
+{
+	return jbc::indexed_array::indexed_array<char const*, E>{T::name...};
+}
+template <typename T>
+struct to_string_helper
+{
+	static constexpr jbc::indexed_array::indexed_array<char const*, E> describe_enumerators_as_indexed_array
+	    {describe_enumerators_as_indexed_array_impl<E>(boost::describe::describe_enumerators<E>())};
+};
+```
+And then use that. But we want to use that only if `indexed_array<char const*, E>` is `O(1)`, otherwise,
+there won't be any benefit. If that's not the case, we fallback to normal formatting via describe. We use
+the static `is_o1` property to enable the overload only when it will gives a performance boost:
+```
+template<class T>
+char const* to_string(T e, typename std::enable_if<
+    boost::describe::has_describe_enumerators<T>::value && 
+    jbc::indexed_array::indexed_array<char const*, T>::is_o1, T>::type = {})
+{
+	if (jbc::indexed_array::indexed_array<char const*, T>::indexer::in_range(e))
+		return to_string_helper<T>::describe_enumerators_as_indexed_array[e];
+	return "<ERROR>";
+};
+
+template<class T>
+char const* to_string(T e, typename std::enable_if<
+    boost::describe::has_describe_enumerators<T>::value && 
+    jbc::indexed_array::indexed_array<char const*, T>::is_o1, T>::type = {})
+{
+	return enum_to_string(e);
+};
+```
+
+The overall performance improvement is about 10 to 15% with gcc or clang for a common enum (around 10 values). The code may also smaller, especially
+when the enum has a lot of values (around 25% smaller with an enum with thirty values). The bigger the 
+number of values in the enum, the bigger the gains.
+
 Back to the [Index](index.md), or continue to [Reference](reference.md)

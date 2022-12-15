@@ -11,7 +11,7 @@ https://www.boost.org/LICENSE_1_0.txt
 The library is header-only. Adding `indexed_array/include` to your
 include path, and 
 
-```
+```cpp
 #include <jbc/indexed_array.hpp>
 ```
 
@@ -92,7 +92,7 @@ will thow `std::out_of_range`.
 
 The following are valid declarations:
 
-```
+```cpp
 indexed_array<std::string, interval<-12, -3>> d1;        // data.size == 10
 indexed_array<char, interval<-3, 6>> d2;                 // data.size() == 10
 indexed_array<std::unique_ptr<int>, interval<10, 19> d3; // data.size() == 10
@@ -102,7 +102,7 @@ indexed_array<char, interval<2ULL, 8ULL>>;               // data.size() == 7
 ```
 
 The following declarations are invalid:
-```
+```cpp
 indexed_array<char, interval<4, 2>> d1;    // fails, interval must be [min,max] with min <= max
 indexed_array<char, interval<-2, 4U>> d2;  // fails, interval must use both integers of same type
 indexed_array<char, interval<-2, 4LL>> d3; // fails, interval must use both integers of same type
@@ -113,7 +113,7 @@ indexed_array<char, interval<-2, 4LL>> d3; // fails, interval must use both inte
 If there is no static enum reflection data, or if you want to use a subset of the enum values, you
 can use an interval as well. Given the following enum declaration:
 
-```
+```cpp
 enum class LogComponent {
 	All = -1,
 	WebServer = 0,
@@ -123,7 +123,7 @@ enum class LogComponent {
 ```
 
 The following declaration is valid:
-```
+```cpp
 constexpr indexed_array<string_view, interval<LogComponent::WebServer, LogComponent::Worker>> 
 logprefixes = {
 	"<<webserver>>",
@@ -134,7 +134,7 @@ logprefixes = {
 
 And can be used like this
 
-```
+```cpp
 template <LogComponent component, typename... Args>
 void log(Args&& args)
 {
@@ -159,7 +159,7 @@ for (auto prefix : logprefixes)
 ```
 
 Will output:
-```
+```cpp
 <<webserver>>
 <<template >>
 <<worker   >>

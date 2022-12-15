@@ -60,6 +60,29 @@ struct for_each_<indexed_array<Content, Indexer>, Func>
 	}
 };
 
+template <typename Content, typename Indexer, typename Func>
+struct for_each_<indexed_span<Content, Indexer>, Func>
+{
+	static void apply(Func&& f, indexed_span<Content, Indexer>& data)
+	{
+		using list_type = typename create_list_helper<Indexer>::type;
+		auto current = data.begin();
+		boost::mp11::mp_for_each<list_type>([&current, f](auto I) {
+			f(I, *current);
+			++current;
+		});
+	}
+	static void apply(Func&& f, indexed_span<Content, Indexer> const& data)
+	{
+		using list_type = typename create_list_helper<Indexer>::type;
+		auto current = data.begin();
+		boost::mp11::mp_for_each<list_type>([&current, f](auto I) {
+			f(I, *current);
+			++current;
+		});
+	}
+};
+
 } // namespace jbc::indexed_array::detail
 
 #endif // JBC_INDEXED_ARRAY_DETAIL_FOREACH_H

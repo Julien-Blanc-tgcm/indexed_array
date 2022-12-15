@@ -75,6 +75,44 @@ BOOST_AUTO_TEST_CASE(foreach4)
 	BOOST_TEST(t[10] == 20);
 }
 
+BOOST_AUTO_TEST_CASE(foreach5)
+{
+	Test4 t{1, 2, 3, 4, 5, 10, 11, 12, 13, 14, 15};
+	Test4 const t2(t);
+	for_each(t2, [&t2](int key, int val) { // reference won't compile here
+		BOOST_TEST(t2[key] == val);
+	});
+}
+
+using Test5 = indexed_array<int, interval<1, 5>, interval<3, 10> >;
+
+BOOST_AUTO_TEST_CASE(foreach_span1)
+{
+	Test5 t;
+	int i = 0;
+	for (auto& v : t)
+		v = i++;
+	auto s = t.slice(2);
+	for_each(s, [&t](int key, int& val) {
+		BOOST_TEST((t[{2, key}] == val));
+		val = 2 * val;
+	});
+	BOOST_TEST(s[3] == 16);
+}
+
+BOOST_AUTO_TEST_CASE(foreach_span2)
+{
+	Test5 t;
+	int i = 0;
+	for (auto& v : t)
+		v = i++;
+	Test5 const t2(t);
+	auto s = t2.slice(2);
+	for_each(s, [&t](int key, int const& val) {
+		BOOST_TEST((t[{2, key}] == val));
+	});
+}
+
 /*
 Not implemented yet. Uncomment this when foreach is implemented for
 multidimensional arrays

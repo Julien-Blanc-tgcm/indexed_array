@@ -9,6 +9,7 @@ https://www.boost.org/LICENSE_1_0.txt
 This library provides a generic fixed-size container, that is a drop-in
 replacement for `std::array`, that uses custom indexes. It allows writing
 code like the following:
+
 ```cpp
 enum class Foo { Bar1 = 4, Bar2, Bar3 };
 // ...
@@ -46,7 +47,7 @@ The library has the following requirements:
 * A `C++17` capable compiler
 * `boost::mp11`
 
-Optionnaly, but strongly recommended, is one of the following:
+Optional, but strongly recommended, is one of the following:
 
 * `boost::describe`
 * `magic_enum`

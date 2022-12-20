@@ -24,6 +24,25 @@ corresponding value.
 access, and false otherwise. This allows putting a `static_assert` in case `O(1)` access is a
 requirement, or to enable some optimizations based on this property.
 
+### Integer sequences
+
+The library provides the template class `value_sequence`, which is very similar to
+`std::integer_sequence`, but does not require the type parameter to be an integer-like
+type. The library uses this class for indexing using a sequence of values, and provides
+automatic conversion from `std::integer_sequence`, so that we can write:
+
+```
+using T = indexed_array<int, std::integer_sequence<int, -1, 0, 1, 2, 3>>;
+assert(T::size() == 5);
+```
+
+This works as well if the values are not contiguous:
+
+```
+using T = indexed_array<int, std::integer_sequence<int, 1, 2, 4, 8>>;
+assert(T::size() == 4);
+```
+
 ### Non contiguous enum values
 
 Sometimes enum values are not contiguous, because some value is reserved or no longer in use.

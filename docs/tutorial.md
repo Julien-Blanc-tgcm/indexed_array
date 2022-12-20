@@ -103,7 +103,7 @@ indexed_array<char, interval<2ULL, 8ULL>>;               // data.size() == 7
 
 The following declarations are invalid:
 ```cpp
-indexed_array<char, interval<4, 2>> d1;    // fails, interval must be [min,max] with min <= max
+indexed_array<char, interval<4, 3>> d1;    // fails, interval must be [min,max] with min <= max
 indexed_array<char, interval<-2, 4U>> d2;  // fails, interval must use both integers of same type
 indexed_array<char, interval<-2, 4LL>> d3; // fails, interval must use both integers of same type
 ```

@@ -12,7 +12,7 @@ Multidimensional arrays can always be implemented as arrays of
 arrays. This is true for `indexed_array` as well:
 
 ```cpp
-indexed_array<indexed_array<int, interval<1, 5>>, interval<1, 5>> data;
+indexed_array<indexed_array<int, index_range<1, 5>>, index_range<1, 5>> data;
 static_assert(sizeof(data) == 25 * sizeof(int));
 ```
 
@@ -31,7 +31,7 @@ implements composing multiple indexers (as a variadic list of indexers) to creat
 a single multidimensional indexer:
 
 ```cpp
-indexed_array<int, interval<1, 5>, interval<1, 5> > data;
+indexed_array<int, index_range<1, 5>, index_range<1, 5> > data;
 static_assert(sizeof(data) == 25 * sizeof(int));
 ```
 
@@ -47,7 +47,7 @@ static_assert(is_same_v<decltype(ret), int>);
 
 This works with enums as well:
 ```
-indexed_array<int, Floor, interval<1, 5> > data;
+indexed_array<int, Floor, index_range<1, 5> > data;
 
 auto ret = data[{Floor::F4, 3}];
 static_assert(is_same_v<decltype(ret), int>);
@@ -61,14 +61,14 @@ The `size()` function returns the **total amount** of items in the multidimensio
 array. This means that the following holds true:
 ```
 size() == sizeof(*this) / sizeof(value_type);
-indexed_array<int, interval<1, 5>, interval<1, 5> > data;
+indexed_array<int, index_range<1, 5>, index_range<1, 5> > data;
 assert(data.size() == 25);
 ```
 
 Iteration is done through the whole raw underlying array, without any hierarchy.
 
 ```
-indexed_array<int, interval<1, 5>, interval<1, 5> > data;
+indexed_array<int, index_range<1, 5>, index_range<1, 5> > data;
 static_assert(is_same_v<decltype(*d.begin()), int>);
 int i = 0;
 for(auto &d : data)
@@ -92,7 +92,7 @@ The whole point of having multiple dimensions is to allow to retrieve a single
 place). In `indexed_array`, this is done through the `slice` (or `slice_at`) call:
 
 ```cpp
-indexed_array<int, interval<1, 3>, interval<1, 5> > data;
+indexed_array<int, index_range<1, 3>, index_range<1, 5> > data;
 int i = 0;
 for(auto &d : data)
 	d = i++;
@@ -101,7 +101,7 @@ assert(v[1] == 5);
 assert(v[5] == 9);
 ```
 
-This call returns an `indexed_span<int, interval<1, 5>>`. This is a view
+This call returns an `indexed_span<int, index_range<1, 5>>`. This is a view
 (a non-owning structure) on the data held in the `indexed_array`, which
 follows the same accessing scheme.
 
@@ -123,7 +123,7 @@ struct fib_multidim_indexer
 {
 	using index = mp_list<int, int, int>;
 	using root_indexer = reverse_fibonnaci_index;
-	using slice_indexer = make_default_indexer<interval<3, 12>, interval<-3, 2>>;
+	using slice_indexer = make_default_indexer<index_range<3, 12>, index_range<-3, 2>>;
 	inline static constexpr size_t const size = root_indexer::size * slice_indexer::size;
 	template<bool b>
 	static constexpr auto at(int v1, int v2, int v3) noexcept(!b)

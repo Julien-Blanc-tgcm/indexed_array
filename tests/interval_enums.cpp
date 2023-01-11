@@ -32,27 +32,27 @@ enum class Foo
 	return o;
 }*/
 
-BOOST_AUTO_TEST_CASE(interval_enum_s)
+BOOST_AUTO_TEST_CASE(index_range_enum_s)
 {
-	indexed_array<int, interval<Foo::bir, Foo::bur> > arr{1, 2, 3};
+	indexed_array<int, index_range<Foo::bir, Foo::bur> > arr{1, 2, 3};
 	BOOST_TEST(arr.size() == 3);
 	BOOST_TEST(arr[Foo::bir] == 1);
 	BOOST_TEST(arr[Foo::bor] == 2);
 	BOOST_TEST(arr[Foo::bur] == 3);
 }
 
-BOOST_AUTO_TEST_CASE(interval_enum_negative)
+BOOST_AUTO_TEST_CASE(index_range_enum_negative)
 {
-	indexed_array<int, interval<Foo::ber, Foo::bor> > arr{1, 2, 3};
+	indexed_array<int, index_range<Foo::ber, Foo::bor> > arr{1, 2, 3};
 	BOOST_TEST(arr.size() == 3);
 	BOOST_TEST(arr[Foo::ber] == 1);
 	BOOST_TEST(arr[Foo::bir] == 2);
 	BOOST_TEST(arr[Foo::bor] == 3);
 }
 
-BOOST_AUTO_TEST_CASE(interval_enum_out_of_bound)
+BOOST_AUTO_TEST_CASE(index_range_enum_out_of_bound)
 {
-	indexed_array<int, interval<Foo::bar, Foo::bir> > arr{1, 2, 3};
+	indexed_array<int, index_range<Foo::bar, Foo::bir> > arr{1, 2, 3};
 	BOOST_TEST(arr.size() == 3);
 	bool catched = false;
 	int a = 0;
@@ -67,9 +67,9 @@ BOOST_AUTO_TEST_CASE(interval_enum_out_of_bound)
 	BOOST_TEST(catched);
 }
 
-BOOST_AUTO_TEST_CASE(interval_enum_empty)
+BOOST_AUTO_TEST_CASE(index_range_enum_empty)
 {
-	indexed_array<int, interval<Foo::bar, Foo::bar> > arr{3};
+	indexed_array<int, index_range<Foo::bar, Foo::bar> > arr{3};
 	BOOST_TEST(arr.size() == 1);
 	BOOST_TEST(arr[Foo::bar] == 3);
 }

@@ -50,18 +50,18 @@ a compile-time error).
 
 All `std::array` operations are supported.
 
-## Using a numeric range (interval)
+## Using a numeric range (index\_range)
 
 Using a numeric range as the indexer allows using non-zero starting index, like
 available in several languages (Fortran, Ada, Algol, etc.). The syntax used is
 similar as for `describe`-d enums, but this time the type passed must be an
-`interval<X, Y>` where `X` is the lower bound (inclusive) and `Y` the higher
+`index_range<X, Y>` where `X` is the lower bound (inclusive) and `Y` the higher
 bound (inclusive).
 
 For example:
 
 ```cpp
-indexed_array<char, interval<0, 5>> data; // data.size() == 6;
+indexed_array<char, index_range<0, 5>> data; // data.size() == 6;
 data[0] = 'H';
 data[1] = 'e';
 data[2] = 'l';
@@ -76,7 +76,7 @@ items can be accessed using `0` to `5` integer values. That is, something that b
 a lot like a plain `std::array<char, 6>`. Let's change this a bit:
 
 ```cpp
-indexed_array<char, interval<1, 6>> data; // data.size() == 6;
+indexed_array<char, index_range<1, 6>> data; // data.size() == 6;
 data[1] = 'H';
 data[2] = 'e';
 data[3] = 'l';
@@ -93,25 +93,25 @@ will thow `std::out_of_range`.
 The following are valid declarations:
 
 ```cpp
-indexed_array<std::string, interval<-12, -3>> d1;        // data.size == 10
-indexed_array<char, interval<-3, 6>> d2;                 // data.size() == 10
-indexed_array<std::unique_ptr<int>, interval<10, 19> d3; // data.size() == 10
-// since interval is inclusive, this declare a one-sized array
-indexed_array<int, interval<4, 4>> d4;                   // data.size() == 1
-indexed_array<char, interval<2ULL, 8ULL>>;               // data.size() == 7
+indexed_array<std::string, index_range<-12, -3>> d1;        // data.size == 10
+indexed_array<char, index_range<-3, 6>> d2;                 // data.size() == 10
+indexed_array<std::unique_ptr<int>, index_range<10, 19> d3; // data.size() == 10
+// since index_range is inclusive, this declare a one-sized array
+indexed_array<int, index_range<4, 4>> d4;                   // data.size() == 1
+indexed_array<char, index_range<2ULL, 8ULL>>;               // data.size() == 7
 ```
 
 The following declarations are invalid:
 ```cpp
-indexed_array<char, interval<4, 3>> d1;    // fails, interval must be [min,max] with min <= max
-indexed_array<char, interval<-2, 4U>> d2;  // fails, interval must use both integers of same type
-indexed_array<char, interval<-2, 4LL>> d3; // fails, interval must use both integers of same type
+indexed_array<char, index_range<4, 3>> d1;    // fails, index_range must be [min,max] with min <= max
+indexed_array<char, index_range<-2, 4U>> d2;  // fails, index_range must use both integers of same type
+indexed_array<char, index_range<-2, 4LL>> d3; // fails, index_range must use both integers of same type
 ```
 
-## Using an enum range (interval)
+## Using an enum range (index\_range)
 
 If there is no static enum reflection data, or if you want to use a subset of the enum values, you
-can use an interval as well. Given the following enum declaration:
+can use an `index_range` as well. Given the following enum declaration:
 
 ```cpp
 enum class LogComponent {
@@ -124,7 +124,7 @@ enum class LogComponent {
 
 The following declaration is valid:
 ```cpp
-constexpr indexed_array<string_view, interval<LogComponent::WebServer, LogComponent::Worker>> 
+constexpr indexed_array<string_view, index_range<LogComponent::WebServer, LogComponent::Worker>> 
 logprefixes = {
 	"<<webserver>>",
 	"<<template >>",
@@ -144,7 +144,7 @@ void log(Args&& args)
 
 The size of the array is `3`, and calling `logprefixes[LogComponent::All]` is undefined behaviour.
 
-The same rules apply when using integer intervals or enum intervals.
+The same rules apply when using integer ranges or enum ranges.
 
 ## Common operations
 
@@ -169,7 +169,7 @@ Reverse iteration is supported as well.
 
 Fill/swap
 ```cpp
-indexed_array<int, interval<1, 10>> d1, d2;
+indexed_array<int, index_range<1, 10>> d1, d2;
 d1.fill(10);
 d2.swap(d1);
 assert(d2[1] == 10);
@@ -177,7 +177,7 @@ assert(d2[1] == 10);
 
 Bound checked or unchecked access
 ```cpp
-indexed_array<int, interval<1, 10>> d1;
+indexed_array<int, index_range<1, 10>> d1;
 d1.at(11) = 10; // throws std::out_of_range
 d1.at(0) = 0; // throws std::out_of_range
 d1[0] = 0; // undefined behaviour
@@ -191,7 +191,7 @@ This is not a real iteration, as the keys are known at compile-time, not run-tim
 a convenience helper:
 
 ```cpp
-indexed_array<int, interval<1, 10>> d1;
+indexed_array<int, index_range<1, 10>> d1;
 for_each(d, [](int key, int& val)
 {
 	val = key;
@@ -205,7 +205,7 @@ The library also supports multidimensional indexing. Declaring a multidimensiona
 is very similar to declaring a single dimension:
 
 ```
-indexed_array<int, interval<1, 4>, Foo> data;
+indexed_array<int, index_range<1, 4>, Foo> data;
 assert(data.size() == 4 * 5); // 5 is the number of enum values in Foo
 ```
 

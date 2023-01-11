@@ -36,6 +36,7 @@ template <typename Value, typename Index1, typename... Indexes>
 using indexed_array = detail::indexed_array<Value, detail::to_single_indexer_t<Index1, Indexes...> >;
 
 using detail::interval;
+using detail::index_range;
 using detail::single_value;
 using detail::union_of;
 template <typename Value, typename... Index>

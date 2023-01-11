@@ -6,7 +6,7 @@
 
 using namespace jbc::indexed_array;
 
-using Test = indexed_array<int, interval<1, 5> >;
+using Test = indexed_array<int, index_range<1, 5> >;
 
 BOOST_AUTO_TEST_CASE(foreach)
 {
@@ -26,7 +26,7 @@ enum class Foo : std::size_t
 	Bar6
 };
 
-using Test2 = indexed_array<int, interval<Foo::Bar1, Foo::Bar6> >;
+using Test2 = indexed_array<int, index_range<Foo::Bar1, Foo::Bar6> >;
 
 BOOST_AUTO_TEST_CASE(foreach2)
 {
@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(foreach3)
 	}
 }
 
-using Test4 = indexed_array<int, union_of<interval<1, 5>, interval<10, 15> > >;
+using Test4 = indexed_array<int, union_of<index_range<1, 5>, index_range<10, 15> > >;
 
 BOOST_AUTO_TEST_CASE(foreach4)
 {
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(foreach5)
 	});
 }
 
-using Test5 = indexed_array<int, interval<1, 5>, interval<3, 10> >;
+using Test5 = indexed_array<int, index_range<1, 5>, index_range<3, 10> >;
 
 BOOST_AUTO_TEST_CASE(foreach_span1)
 {
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE(foreach_span2)
 /*
 Not implemented yet. Uncomment this when foreach is implemented for
 multidimensional arrays
-using Test5 = indexed_array<int, interval<1, 5>, interval<10, 15> >;
+using Test5 = indexed_array<int, index_range<1, 5>, index_range<10, 15> >;
 
 BOOST_AUTO_TEST_CASE(foreach5)
 {

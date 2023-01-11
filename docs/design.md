@@ -81,15 +81,15 @@ static inline constexpr auto const integral_value_v = integral_value<decltype(C)
 This will allow us to convert enum values to their underlying integral type, both at compile and
 run time, while keeping integral value unchanged. This will help reduce boilerplate code.
 
-### Indexing using an integral (or enum) interval
+### Indexing using an integral (or enum) index\_range
 
-The first thing that is needed is a type to represent such an interval (the term interval is used preferrably
-over range, to avoid any confusion with the C++20 range library).
+The first thing that is needed is a type to represent such an index (we prefix with index to avoid any
+confusion with the C++20 range library).
 
 The library provides one, whose definition is as simple as :
 ```cpp
 template <auto minInclusive, type_identity_t<decltype(minInclusive)> maxInclusive>
-struct interval
+struct index_range
 {
 	using type = decltype(minInclusive);
 	static inline constexpr type const min = minInclusive;
@@ -101,7 +101,7 @@ Then we just have to write the following specialization (see source code for act
 ```cpp
 template <typename T, T min, T max>
 struct default_indexer<
-    interval<min, max>, 
+    index_range<min, max>, 
     typename std::enable_if_t<
         std::is_integral<T>::value || std::is_enum<T>::value,
         void>>
@@ -118,7 +118,7 @@ Such indexing provides a mapping between the value and the index in the sequence
 
 The standard library already provides a type to represent such a sequence, it's called `std::integer_sequence`,
 so we just need to write a specialization for it. This is pretty straightforward, but there's a pretty cheap
-optimization we can do: detect if the sequence is contiguous, and in that case use an interval-like scheme.
+optimization we can do: detect if the sequence is contiguous, and in that case use an index\_range-like scheme.
 
 We thus provide two specializations:
 

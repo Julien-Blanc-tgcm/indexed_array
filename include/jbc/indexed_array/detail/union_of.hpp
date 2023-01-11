@@ -71,7 +71,7 @@ struct union_of_helper
 };
 
 template <auto T1, auto T2, typename... Args>
-struct union_of_helper<interval<T1, T2>, Args...>
+struct union_of_helper<index_range<T1, T2>, Args...>
 {
 	template <class T>
 	using add_value = std::integral_constant<std::decay_t<decltype(T1)>, sum_of_v<T1, static_cast<int>(T::value)> >;

@@ -27,9 +27,9 @@ struct create_list_helper<default_indexer<value_sequence<decltype(first), first,
 };
 
 template <auto v1, type_identity_t<decltype(v1)> v2>
-struct create_list_helper<default_indexer<interval<v1, v2> > >
+struct create_list_helper<default_indexer<index_range<v1, v2> > >
 {
-	using type = typename union_of_helper<interval<v1, v2> >::type;
+	using type = typename union_of_helper<index_range<v1, v2> >::type;
 };
 
 template <typename T, typename Func>

@@ -21,7 +21,7 @@ BOOST_DESCRIBE_ENUM(Color, Red, Green, Blue, Black, White);
 
 BOOST_AUTO_TEST_CASE(equality)
 {
-	using Base = indexed_array<std::string, Color, interval<3, 8>, interval<-2, 4> >;
+	using Base = indexed_array<std::string, Color, index_range<3, 8>, index_range<-2, 4> >;
 
 	Base b1;
 	Base b2;
@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(equality)
 
 BOOST_AUTO_TEST_CASE(inferiority)
 {
-	using Base = indexed_array<std::string, Color, interval<3, 8>, interval<-2, 4> >;
+	using Base = indexed_array<std::string, Color, index_range<3, 8>, index_range<-2, 4> >;
 
 	Base b1;
 	Base b2;
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(inferiority)
 
 BOOST_AUTO_TEST_CASE(size)
 {
-	using Base = indexed_array<std::string, Color, interval<3, 8>, interval<-2, 4> >;
+	using Base = indexed_array<std::string, Color, index_range<3, 8>, index_range<-2, 4> >;
 	Base b1;
 	BOOST_TEST(b1.size() == 5 * 6 * 7);
 	BOOST_TEST(!b1.empty());
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(size)
 
 BOOST_AUTO_TEST_CASE(swap)
 {
-	using Base = indexed_array<std::string, Color, interval<3, 8>, interval<-2, 4> >;
+	using Base = indexed_array<std::string, Color, index_range<3, 8>, index_range<-2, 4> >;
 	Base b1;
 	int i = 0;
 	for (auto& b : b1)

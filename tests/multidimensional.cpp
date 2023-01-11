@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(bidimensional2)
 
 BOOST_AUTO_TEST_CASE(bidimensional3)
 {
-	indexed_array<std::string, Color, interval<3, 8> > arr;
+	indexed_array<std::string, Color, index_range<3, 8> > arr;
 	BOOST_TEST(arr.size() == 30);
 	int i = 0;
 	for (auto& a : arr)
@@ -79,7 +79,7 @@ struct custom_indexer
 
 BOOST_AUTO_TEST_CASE(multidimensional)
 {
-	indexed_array<std::unique_ptr<std::string>, Color, interval<3, 8>, custom_indexer, Material> arr;
+	indexed_array<std::unique_ptr<std::string>, Color, index_range<3, 8>, custom_indexer, Material> arr;
 	BOOST_TEST(arr.size() == 5 * 6 * 8 * 4);
 	int i = 0;
 	for (auto& a : arr)
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(multidimensional)
 
 BOOST_AUTO_TEST_CASE(multidimensional_init)
 {
-	indexed_array<std::unique_ptr<std::string>, interval<3, 4>, interval<5, 6>, interval<7, 8> > arr{
+	indexed_array<std::unique_ptr<std::string>, index_range<3, 4>, index_range<5, 6>, index_range<7, 8> > arr{
 	    std::make_unique<std::string>("357"),
 	    std::make_unique<std::string>("358"),
 	    std::make_unique<std::string>("367"),
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(multidimensional_init)
 BOOST_AUTO_TEST_CASE(multidimensional_safe_initialization)
 {
 	auto blue3 = std::make_unique<std::string>("Blue3");
-	indexed_array<std::unique_ptr<std::string>, Color, interval<3, 4> > arr{
+	indexed_array<std::unique_ptr<std::string>, Color, index_range<3, 4> > arr{
 	    safe_arg<Color::Red, 3>(std::make_unique<std::string>("Red3")),
 	    safe_arg<Color::Red, 4>(std::make_unique<std::string>("Red4")),
 	    safe_arg<Color::Green, 3>(std::make_unique<std::string>("Green3")),
@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_CASE(multidimensional_safe_initialization)
 
 BOOST_AUTO_TEST_CASE(multidimensional_slices)
 {
-	indexed_array<std::unique_ptr<std::string>, Color, Material, interval<-3, 6> > arr{};
+	indexed_array<std::unique_ptr<std::string>, Color, Material, index_range<-3, 6> > arr{};
 	int i = 0;
 	for (auto& a : arr)
 	{
@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE(multidimensional_slices)
 
 BOOST_AUTO_TEST_CASE(multidimensional_const_slices)
 {
-	indexed_array<std::unique_ptr<std::string>, Color, Material, interval<-3, 6> > arr{};
+	indexed_array<std::unique_ptr<std::string>, Color, Material, index_range<-3, 6> > arr{};
 	int i = 0;
 	for (auto& a : arr)
 	{
@@ -165,17 +165,17 @@ BOOST_AUTO_TEST_CASE(multidimensional_const_slices)
 
 BOOST_AUTO_TEST_CASE(multidimensional_o1)
 {
-	using T = indexed_array<int, interval<-2, 5>, interval<10, 15>, interval<4, 8> >;
+	using T = indexed_array<int, index_range<-2, 5>, index_range<10, 15>, index_range<4, 8> >;
 	BOOST_TEST(T::is_o1);
-	using T2 = indexed_array<int, union_of<interval<-2, 5>, interval<10, 15> >, interval<4, 8> >;
+	using T2 = indexed_array<int, union_of<index_range<-2, 5>, index_range<10, 15> >, index_range<4, 8> >;
 	BOOST_TEST(!T2::is_o1);
-	using T3 = indexed_array<int, union_of<interval<0, 5>, interval<5, 10> > >;
+	using T3 = indexed_array<int, union_of<index_range<0, 5>, index_range<5, 10> > >;
 	BOOST_TEST(T3::is_o1);
 }
 
 BOOST_AUTO_TEST_CASE(multidimensional_in_range)
 {
-	using T = indexed_array<std::unique_ptr<std::string>, Color, Material, interval<-3, 6> >;
+	using T = indexed_array<std::unique_ptr<std::string>, Color, Material, index_range<-3, 6> >;
 	BOOST_TEST(T::in_range(Color::Black, Material::Wood, 4));
 	BOOST_TEST(!T::in_range(static_cast<Color>(-5), Material::Wood, 4));
 	BOOST_TEST(!T::in_range(Color::White, Material::Wood, 8));

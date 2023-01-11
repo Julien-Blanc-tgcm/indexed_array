@@ -103,7 +103,7 @@ enum class Floor : uint8_t {
 ```
 
 In real life, no lift ever has so many floors. We only use a subset of the floors, for example 
-`[F1..F32]` or `[F1..F64]`. We already covered that case earlier, using an interval. But lifts
+`[F1..F32]` or `[F1..F64]`. We already covered that case earlier, using an index range. But lifts
 also have some special *floors*, such as the machinery or the pit (beneath the lowest user level).
 So, we modify our enum accordingly:
 ```
@@ -122,7 +122,7 @@ store this data, we can declare the following:
 ```
 indexed_array<FiredetectorState, 
               union_of<
-                  interval<Floor::F1, Floor::F32>,
+                  index_range<Floor::F1, Floor::F32>,
                   single_value<Floor::Machinery>,
                   single_value<Floor::Pit>>> firedetectors;
 ```
@@ -156,7 +156,7 @@ enum class MyEnum
 
 This allows us to declare
 ```
-indexed_array<int, interval<MyEnum::first, MyEnum::last>> arr;
+indexed_array<int, index_range<MyEnum::first, MyEnum::last>> arr;
 assert(arr.size() == 3);
 ```
 

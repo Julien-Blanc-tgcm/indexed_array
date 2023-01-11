@@ -14,7 +14,7 @@ a long explanation:
 
 ```cpp
 BOOST_DEFINE_ENUM_CLASS(Color, red, blue, green, black);
-indexed_array<int, interval<Color>> values { 
+indexed_array<int, index_range<Color>> values { 
     0xFF0000,
     0x00FF00, // whoops, this is the value for green
     0x0000FF, // whoops, this is the value for blue

@@ -21,7 +21,7 @@ BOOST_DESCRIBE_ENUM(Color, Red, Green, Blue, Black, White);
 
 BOOST_AUTO_TEST_CASE(fill)
 {
-	using Base = indexed_array<std::string, Color, interval<3, 8>, interval<-2, 4> >;
+	using Base = indexed_array<std::string, Color, index_range<3, 8>, index_range<-2, 4> >;
 	Base b1;
 	b1.fill("b");
 	for (auto& b : b1)
@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(fill)
 
 BOOST_AUTO_TEST_CASE(copy)
 {
-	using Base = indexed_array<std::string, Color, interval<3, 8>, interval<-2, 4> >;
+	using Base = indexed_array<std::string, Color, index_range<3, 8>, index_range<-2, 4> >;
 	Base b1;
 	b1.fill("b");
 	Base b2(b1);
@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(copy)
 
 BOOST_AUTO_TEST_CASE(move)
 {
-	using Base = indexed_array<std::unique_ptr<int>, Color, interval<3, 8>, interval<-2, 4> >;
+	using Base = indexed_array<std::unique_ptr<int>, Color, index_range<3, 8>, index_range<-2, 4> >;
 	Base b1;
 	int i = 0;
 	for (auto& b : b1)

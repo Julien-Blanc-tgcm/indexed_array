@@ -91,8 +91,8 @@ slice_at(/* 1-dimension index */)
 > index. `slice` does not do any bound checking, `slice_at` throws `std::out_of_range` on error.
 
 ```cpp
-indexed_array<int, Color, Material, interval<1, 10>> foo;
-auto reds = foo.slice(Color::Red); // reds is indexed_span<int, Material, interval<1, 10>>
+indexed_array<int, Color, Material, index_range<1, 10>> foo;
+auto reds = foo.slice(Color::Red); // reds is indexed_span<int, Material, index_range<1, 10>>
 ```
 
 ## indexed\_span
@@ -162,16 +162,18 @@ on the parameters.
 
 ## Sets of value
 
-### interval
+### index\_range
 
 ```cpp
 template <auto minInclusive, type_identity_t<decltype(minInclusive)> maxInclusive>
-struct interval
+struct index_range
 ```
 
-Represent a contiguous inclusive interval of all values between `minInclusive` and 
-`maxInclusive` (thus, it contains `maxInclusive - minInclusive + 1` elements). This
-type is a marker meant to be used with `default_indexer`.
+> Represent a contiguous inclusive range of all values between `minInclusive` and 
+> `maxInclusive` (thus, it contains `maxInclusive - minInclusive + 1` elements). This
+> type is a marker meant to be used with `default_indexer`.
+
+_This was called `interval` in previous versions of the library, the alias is still provided_
 
 ### union\_of
 
@@ -180,8 +182,8 @@ template <typename... Args>
 /* */ union_of = typename to_value_sequence<typename union_of_helper<Args...>::type>::type;
 ```
 
-Represent the union of several sets of value (either `interval`, `value_sequence` or `single_value`). The
-result is always an `integer_sequence`.
+> Represent the union of several sets of value (either `index_range`, `value_sequence` or `single_value`). The
+> result is always a `value_sequence`.
 
 ### single\_value
 
@@ -190,7 +192,7 @@ template <auto T1>
 /* */ single_value = std::integral_constant<decltype(T1), T1>;
 ```
 
-Represent a single value, meant to be used with `union_of` helper.
+> Represent a single value, meant to be used with `union_of` helper.
 
 ### value\_sequence
 ```cpp
@@ -201,7 +203,7 @@ struct value_sequence
 };
 ```
 
-Represent a sequence of values. Use like this:
+> Represent a sequence of values. Use like this:
 
 ```cpp
 value_sequence<my_enum, my_enum::v1, my_enum::v2, ... >
@@ -225,21 +227,21 @@ already itself an indexer. The following must hold:
 
 ```cpp
 static_assert(std::is_same<
-    indexed_array<char, interval<-2, 3>>,
-    indexed_array<char, make_default_indexer<interval<-2, 3>>>
+    indexed_array<char, index_range<-2, 3>>,
+    indexed_array<char, make_default_indexer<index_range<-2, 3>>>
     >::value);
 ```
 
-`default_indexer` is defined for `describe`-d enums, `interval`s and `integer_sequence`s.
+`default_indexer` is defined for `describe`-d enums, `index_range`s and `value_sequence`s.
 
 `default_indexer` is also defined for multidimensional indexers. It is the most convenient
 way to define a multidimensional indexer (and is what is used by variadic `indexed_array`):
 
 ```cpp
-using multidim_indexer = make_default_indexer<interval<-2, 3>, interval<-5, 6>, my_described_enum>;
+using multidim_indexer = make_default_indexer<index_range<-2, 3>, index_range<-5, 6>, my_described_enum>;
 static_assert(std::is_same<
     indexed_array<char, multidim_indexer>,
-    indexed_array<char, interval<-2, 3>, interval<-5, 6>, my_described_enum>
+    indexed_array<char, index_range<-2, 3>, index_range<-5, 6>, my_described_enum>
     >::value);
 ```
 

@@ -21,13 +21,13 @@ BOOST_DESCRIBE_ENUM(Color, Red, Green, Blue, Black, White);
 
 BOOST_AUTO_TEST_CASE(subindexer)
 {
-	using Base = indexed_array<int, Color, interval<3, 8>, interval<-2, 4>>;
+	using Base = indexed_array<int, Color, index_range<3, 8>, index_range<-2, 4>>;
 
 	using Slice = Base::indexer::slice_indexer;
 
-	BOOST_TEST((std::is_same<Slice, detail::to_single_indexer_t<interval<3, 8>, interval<-2, 4>>>::value));
+	BOOST_TEST((std::is_same<Slice, detail::to_single_indexer_t<index_range<3, 8>, index_range<-2, 4>>>::value));
 
 	using Slice2 = Slice::slice_indexer;
 
-	BOOST_TEST((std::is_same<Slice2, detail::to_single_indexer_t<interval<-2, 4>>>::value));
+	BOOST_TEST((std::is_same<Slice2, detail::to_single_indexer_t<index_range<-2, 4>>>::value));
 }

@@ -21,7 +21,7 @@ optimizations enabled, the same code is generated for the following snippets :
 ```cpp
 extern int f(int);
 
-static indexed_array<int, interval<3, 7>> vals_idx{0, 1, 2, 3, 4};
+static indexed_array<int, index_range<3, 7>> vals_idx{0, 1, 2, 3, 4};
 
 int test_idx(int idx)
 {
@@ -77,7 +77,7 @@ enum class color
 
 const std::array<int, 4> vals_int{0xFF0000, 0x00FF00, 0x0000FF, 0};
 
-const indexed_array<int, interval<color::red, color::black>> vals_idx{0xFF0000, 0x00FF00, 0x0000FF, 0};
+const indexed_array<int, index_range<color::red, color::black>> vals_idx{0xFF0000, 0x00FF00, 0x0000FF, 0};
 
 int test_idx(color idx)
 {
@@ -287,10 +287,10 @@ t_idx25color:
 ### Detection of contiguous sequences
 
 The code is optimized for the case
-where a sequence is contiguous (it can be represented as an interval), so given the following:
+where a sequence is contiguous (it can be represented as an `index_range`), so given the following:
 
 ```cpp
-indexed_array<int, interval<3, 7>> arr1;
+indexed_array<int, index_range<3, 7>> arr1;
 indexed_array<int, std::integer_sequence<int, 3, 4, 5, 6, 7>> arr2;
 ```
 

@@ -29,14 +29,17 @@ template <class T>
 using type_identity_t = typename type_identity<T>::type;
 
 template <auto minInclusive, type_identity_t<decltype(minInclusive)> maxInclusive>
-struct interval
+struct index_range
 {
 	using type = decltype(minInclusive);
 	static inline constexpr type const min = minInclusive;
 	static inline constexpr type const max = maxInclusive;
 	static_assert(integral_value_v<minInclusive> <= integral_value_v<maxInclusive>,
-	              "Bounds must form a non-empty interval, min <= max");
+	              "Bounds must form a non-empty range, min <= max");
 };
+
+template <auto minInclusive, type_identity_t<decltype(minInclusive)> maxInclusive>
+using interval = index_range<minInclusive, maxInclusive>;
 
 template <typename index, typename T = void>
 struct default_indexer
@@ -44,7 +47,7 @@ struct default_indexer
 };
 
 template <typename T, T min, T max>
-struct default_indexer<interval<min, max>,
+struct default_indexer<index_range<min, max>,
                        typename std::enable_if_t<std::is_integral<T>::value || std::is_enum<T>::value, void> >
 {
 	using integral_index_type = decltype(integral_value_v<T{}>);

@@ -250,12 +250,12 @@ Enum class x_coordinate : std::size_t {}; // strongly typed alias
 enum class y_coordinate : std::size_t {};
 enum class z_coordinate : std::size_t {};
 
-indexed_array<float, interval<x_coordinate{0}, x_coordinate{299}>, 
-                     interval<y_coordinate{0}, y_coordinate{199}>,
-                     interval<z_coordinate{0}, z_coordinate{99}>> initial_data;
-indexed_array<float, interval<z_coordinate{0}, z_coordinate{99}>, 
-                     interval<y_coordinate{0}, y_coordinate{199}>,
-                     interval<x_coordinate{0}, x_coordinate{299}>> calculation_result;
+indexed_array<float, index_range<x_coordinate{0}, x_coordinate{299}>, 
+                     index_range<y_coordinate{0}, y_coordinate{199}>,
+                     index_range<z_coordinate{0}, z_coordinate{99}>> initial_data;
+indexed_array<float, index_range<z_coordinate{0}, z_coordinate{99}>, 
+                     index_range<y_coordinate{0}, y_coordinate{199}>,
+                     index_range<x_coordinate{0}, x_coordinate{299}>> calculation_result;
 
 // for convenience, we add this into our cpp file
 using x = x_coordinate;

@@ -36,6 +36,7 @@ add_single_test(array_operations array_operations.cpp)
 add_single_test(copy_operations copy_operations.cpp)
 add_single_test(non_default_constructible non_default_constructible.cpp)
 add_single_test(foreach foreach.cpp)
+add_single_test(bitset indexed_bitset.cpp)
 
 set(definitions -DINDEXED_ARRAY_HAS_MAGIC_ENUM)
 add_single_test(magic_enum magic_enum.cpp)

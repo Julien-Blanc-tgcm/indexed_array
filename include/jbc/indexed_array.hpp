@@ -9,6 +9,7 @@
 #include "indexed_array/detail/default_indexer.hpp"
 #include "indexed_array/detail/foreach.hpp"
 #include "indexed_array/detail/indexed_array.hpp"
+#include "indexed_array/detail/indexed_bitset.hpp"
 #include "indexed_array/detail/is_contiguous.hpp"
 #include "indexed_array/detail/union_of.hpp"
 
@@ -35,8 +36,11 @@ namespace jbc::indexed_array
 template <typename Value, typename Index1, typename... Indexes>
 using indexed_array = detail::indexed_array<Value, detail::to_single_indexer_t<Index1, Indexes...> >;
 
-using detail::interval;
+template <typename Index1, typename... Indexes>
+using indexed_bitset = detail::indexed_bitset<detail::to_single_indexer_t<Index1, Indexes...> >;
+
 using detail::index_range;
+using detail::interval;
 using detail::single_value;
 using detail::union_of;
 template <typename Value, typename... Index>

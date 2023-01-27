@@ -5,6 +5,7 @@
 #ifndef JBC_INDEXED_ARRAY_DETAIL_DEFAULT_INDEXER_H
 #define JBC_INDEXED_ARRAY_DETAIL_DEFAULT_INDEXER_H
 
+#include "index_range.hpp"
 #include "is_contiguous.hpp"
 #include "is_indexer.hpp"
 #include "value_sequence.hpp"
@@ -18,28 +19,6 @@
 namespace jbc::indexed_array::detail
 {
 namespace mp11 = boost::mp11;
-
-template <class T>
-struct type_identity
-{
-	using type = T;
-};
-
-template <class T>
-using type_identity_t = typename type_identity<T>::type;
-
-template <auto minInclusive, type_identity_t<decltype(minInclusive)> maxInclusive>
-struct index_range
-{
-	using type = decltype(minInclusive);
-	static inline constexpr type const min = minInclusive;
-	static inline constexpr type const max = maxInclusive;
-	static_assert(integral_value_v<minInclusive> <= integral_value_v<maxInclusive>,
-	              "Bounds must form a non-empty range, min <= max");
-};
-
-template <auto minInclusive, type_identity_t<decltype(minInclusive)> maxInclusive>
-using interval = index_range<minInclusive, maxInclusive>;
 
 template <typename index, typename T = void>
 struct default_indexer

@@ -272,4 +272,4 @@ return calculation_result[{z{coord_z}, y{coord_y}, x{coord_x}}]; // we fixed the
 
 This check is done purely at compile time, and will not incurs any runtime cost.
 
-Back to the [Index](index.md), or continue to [Reference](reference.md)
+Back to the [Index](index.md), or continue to [Bitset](bitset.md)

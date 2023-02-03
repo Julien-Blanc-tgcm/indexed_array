@@ -36,6 +36,7 @@ foo.at(Foo::Bar2, Foo::Bar2) = "an example string"; // modify the “central” 
 * [Performance considerations](performance.md)
 * [Integrations and extensions](extensions.md)
 * [Example use cases](usecases.md)
+* [Bitsets](bitset.md)
 * [Reference](reference.md)
 * [Design principles](design.md)
 * [Comparison with other libraries](comparison.md)

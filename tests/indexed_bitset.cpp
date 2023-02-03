@@ -16,7 +16,7 @@ BOOST_DESCRIBE_ENUM(Color, Red, Green, Blue);
 
 using namespace jbc::indexed_array;
 
-BOOST_AUTO_TEST_CASE(bitset)
+BOOST_AUTO_TEST_CASE(indexed_bitset1)
 {
 	indexed_bitset<index_range<2, 10> > b(0b001001001u);
 	BOOST_TEST(b.size() == 9);
@@ -42,4 +42,16 @@ BOOST_AUTO_TEST_CASE(multi_indexed_bitset)
 	b.flip(3, Color::Red);
 	b.set(3, Color::Blue);
 	BOOST_TEST(b.to_ulong(), 0b100010001);
+}
+
+BOOST_AUTO_TEST_CASE(internal_bitset)
+{
+	indexed_bitset<index_range<2, 10> > b(0u);
+	BOOST_TEST(b.size() == 9);
+	static_cast<std::bitset<9>&>(b) = 0x11u;
+	BOOST_TEST(b.test(2));
+	BOOST_TEST(!b.test(3));
+	BOOST_TEST(b.test(6));
+	BOOST_TEST(static_cast<std::bitset<9> const&>(b).test(0));
+	BOOST_TEST(b.to_ullong() == static_cast<std::bitset<9> const&>(b).to_ullong());
 }

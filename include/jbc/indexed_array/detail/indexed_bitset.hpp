@@ -79,6 +79,16 @@ class indexed_bitset :
 
 	constexpr indexed_bitset& operator=(indexed_bitset<Indexer>&& other) = default;
 
+	constexpr explicit operator std::bitset<Indexer::size> const& () const
+	{
+		return data_;
+	}
+
+	constexpr explicit operator std::bitset<Indexer::size> & ()
+	{
+		return data_;
+	}
+
 	// standard constructor
 	template <typename Arg,
 	          typename... Args,
@@ -123,6 +133,10 @@ class indexed_bitset :
 		return data_.to_ulong();
 	}
 
+	unsigned long long to_ullong() const
+	{
+		return data_.to_ullong();
+	}
 };
 
 //

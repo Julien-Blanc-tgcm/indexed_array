@@ -81,3 +81,10 @@ BOOST_AUTO_TEST_CASE(integerlist_contiguous_indexing)
 }
 
 
+BOOST_AUTO_TEST_CASE(integer_overflow)
+{
+	// must use long long here. Using 32bits integer will result in a compile error
+	using T = indexed_array<int, index_range<-2'000'000'000ll, 1'000'000'000ll> >;
+	auto v = std::tuple_size<T>::value;
+	BOOST_TEST(v == 3'000'000'001u);
+}

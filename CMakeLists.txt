@@ -37,6 +37,7 @@ add_executable(indexed_array "main.cpp"
 	"include/jbc/indexed_array/detail/indexed_span.hpp"
 	"include/jbc/indexed_array/detail/is_contiguous.hpp"
 	"include/jbc/indexed_array/detail/is_indexer.hpp"
+	"include/jbc/indexed_array/detail/lambda_indexer.hpp"
 	"include/jbc/indexed_array/detail/union_of.hpp"
 )
 target_compile_options(indexed_array PRIVATE -Wall)

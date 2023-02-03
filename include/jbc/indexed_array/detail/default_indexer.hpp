@@ -26,8 +26,7 @@ struct default_indexer
 };
 
 template <typename T, T min, T max>
-struct default_indexer<index_range<min, max>,
-                       typename std::enable_if_t<std::is_integral<T>::value || std::is_enum<T>::value, void> >
+struct default_indexer<index_range<min, max>, std::enable_if_t<can_be_integral_value<T, min>::value, void> >
 {
 	using integral_index_type = decltype(integral_value_v<T{}>);
 	static inline constexpr auto const size = integral_value_v<max> - integral_value_v<min> + 1;

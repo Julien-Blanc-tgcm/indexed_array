@@ -301,8 +301,8 @@ constexpr auto indexed_array_helper<Value, Indexer, Owner, Index>::operator[](In
 //
 // Specialisation for the case where index is a typelist
 // (multi-dimensional array)
-template <typename Value, typename Indexer, typename Owner, template <class...> class Index, typename... Args>
-class indexed_array_helper<Value, Indexer, Owner, Index<Args...> >
+template <typename Value, typename Indexer, typename Owner, typename... Args>
+class indexed_array_helper<Value, Indexer, Owner, mp11::mp_list<Args...> >
 {
   protected:
 	constexpr indexed_array_helper() noexcept = default;
@@ -382,5 +382,16 @@ constexpr decltype(auto) at(indexed_array<Value, Indexer> const& arr, typename I
 }
 
 } // namespace jbc::indexed_array::detail
+
+namespace std
+{
+// specialization of tuple_size for all indexed_array-s
+template <typename... Args>
+struct tuple_size<jbc::indexed_array::detail::indexed_array<Args...> > :
+    std::integral_constant<std::size_t, jbc::indexed_array::detail::indexed_array<Args...>::indexer::size>
+{
+};
+
+} // namespace std
 
 #endif // JBC_INDEXED_ARRAY_DETAIL_INDEXED_ARRAY_H

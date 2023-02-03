@@ -11,6 +11,7 @@
 #include "indexed_array/detail/indexed_array.hpp"
 #include "indexed_array/detail/indexed_bitset.hpp"
 #include "indexed_array/detail/is_contiguous.hpp"
+#include "indexed_array/detail/lambda_indexer.hpp"
 #include "indexed_array/detail/union_of.hpp"
 
 #if defined(INDEXED_ARRAY_HAS_MAGIC_ENUM) && defined(INDEXED_ARRAY_HAS_DESCRIBE)
@@ -41,6 +42,7 @@ using indexed_bitset = detail::indexed_bitset<detail::to_single_indexer_t<Index1
 
 using detail::index_range;
 using detail::interval;
+using detail::lambda_indexer;
 using detail::single_value;
 using detail::union_of;
 template <typename Value, typename... Index>

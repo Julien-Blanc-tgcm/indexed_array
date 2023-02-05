@@ -17,44 +17,9 @@
 namespace jbc::indexed_array::detail
 {
 
-// helper class to provide [] and at() members with correct signature
-// specialized later for multidimensional bitsets
-template <typename Indexer, typename Owner, typename Index>
-class indexed_bitset_helper
-{
-  public:
-	constexpr indexed_bitset_helper() noexcept = default;
-	~indexed_bitset_helper() noexcept = default;
-	constexpr indexed_bitset_helper(indexed_bitset_helper&&) noexcept = default;
-	constexpr indexed_bitset_helper(indexed_bitset_helper const&) noexcept = default;
-	constexpr indexed_bitset_helper& operator=(indexed_bitset_helper&&) = default;
-	constexpr indexed_bitset_helper& operator=(indexed_bitset_helper const&) = default;
-
-  public:
-	using value_type = bool;
-	using reference = typename std::bitset<Indexer::size>::reference;
-	using const_reference = bool;
-	using indexer = Indexer;
-	constexpr bool test(Index index) const;
-	constexpr reference operator[](Index idx);
-	constexpr const_reference operator[](Index idx) const;
-	constexpr Owner& set(Index index);
-	constexpr Owner& reset(Index index);
-	constexpr Owner& flip(Index index);
-
-	static constexpr bool in_range(Index idx)
-	{
-		return Indexer::in_range(idx);
-	}
-};
-
 template <typename Indexer>
-class indexed_bitset :
-    private indexed_bitset_helper<Indexer, indexed_bitset<Indexer>, typename Indexer::index>
+class indexed_bitset
 {
-	template <typename I, typename Owner, typename Idx>
-	friend class indexed_bitset_helper;
-
 	std::bitset<Indexer::size> data_;
 
   public:
@@ -79,12 +44,12 @@ class indexed_bitset :
 
 	constexpr indexed_bitset& operator=(indexed_bitset<Indexer>&& other) = default;
 
-	constexpr explicit operator std::bitset<Indexer::size> const& () const
+	constexpr explicit operator std::bitset<Indexer::size> const&() const
 	{
 		return data_;
 	}
 
-	constexpr explicit operator std::bitset<Indexer::size> & ()
+	constexpr explicit operator std::bitset<Indexer::size>&()
 	{
 		return data_;
 	}
@@ -92,7 +57,7 @@ class indexed_bitset :
 	// standard constructor
 	template <typename Arg,
 	          typename... Args,
-	          std::enable_if_t<!has_member_index<boost::mp11::mp_first<boost::mp11::mp_list<Arg, Args...> > >::value &&
+	          std::enable_if_t<!is_checked_arg<boost::mp11::mp_first<boost::mp11::mp_list<Arg, Args...> > >::value &&
 	                               !std::is_invocable_v<indexed_bitset(indexed_bitset const&), Arg&&, Args&&...>,
 	                           bool> = true>
 	constexpr explicit indexed_bitset(Arg&& head, Args&&... list) noexcept :
@@ -103,7 +68,7 @@ class indexed_bitset :
 	// safe_arg constructor
 	template <typename Arg,
 	          typename... Args,
-	          std::enable_if_t<has_member_index<boost::mp11::mp_first<boost::mp11::mp_list<Arg, Args...> > >::value,
+	          std::enable_if_t<is_checked_arg<boost::mp11::mp_first<boost::mp11::mp_list<Arg, Args...> > >::value,
 	                           bool> = true>
 	constexpr explicit indexed_bitset(Arg&& head, Args&&... args) noexcept :
 	    data_{static_cast<bool>(head), static_cast<bool>(args)...}
@@ -113,13 +78,70 @@ class indexed_bitset :
 		    "Argument mismatch");
 	}
 
-	// at and [] operators. Use inheritance to get correct signature
-	using indexed_bitset_helper<Indexer, indexed_bitset<Indexer>, typename Indexer::index>::test;
-	using indexed_bitset_helper<Indexer, indexed_bitset<Indexer>, typename Indexer::index>::set;
-	using indexed_bitset_helper<Indexer, indexed_bitset<Indexer>, typename Indexer::index>::reset;
-	using indexed_bitset_helper<Indexer, indexed_bitset<Indexer>, typename Indexer::index>::flip;
-	using indexed_bitset_helper<Indexer, indexed_bitset<Indexer>, typename Indexer::index>::operator[];
-	using indexed_bitset_helper<Indexer, indexed_bitset<Indexer>, typename Indexer::index>::in_range;
+	// [] operator and standard functions. Use enable_if to disable overloads that won't work
+	template <typename... Args,
+	          std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Args...>, int> = 0>
+	constexpr bool test(Args&&... args)
+	{
+		return data_.test(Indexer::template at<true>(std::forward<Args>(args)...));
+	}
+	template <typename... Args,
+	          std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Args...>, int> = 0>
+	constexpr indexed_bitset& set(Args&&... args)
+	{
+		data_.set(Indexer::template at<true>(std::forward<Args>(args)...));
+		return *this;
+	}
+	template <typename... Args,
+	          std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Args...>, int> = 0>
+	constexpr indexed_bitset& reset(Args&&... args)
+	{
+		data_.reset(Indexer::template at<true>(std::forward<Args>(args)...));
+		return *this;
+	}
+	template <typename... Args,
+	          std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Args...>, int> = 0>
+	constexpr indexed_bitset& flip(Args&&... args)
+	{
+		data_.flip(Indexer::template at<true>(std::forward<Args>(args)...));
+		return *this;
+	}
+
+#if defined(__cpp_multidimensional_subscript)
+	template <typename... Args,
+	          std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Args...>, int> = 0>
+	constexpr reference operator[](Args&&... args)
+	{
+		auto i = indexer::template at<false>(std::forward<Args>(args)...);
+		return data_[i];
+	}
+	template <typename... Args,
+	          std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Args...>, int> = 0>
+	constexpr const_reference operator[](Args&&... args) const
+	{
+		auto i = indexer::template at<false>(std::forward<Args>(args)...);
+		return data_[i];
+	}
+#else
+	template <typename Arg, std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Arg>, int> = 0>
+	constexpr reference operator[](Arg&& arg)
+	{
+		return data_[Indexer::template at<false>(std::forward<Arg>(arg))];
+	}
+
+	template <typename Arg, std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Arg>, int> = 0>
+	constexpr const_reference operator[](Arg&& arg) const
+	{
+		return data_[Indexer::template at<false>(std::forward<Arg>(arg))];
+	}
+#endif
+
+	template <typename... Args,
+	          std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Args...>, int> = 0>
+	constexpr bool in_range(Args&&... args)
+	{
+		return Indexer::in_range(std::forward<Args>(args)...);
+	}
 
 	static constexpr bool is_o1 = Indexer::is_o1;
 
@@ -139,108 +161,6 @@ class indexed_bitset :
 	}
 };
 
-//
-// Standard array operations
-//
-
-// Implementation of the at() function for indexed_array_helper when index is an integral type
-// (single dimensional array)
-template <typename Indexer, typename Owner, typename Index>
-constexpr bool indexed_bitset_helper<Indexer, Owner, Index>::test(Index index) const
-{
-	return static_cast<Owner const&>(*this).data_.test(indexer::template at<false>(index));
-}
-
-template <typename Indexer, typename Owner, typename Index>
-constexpr Owner& indexed_bitset_helper<Indexer, Owner, Index>::set(Index index)
-{
-	static_cast<Owner&>(*this).data_.set(indexer::template at<false>(index));
-	return static_cast<Owner&>(*this);
-}
-
-template <typename Indexer, typename Owner, typename Index>
-constexpr Owner& indexed_bitset_helper<Indexer, Owner, Index>::reset(Index index)
-{
-	static_cast<Owner&>(*this).data_.reset(indexer::template at<false>(index));
-	return static_cast<Owner&>(*this);
-}
-
-template <typename Indexer, typename Owner, typename Index>
-constexpr Owner& indexed_bitset_helper<Indexer, Owner, Index>::flip(Index index)
-{
-	static_cast<Owner&>(*this).data_.flip(indexer::template at<false>(index));
-	return static_cast<Owner&>(*this);
-}
-
-template <typename Indexer, typename Owner, typename Index>
-constexpr auto indexed_bitset_helper<Indexer, Owner, Index>::operator[](Index idx) -> reference
-{
-	static_cast<Owner&>(*this).data_[Indexer::template at<false>(idx)];
-	return static_cast<Owner&>(*this);
-}
-
-template <typename Indexer, typename Owner, typename Index>
-constexpr auto indexed_bitset_helper<Indexer, Owner, Index>::operator[](Index idx) const -> const_reference
-{
-	static_cast<Owner const&>(*this).data_[Indexer::template at<false>(idx)];
-	return static_cast<Owner const&>(*this);
-}
-
-//
-// Specialisation for the case where index is a typelist
-// (multi-dimensional array)
-template <typename Indexer, typename Owner, typename... Args>
-class indexed_bitset_helper<Indexer, Owner, boost::mp11::mp_list<Args...> >
-{
-  protected:
-	constexpr indexed_bitset_helper() noexcept = default;
-	~indexed_bitset_helper() noexcept = default;
-	constexpr indexed_bitset_helper(indexed_bitset_helper&&) noexcept = default;
-	constexpr indexed_bitset_helper(indexed_bitset_helper const&) noexcept = default;
-	constexpr indexed_bitset_helper& operator=(indexed_bitset_helper&&) = default;
-	constexpr indexed_bitset_helper& operator=(indexed_bitset_helper const&) = default;
-
-  public:
-	using value_type = bool;
-	using reference = typename std::bitset<Indexer::size>::reference;
-	using const_reference = bool;
-	using indexer = Indexer;
-	constexpr bool test(Args... index)
-	{
-		return static_cast<Owner&>(*this).data_.test(indexer::template at<true>(std::forward<Args>(index)...));
-	}
-	constexpr reference operator[](std::tuple<Args...> idx)
-	{
-		auto i = std::apply(indexer::template at<false>, idx);
-		return static_cast<Owner&>(*this).data_[i];
-	}
-	constexpr const_reference operator[](std::tuple<Args...> idx) const
-	{
-		auto i = std::apply(indexer::template at<false>, idx);
-		return static_cast<Owner const&>(*this).data_[i];
-	}
-
-	static constexpr bool in_range(Args... index)
-	{
-		return Indexer::in_range(std::forward<Args>(index)...);
-	}
-	constexpr Owner& set(Args... index)
-	{
-		static_cast<Owner&>(*this).data_.set(indexer::template at<false>(std::forward<Args>(index)...));
-		return static_cast<Owner&>(*this);
-	}
-	constexpr Owner& reset(Args... index)
-	{
-		static_cast<Owner&>(*this).data_.reset(indexer::template at<false>(std::forward<Args>(index)...));
-		return static_cast<Owner&>(*this);
-	}
-	constexpr Owner& flip(Args... index)
-	{
-		static_cast<Owner&>(*this).data_.flip(indexer::template at<false>(std::forward<Args>(index)...));
-		return static_cast<Owner&>(*this);
-	}
-};
-
-} // namespace jbc::indexed_bitset::detail
+} // namespace jbc::indexed_array::detail
 
 #endif // JBC_INDEXED_ARRAY_DETAIL_INDEXED_ARRAY_H

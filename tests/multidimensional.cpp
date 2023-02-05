@@ -33,6 +33,10 @@ BOOST_DESCRIBE_ENUM(Material, Wood, Metal, Stone, Leather);
 BOOST_AUTO_TEST_CASE(bidimensional)
 {
 	indexed_array<std::string, Color, Material> arr;
+	using T = decltype(arr)::indexer;
+	static_assert(std::is_same_v<T::root_indexer, T::root_indexer>, "vv");
+	static_assert(detail::has_root_indexer<T, Color>::value, "Has root indexer");
+	static_assert(!detail::has_root_indexer<T, int>::value, "Wrong signature results in no root indexer");
 	BOOST_TEST(arr.size() == 20);
 }
 
@@ -52,7 +56,7 @@ BOOST_AUTO_TEST_CASE(bidimensional3)
 		a = std::to_string(i++);
 	}
 	BOOST_TEST(arr.at(Color::Red, 3) == "0");
-	BOOST_TEST((arr[{Color::White, 8}] == "29"));
+	BOOST_TEST((arr[std::make_tuple(Color::White, 8)] == "29"));
 	BOOST_TEST(arr.at(Color::Blue, 5) == "14");
 }
 
@@ -102,6 +106,22 @@ BOOST_AUTO_TEST_CASE(multidimensional_init)
 	    std::make_unique<std::string>("468"),
 	};
 	BOOST_TEST(*arr.at(4, 5, 7) == "457");
+}
+
+BOOST_AUTO_TEST_CASE(multidimensional_operator_bracket)
+{
+	indexed_array<std::unique_ptr<std::string>, index_range<3, 4>, index_range<5, 6>, index_range<7, 8> > arr{
+	    std::make_unique<std::string>("357"),
+	    std::make_unique<std::string>("358"),
+	    std::make_unique<std::string>("367"),
+	    std::make_unique<std::string>("368"),
+	    std::make_unique<std::string>("457"),
+	    std::make_unique<std::string>("458"),
+	    std::make_unique<std::string>("467"),
+	    std::make_unique<std::string>("468"),
+	};
+	BOOST_TEST(*arr(4, 5, 7) == "457");
+	BOOST_TEST((*arr[std::tuple{4, 5, 7}] == "457"));
 }
 
 BOOST_AUTO_TEST_CASE(multidimensional_safe_initialization)

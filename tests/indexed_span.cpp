@@ -62,9 +62,9 @@ BOOST_AUTO_TEST_CASE(indexed_span_slice)
 	indexed_array<int, index_range<2, 4>, index_range<3, 5> > arr{0, 1, 2, 3, 4, 5, 6, 7, 8};
 	BOOST_TEST((std::is_same_v<decltype(arr.slice_at(2)), indexed_span<int, index_range<3, 5> > >));
 	BOOST_TEST((std::is_same_v<decltype(arr.slice(2)), indexed_span<int, index_range<3, 5> > >));
-	BOOST_TEST((arr[{2, 4}] == 1));
+	BOOST_TEST((arr[std::make_tuple(2, 4)] == 1));
 	arr.slice(2).slice(4) = 10;
-	BOOST_TEST((arr[{2, 4}] == 10));
+	BOOST_TEST((arr[std::make_tuple(2, 4)] == 10));
 }
 
 BOOST_AUTO_TEST_CASE(indexed_span_slice_at)

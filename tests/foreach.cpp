@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE(foreach_span1)
 		v = i++;
 	auto s = t.slice(2);
 	for_each(s, [&t](int key, int& val) {
-		BOOST_TEST((t[{2, key}] == val));
+		BOOST_TEST((t[std::make_tuple(2, key)] == val));
 		val = 2 * val;
 	});
 	BOOST_TEST(s[3] == 16);
@@ -109,7 +109,8 @@ BOOST_AUTO_TEST_CASE(foreach_span2)
 	Test5 const t2(t);
 	auto s = t2.slice(2);
 	for_each(s, [&t](int key, int const& val) {
-		BOOST_TEST((t[{2, key}] == val));
+		BOOST_TEST((t[std::tuple(2, key)] == val));
+		BOOST_TEST((t(2, key) == val));
 	});
 }
 

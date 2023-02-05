@@ -21,8 +21,10 @@ enum class Color
 
 BOOST_DESCRIBE_ENUM(Color, Red, Green, Blue, Black, White);
 
+constexpr auto l = [](std::chrono::seconds n) { return n.count(); };
+
 using seconds_indexer1 =
-    lambda_indexer<std::chrono::seconds, [](std::chrono::seconds n) { return n.count(); }, -3l, 6l>;
+    lambda_indexer<std::chrono::seconds, l, l(std::chrono::seconds{-3}), l(std::chrono::seconds{6})>;
 
 BOOST_AUTO_TEST_CASE(duration_indexer)
 {

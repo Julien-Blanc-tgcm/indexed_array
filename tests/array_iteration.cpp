@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(iteration)
 	BOOST_TEST(b2 >= b1);
 	BOOST_TEST(b1 <= b2);
 	BOOST_TEST(b2 <= b1);
-	b1[{Color::Red, 4, 0}] = "12";
+	b1[std::make_tuple(Color::Red, 4, 0)] = "12";
 	BOOST_TEST(!(b1 == b2));
 	BOOST_TEST(b1 != b2);
 }

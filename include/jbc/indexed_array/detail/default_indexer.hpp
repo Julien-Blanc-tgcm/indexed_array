@@ -224,6 +224,20 @@ struct default_indexer<
 	}
 };
 
+template <typename T, typename Arg, typename = void>
+struct has_root_indexer : public std::false_type
+{
+};
+
+template <typename T, typename Arg>
+struct has_root_indexer<T,
+                        Arg,
+                        std::enable_if_t<std::is_class_v<typename T::root_indexer> &&
+                                             std::is_invocable_v<decltype(T::root_indexer::in_range), Arg>,
+                                         void> > : public std::true_type
+{
+};
+
 template <typename Arg>
 struct wrong_indexer
 {

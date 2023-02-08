@@ -6,9 +6,6 @@
 #define JBC_INDEXED_ARRAY_DETAIL_LAMBDA_INDEXER_H
 
 #include "default_indexer.hpp"
-#include "is_contiguous.hpp"
-#include "is_indexer.hpp"
-#include "value_sequence.hpp"
 
 #include <stdexcept>
 #include <type_traits>
@@ -19,45 +16,25 @@
 namespace jbc::indexed_array::detail
 {
 
-template<auto F, auto Value, typename T = void>
-struct helper_compute_value
-{
-	static constexpr auto const value = Value;
-};
-
-template<auto F, auto Value>
-struct helper_compute_value<F, Value,
-    std::enable_if_t<
-        std::is_integral_v<decltype(F(Value))>, void>>
-{
-	static constexpr auto const value = F(Value);
-};
-
-template <typename T, auto F, auto MinValue, type_identity_t<decltype(MinValue)> MaxValue>
+template <auto F, std::size_t number_of_items, bool is_o1_ = true>
 struct lambda_indexer
 {
-	using integral_index_type = decltype(MinValue);
-	static_assert(std::is_same_v<std::decay_t<decltype(F(std::declval<T>()))>,
-	                             std::decay_t<decltype(helper_compute_value<F, MinValue>::value)>>,
-	              "F(T) must return the same thing as MinValue");
-
   private:
-	static constexpr auto minvalue = helper_compute_value<F,MinValue>::value;
-	static constexpr auto maxvalue = helper_compute_value<F, MaxValue>::value;
-	using internal_indexer_ = default_indexer<index_range<minvalue, maxvalue>>;
+	using internal_indexer_ = default_indexer<index_range<0, number_of_items - 1u> >;
 
   public:
-	static inline constexpr auto const size = internal_indexer_::size;
-	static constexpr bool is_o1 = internal_indexer_::is_o1;
-	using index = T;
-	template <bool throws_on_error = false>
-	static constexpr auto at(index v)
+	static constexpr auto const size = internal_indexer_::size;
+	static constexpr bool is_o1 = is_o1_;
+	template <bool throws_on_error, typename... Args>
+	static constexpr std::size_t at(Args... args)
 	{
-		return internal_indexer_::at(F(v));
+		return internal_indexer_::template at<throws_on_error>(F(args...));
 	}
-	static constexpr bool in_range(index v) noexcept
+
+	template <typename... Args>
+	static constexpr bool in_range(Args... args)
 	{
-		return internal_indexer_::in_range(F(v));
+		return internal_indexer_::in_range(F(args...));
 	}
 };
 

@@ -34,16 +34,6 @@ struct integral_value<T, v, std::enable_if_t<std::is_enum<T>::value, void> >
 	    static_cast<typename std::underlying_type<T>::type>(v);
 };
 
-template <typename T, T v>
-struct integral_value<
-    T,
-    v,
-    std::enable_if_t<std::is_convertible_v<T, long long> && !std::is_enum<T>::value && !std::is_integral<T>::value,
-                     void> >
-{
-	static inline constexpr long long value = static_cast<long long>(v);
-};
-
 template <auto C>
 static inline constexpr auto const integral_value_v = integral_value<decltype(C), C>::value;
 
@@ -56,7 +46,7 @@ template <typename T, T v>
 struct can_be_integral_value<
     T,
     v,
-    std::enable_if_t<std::is_integral_v<T> || std::is_enum_v<T> || std::is_convertible_v<T, long long>, void> > :
+    std::enable_if_t<std::is_integral_v<T> || std::is_enum_v<T>, void> > :
     public std::true_type
 {
 };

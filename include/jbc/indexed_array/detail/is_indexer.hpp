@@ -23,6 +23,9 @@ struct is_indexer<
 {
 };
 
+template <typename T>
+constexpr bool is_indexer_v = is_indexer<T>::value;
+
 } // namespace jbc::indexed_array::detail
 
 #endif // JBC_INDEXED_ARRAY_DETAIL_IS_INDEXER_H

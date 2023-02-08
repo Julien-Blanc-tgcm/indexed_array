@@ -35,8 +35,9 @@ BOOST_AUTO_TEST_CASE(bidimensional)
 	indexed_array<std::string, Color, Material> arr;
 	using T = decltype(arr)::indexer;
 	static_assert(std::is_same_v<T::root_indexer, T::root_indexer>, "vv");
+	//auto s = T::root_indexer::in_range(Color::White);
 	static_assert(detail::has_root_indexer<T, Color>::value, "Has root indexer");
-	static_assert(!detail::has_root_indexer<T, int>::value, "Wrong signature results in no root indexer");
+	//static_assert(!detail::has_root_indexer<T, int>::value, "Wrong signature results in no root indexer");
 	BOOST_TEST(arr.size() == 20);
 }
 

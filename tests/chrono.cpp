@@ -6,49 +6,44 @@
 
 #include "jbc/indexed_array.hpp"
 
-struct hour
-{
-	int value;
-	constexpr hour(int v) : value{v}
-	{
-	}
-	constexpr operator int() const
-	{
-		return value;
-	}
-	constexpr hour() = default;
-};
-
-template <typename duration>
-struct duration_wrapper
-{
-	typename duration::rep val;
-	constexpr duration_wrapper() = default;
-	explicit constexpr duration_wrapper(typename duration::rep v) : val(v) {}
-	constexpr duration_wrapper(duration d) : val(d.count()) {}
-	constexpr operator typename duration::rep() const { return val; }
-};
-
-static_assert(std::is_convertible_v<hour, long long>, "Must be convertible");
 
 using namespace jbc::indexed_array;
 
-static_assert(detail::integral_value<hour, hour(1)>::value == 1, "Must be equal");
-static_assert(detail::integral_value<duration_wrapper<std::chrono::minutes>,
-                                     duration_wrapper<std::chrono::minutes>(std::chrono::minutes(3))>::value == 3,
-              "Must be equal");
+auto l = [](std::chrono::weekday d) { return static_cast<std::size_t>(d.iso_encoding() - 1); };
 
 BOOST_AUTO_TEST_CASE(chrono_indexer)
 {
 	int a = 2;
-	indexed_array<int, index_range<hour{1}, hour{7}>> arr{1, 2, 3, 4, 5, 6, 7};
+	indexed_array<int, lambda_indexer<l, 7>> arr{1, 2, 3, 4, 5, 6, 7};
 	BOOST_TEST(arr.size() == 7);
-	BOOST_TEST(arr[hour(4)] == 4);
-	indexed_array<int,
-	              index_range<duration_wrapper<std::chrono::minutes>(-1), duration_wrapper<std::chrono::minutes>(7)> >
-	    arr2{1, 2, 3, 4, 5, 6, 7, 8, 9};
-	BOOST_TEST(arr2[std::chrono::minutes(4)] == 6);
+	BOOST_TEST(arr[std::chrono::Thursday] == 4);
 }
 
+struct heterogenous_index
+{
+	constexpr std::size_t operator()(std::chrono::seconds s) const
+	{
+		auto v = s.count();
+		if (v < 0 || v >= 60)
+			return std::numeric_limits<std::size_t>::max();
+		return static_cast<std::size_t>(s.count());
+	}
+	constexpr std::size_t operator()(std::chrono::minutes m) const
+	{
+		auto v = m.count();
+		if (v < 0 || v >= 60)
+			return std::numeric_limits<std::size_t>::max();
+		return static_cast<std::size_t>(m.count() + 60);
+	}
+};
 
-
+BOOST_AUTO_TEST_CASE(chrono_heterogenous)
+{
+	using het_index = lambda_indexer<heterogenous_index{}, 120>;
+	indexed_array<int, het_index> arr;
+	int i = 0;
+	for (auto& a : arr)
+		a = i++;
+	BOOST_TEST(arr[std::chrono::seconds{10}] == 10);
+	BOOST_TEST(arr[std::chrono::minutes{10}] == 70);
+}

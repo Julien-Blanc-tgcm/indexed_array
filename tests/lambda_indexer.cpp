@@ -21,10 +21,9 @@ enum class Color
 
 BOOST_DESCRIBE_ENUM(Color, Red, Green, Blue, Black, White);
 
-constexpr auto l = [](std::chrono::seconds n) { return n.count(); };
+constexpr auto l = [](std::chrono::seconds n) { return n.count() + 3; };
 
-using seconds_indexer1 =
-    lambda_indexer<std::chrono::seconds, l, l(std::chrono::seconds{-3}), l(std::chrono::seconds{6})>;
+using seconds_indexer1 = lambda_indexer<l, 10>;
 
 BOOST_AUTO_TEST_CASE(duration_indexer)
 {
@@ -39,8 +38,8 @@ BOOST_AUTO_TEST_CASE(duration_indexer)
 
 BOOST_AUTO_TEST_CASE(day_of_month_indexer)
 {
-	constexpr auto day_to_unsigned = [](std::chrono::day d) { return static_cast<unsigned>(d); };
-	using day_of_month_indexer = lambda_indexer<std::chrono::day, day_to_unsigned, 1u, 31u>;
+	constexpr auto day_to_unsigned = [](std::chrono::day d) { return static_cast<unsigned>(d) - 1u; };
+	using day_of_month_indexer = lambda_indexer<day_to_unsigned, 31>;
 	using Base = indexed_array<int, day_of_month_indexer, Color>;
 	Base b;
 	BOOST_TEST(b.size() == 31 * 5);
@@ -51,7 +50,7 @@ BOOST_AUTO_TEST_CASE(weekday_indexer)
 	using namespace std::chrono;
 	constexpr auto weekday_to_unsigned = [](weekday w) { return w.iso_encoding(); };
 	using wday_indexer =
-	    lambda_indexer<weekday, weekday_to_unsigned, weekday_to_unsigned(Monday), weekday_to_unsigned(Sunday)>;
+	    lambda_indexer<weekday_to_unsigned, 7u>;
 	using Base = indexed_array<int, wday_indexer>;
 	Base b;
 	BOOST_TEST(b.size() == 7);

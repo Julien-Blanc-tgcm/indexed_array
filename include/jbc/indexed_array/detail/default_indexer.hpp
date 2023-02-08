@@ -34,17 +34,18 @@ struct default_indexer<index_range<min, max>, std::enable_if_t<can_be_integral_v
 	static constexpr bool is_o1 = true;
 
 	using index = T;
-	template <bool throws_on_error = true>
-	static constexpr auto at(index v) noexcept(!throws_on_error)
+	template <bool throws_on_error, typename Arg>
+	static constexpr std::size_t at(Arg v) noexcept(!throws_on_error)
 	{
 		if constexpr (throws_on_error)
 		{
 			if (BOOST_UNLIKELY(!in_range(v)))
 				throw std::out_of_range("Invalid index");
 		}
-		return (static_cast<integral_index_type>(v) - integral_value_v<min>);
+		return std::size_t(static_cast<integral_index_type>(v) - integral_value_v<min>);
 	}
-	static constexpr auto in_range(index v) noexcept
+	template <typename Arg>
+	static constexpr auto in_range(Arg v) noexcept
 	{
 		return !(static_cast<integral_index_type>(v) < integral_value_v<min> ||
 		         static_cast<integral_index_type>(v) > integral_value_v<max>);
@@ -64,18 +65,19 @@ struct default_indexer<
 	using index = T;
 
 	template <bool throws_on_error = false>
-	static constexpr auto at(index i) noexcept(!throws_on_error)
+	static constexpr std::size_t at(index i) noexcept(!throws_on_error)
 	{
 		if constexpr (throws_on_error)
 		{
 			if (!in_range(i))
 				throw std::out_of_range("Invalid index");
 		}
-		return static_cast<decltype(integral_value_v<T{}>)>(i) -
-		       integral_value_v<mp11::mp_front<mp11::mp_list_c<T, vals...> >::value>;
+		return std::size_t(static_cast<decltype(integral_value_v<T{}>)>(i) -
+		                   integral_value_v<mp11::mp_front<mp11::mp_list_c<T, vals...> >::value>);
 	}
 
-	static constexpr bool in_range(index i)
+	template <typename Arg>
+	static constexpr bool in_range(Arg i)
 	{
 		return (static_cast<decltype(integral_value<T, T{}>::value)>(i) >=
 		        integral_value_v<mp11::mp_front<mp11::mp_list_c<T, vals...> >::
@@ -96,7 +98,7 @@ struct default_indexer<
 	static constexpr bool is_o1 = false;
 
 	template <bool throws_on_error = false>
-	static constexpr auto at(index v)
+	static constexpr std::size_t at(index v)
 	{
 		std::size_t ret = 0;
 		bool found = false;
@@ -154,7 +156,7 @@ template <typename Arg, typename... Args>
 struct at_computation_helper
 {
 	template <bool c>
-	static constexpr auto at(typename Arg::index idx, typename Args::index... rem)
+	static constexpr std::size_t at(typename Arg::index idx, typename Args::index... rem)
 	{
 		return Arg::template at<c>(idx) * product_v<Args::size...> +
 		       at_computation_helper<Args...>::template at<c>(rem...);
@@ -164,7 +166,7 @@ template <typename Arg>
 struct at_computation_helper<Arg>
 {
 	template <bool c>
-	static constexpr auto at(typename Arg::index idx)
+	static constexpr std::size_t at(typename Arg::index idx)
 	{
 		return Arg::template at<c>(idx);
 	}
@@ -176,7 +178,7 @@ struct add_default_handler_if_needed
 	using type = default_indexer<T>;
 };
 template <typename T>
-struct add_default_handler_if_needed<T, std::enable_if_t<is_indexer<T>::value, void> >
+struct add_default_handler_if_needed<T, std::enable_if_t<is_indexer_v<T>, void> >
 {
 	using type = T;
 };
@@ -204,11 +206,12 @@ struct default_indexer<
     boost::mp11::mp_list<Arg, Args...>,
     typename std::enable_if_t<boost::mp11::mp_all<is_indexer<Arg>, is_indexer<Args>...>::value, void> >
 {
-	using index = boost::mp11::mp_list<typename Arg::index, typename Args::index...>;
-	static inline constexpr auto const size = product_v<Arg::size, Args::size...>;
+//	using index = boost::mp11::mp_list<typename Arg::index, typename Args::index...>;
+	static inline constexpr std::size_t const size = product_v<Arg::size, Args::size...>;
 
-	template <bool throws_on_error = false>
-	static constexpr auto at(typename Arg::index arg, typename Args::index... args) noexcept(!throws_on_error)
+	template <bool throws_on_error = false, typename A1, typename... An>
+	static constexpr std::size_t at(A1 arg, An... args)
+	    noexcept(!throws_on_error)
 	{
 		return at_computation_helper<Arg, Args...>::template at<throws_on_error>(arg, args...);
 	}
@@ -218,9 +221,10 @@ struct default_indexer<
 
 	static constexpr bool is_o1 = root_indexer::is_o1 && slice_indexer::is_o1;
 
-	static constexpr bool in_range(typename Arg::index arg, typename Args::index... args) noexcept
+	template <typename A1, typename... An>
+	static constexpr bool in_range(A1 arg, An... args) noexcept
 	{
-		return root_indexer::in_range(arg) && slice_indexer::in_range(std::forward<typename Args::index>(args)...);
+		return root_indexer::in_range(arg) && slice_indexer::in_range(args...);
 	}
 };
 
@@ -230,11 +234,13 @@ struct has_root_indexer : public std::false_type
 };
 
 template <typename T, typename Arg>
-struct has_root_indexer<T,
-                        Arg,
-                        std::enable_if_t<std::is_class_v<typename T::root_indexer> &&
-                                             std::is_invocable_v<decltype(T::root_indexer::in_range), Arg>,
-                                         void> > : public std::true_type
+struct has_root_indexer<
+    T,
+    Arg,
+    std::enable_if_t<
+        std::is_class_v<typename T::root_indexer> /*&&
+            std::is_invocable_v<decltype(static_cast<bool (*)(std::decay_t<Arg>)>(T::root_indexer::in_range)), Arg>*/,
+        void> > : public std::true_type
 {
 };
 

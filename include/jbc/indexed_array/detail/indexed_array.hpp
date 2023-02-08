@@ -84,14 +84,20 @@ class indexed_array
 
 	// at and [] operators. Use enable_if to disable overloads that won't work
 	template <typename... Args,
-	          std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Args...>, int> = 0>
+	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Args>...)>(
+	                                                   Indexer::template at<true>)),
+	                                               Args...>,
+	                           int> = 0>
 	constexpr reference at(Args&&... args)
 	{
 		return data_[Indexer::template at<true>(std::forward<Args>(args)...)];
 	}
 
 	template <typename... Args,
-	          std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Args...>, int> = 0>
+	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Args>...)>(
+	                                                   Indexer::template at<true>)),
+	                                               Args...>,
+	                           int> = 0>
 	constexpr const_reference at(Args&&... args) const
 	{
 		return data_[Indexer::template at<true>(std::forward<Args>(args)...)];
@@ -99,14 +105,20 @@ class indexed_array
 
 #if defined(__cpp_multidimensional_subscript)
 	template <typename... Args,
-	          std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Args...>, int> = 0>
+	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Args>...)>(
+	                                                   Indexer::template at<true>)),
+	                                               Args...>,
+	                           int> = 0>
 	constexpr reference operator[](Args&&... args)
 	{
 		auto i = indexer::template at<false>(std::forward<Args>(args)...);
 		return data_[i];
 	}
 	template <typename... Args,
-	          std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Args...>, int> = 0>
+	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Args>...)>(
+	                                                   Indexer::template at<true>)),
+	                                               Args...>,
+	                           int> = 0>
 	constexpr const_reference operator[](Args&&... args) const
 	{
 		auto i = indexer::template at<false>(std::forward<Args>(args)...);
@@ -114,36 +126,55 @@ class indexed_array
 	}
 #else
 	// multiple arguments subscript not supported, restrict to single argument
-	template <typename Arg, std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Arg>, int> = 0>
+	template <typename Arg,
+	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Arg>)>(
+	                                                   Indexer::template at<false>)),
+	                                               Arg>,
+	                           int> = 0>
 	constexpr reference operator[](Arg&& arg)
 	{
 		return data_[Indexer::template at<false>(std::forward<Arg>(arg))];
 	}
 
-	template <typename Arg, std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Arg>, int> = 0>
+	template <typename Arg,
+	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Arg>)>(
+	                                                   Indexer::template at<false>)),
+	                                               Arg>,
+	                           int> = 0>
 	constexpr const_reference operator[](Arg&& arg) const
 	{
 		return data_[Indexer::template at<false>(std::forward<Arg>(arg))];
 	}
 #endif
 	template <typename... Args,
-	          std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Args...>, int> = 0>
+	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Args>...)>(
+	                                                   Indexer::template at<false>)),
+	                                               Args...>,
+	                           int> = 0>
 	constexpr reference operator[](std::tuple<Args...> arg)
 	{
-		auto i = std::apply(indexer::template at<false>, std::forward<std::tuple<Args...> >(arg));
+		auto f = static_cast<std::size_t (*)(std::decay_t<Args>...)>(Indexer::template at<false>);
+		auto i = std::apply(f, std::forward<std::tuple<Args...> >(arg));
 		return data_[i];
 	}
 
 	template <typename... Args,
-	          std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Args...>, int> = 0>
+	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Args>...)>(
+	                                                   Indexer::template at<false>)),
+	                                               Args...>,
+	                           int> = 0>
 	constexpr const_reference operator[](std::tuple<Args...> arg) const
 	{
-		auto i = std::apply(indexer::template at<false>, arg);
+		auto f = static_cast<std::size_t (*)(std::decay_t<Args>...)>(Indexer::template at<false>);
+		auto i = std::apply(f, arg);
 		return data_[i];
 	}
 
 	template <typename... Args,
-	          std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Args...>, int> = 0>
+	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Args>...)>(
+	                                                   Indexer::template at<true>)),
+	                                               Args...>,
+	                           int> = 0>
 	constexpr reference operator()(Args&&... args)
 	{
 		auto i = indexer::template at<false>(std::forward<Args>(args)...);
@@ -151,7 +182,10 @@ class indexed_array
 	}
 
 	template <typename... Args,
-	          std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Args...>, int> = 0>
+	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Args>...)>(
+	                                                   Indexer::template at<true>)),
+	                                               Args...>,
+	                           int> = 0>
 	constexpr const_reference operator()(Args&&... args) const
 	{
 		auto i = indexer::template at<false>(std::forward<Args>(args)...);
@@ -187,7 +221,9 @@ class indexed_array
 	}
 
 	template <typename... Args,
-	          std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Args...>, int> = 0>
+	          std::enable_if_t<
+	              std::is_invocable_v<decltype(static_cast<bool(*)(Args...)>(Indexer::in_range)), Args...>,
+	              int> = 0>
 	static constexpr bool in_range(Args&&... args)
 	{
 		return Indexer::in_range(std::forward<Args>(args)...);

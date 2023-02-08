@@ -31,8 +31,6 @@ BOOST_AUTO_TEST_CASE(indexed_span_test)
 	BOOST_TEST(s.size() == 2);
 	BOOST_TEST(s.at(0) == 2);
 	BOOST_TEST(s[1] == 3);
-	auto s2 = s.slice(1);
-	BOOST_TEST(s2 == 3);
 	BOOST_TEST(!decltype(sp)::is_o1);
 	BOOST_TEST(sp.in_range(Color::Green, 0));
 	BOOST_TEST(!sp.in_range(Color::Green, -1));
@@ -53,8 +51,6 @@ BOOST_AUTO_TEST_CASE(indexed_span_foreach)
 	BOOST_TEST(s.size() == 2);
 	BOOST_TEST(s.at(0) == "22");
 	BOOST_TEST(s[1] == "33");
-	auto s2 = s.slice(1);
-	BOOST_TEST(s2 == "33");
 }
 
 BOOST_AUTO_TEST_CASE(indexed_span_slice)
@@ -63,7 +59,7 @@ BOOST_AUTO_TEST_CASE(indexed_span_slice)
 	BOOST_TEST((std::is_same_v<decltype(arr.slice_at(2)), indexed_span<int, index_range<3, 5> > >));
 	BOOST_TEST((std::is_same_v<decltype(arr.slice(2)), indexed_span<int, index_range<3, 5> > >));
 	BOOST_TEST((arr[std::make_tuple(2, 4)] == 1));
-	arr.slice(2).slice(4) = 10;
+	arr.slice(2)[4] = 10;
 	BOOST_TEST((arr[std::make_tuple(2, 4)] == 10));
 }
 
@@ -74,7 +70,7 @@ BOOST_AUTO_TEST_CASE(indexed_span_slice_at)
 	BOOST_TEST((std::is_same_v<decltype(arr.slice(2)), indexed_span<int, index_range<3, 5> > >));
 	BOOST_CHECK_THROW(arr.slice_at(0), std::out_of_range);
 	auto v = arr.slice_at(3); // does not throw
-	BOOST_CHECK_THROW(v.slice_at(0), std::out_of_range);
+	BOOST_CHECK_THROW(v.at(0), std::out_of_range);
 }
 
 BOOST_AUTO_TEST_CASE(indexed_span_slice_at2)

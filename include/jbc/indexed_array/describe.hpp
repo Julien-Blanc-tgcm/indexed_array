@@ -32,7 +32,7 @@ struct default_indexer<Enum, typename std::enable_if_t<boost::describe::has_desc
 	static constexpr bool is_o1 = default_indexer<helper_list_type>::is_o1;
 	static inline constexpr auto const size = default_indexer<helper_list_type>::size;
 	template <bool throws_on_error = false>
-	static constexpr auto at(Enum v) noexcept(!throws_on_error)
+	static constexpr std::size_t at(Enum v) noexcept(!throws_on_error)
 	{
 		return default_indexer<helper_list_type>::template at<throws_on_error>(v);
 	}

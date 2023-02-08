@@ -80,27 +80,39 @@ class indexed_bitset
 
 	// [] operator and standard functions. Use enable_if to disable overloads that won't work
 	template <typename... Args,
-	          std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Args...>, int> = 0>
+	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Args>...)>(
+	                                                   Indexer::template at<true>)),
+	                                               Args...>,
+	                           int> = 0>
 	constexpr bool test(Args&&... args)
 	{
 		return data_.test(Indexer::template at<true>(std::forward<Args>(args)...));
 	}
 	template <typename... Args,
-	          std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Args...>, int> = 0>
+	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Args>...)>(
+	                                                   Indexer::template at<true>)),
+	                                               Args...>,
+	                           int> = 0>
 	constexpr indexed_bitset& set(Args&&... args)
 	{
 		data_.set(Indexer::template at<true>(std::forward<Args>(args)...));
 		return *this;
 	}
 	template <typename... Args,
-	          std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Args...>, int> = 0>
+	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Args>...)>(
+	                                                   Indexer::template at<true>)),
+	                                               Args...>,
+	                           int> = 0>
 	constexpr indexed_bitset& reset(Args&&... args)
 	{
 		data_.reset(Indexer::template at<true>(std::forward<Args>(args)...));
 		return *this;
 	}
 	template <typename... Args,
-	          std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Args...>, int> = 0>
+	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Args>...)>(
+	                                                   Indexer::template at<true>)),
+	                                               Args...>,
+	                           int> = 0>
 	constexpr indexed_bitset& flip(Args&&... args)
 	{
 		data_.flip(Indexer::template at<true>(std::forward<Args>(args)...));
@@ -109,27 +121,41 @@ class indexed_bitset
 
 #if defined(__cpp_multidimensional_subscript)
 	template <typename... Args,
-	          std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Args...>, int> = 0>
+	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Args>...)>(
+	                                                   Indexer::template at<true>)),
+	                                               Args...>,
+	                           int> = 0>
 	constexpr reference operator[](Args&&... args)
 	{
 		auto i = indexer::template at<false>(std::forward<Args>(args)...);
 		return data_[i];
 	}
 	template <typename... Args,
-	          std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Args...>, int> = 0>
+	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Args>...)>(
+	                                                   Indexer::template at<true>)),
+	                                               Args...>,
+	                           int> = 0>
 	constexpr const_reference operator[](Args&&... args) const
 	{
 		auto i = indexer::template at<false>(std::forward<Args>(args)...);
 		return data_[i];
 	}
 #else
-	template <typename Arg, std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Arg>, int> = 0>
+	template <typename Arg,
+	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Arg>)>(
+	                                                   Indexer::template at<true>)),
+	                                               Arg>,
+	                           int> = 0>
 	constexpr reference operator[](Arg&& arg)
 	{
 		return data_[Indexer::template at<false>(std::forward<Arg>(arg))];
 	}
 
-	template <typename Arg, std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Arg>, int> = 0>
+	template <typename Arg,
+	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Arg>)>(
+	                                                   Indexer::template at<true>)),
+	                                               Arg>,
+	                           int> = 0>
 	constexpr const_reference operator[](Arg&& arg) const
 	{
 		return data_[Indexer::template at<false>(std::forward<Arg>(arg))];
@@ -137,7 +163,10 @@ class indexed_bitset
 #endif
 
 	template <typename... Args,
-	          std::enable_if_t<std::is_invocable_v<decltype(Indexer::template at<true>), Args...>, int> = 0>
+	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Args>...)>(
+	                                                   Indexer::template at<true>)),
+	                                               Args...>,
+	                           int> = 0>
 	constexpr bool in_range(Args&&... args)
 	{
 		return Indexer::in_range(std::forward<Args>(args)...);

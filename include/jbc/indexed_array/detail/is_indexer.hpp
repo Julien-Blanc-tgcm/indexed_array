@@ -6,7 +6,7 @@
 #define JBC_INDEXED_ARRAY_DETAIL_IS_INDEXER_H
 
 #include <type_traits>
-#if __cpp_concepts >= 202002L
+#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 #include <concepts>
 #endif
 
@@ -31,7 +31,7 @@ constexpr bool is_indexer_v = is_indexer<T>::value;
 
 } // namespace jbc::indexed_array::detail
 
-#if __cpp_concepts >= 202002L
+#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 namespace jbc::indexed_array::concepts
 {
 template <typename T>

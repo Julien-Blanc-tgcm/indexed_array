@@ -18,7 +18,7 @@
 namespace jbc::indexed_array::detail
 {
 
-#if __cpp_concepts >= 202002L
+#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 template <typename Value, jbc::indexed_array::concepts::indexer Indexer>
 #else
 template <typename Value, typename Indexer>
@@ -58,7 +58,7 @@ class indexed_array
 	}
 
 	// standard constructor
-#if __cpp_concepts >= 202002L
+#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 	template <std::convertible_to<Value> Arg, std::convertible_to<Value>... Args>
 #else
 	template <typename Arg,
@@ -68,14 +68,14 @@ class indexed_array
 	                           bool> = true>
 #endif
 	constexpr explicit indexed_array(Arg&& head, Args&&... list) noexcept(std::is_nothrow_copy_constructible_v<Value>) 
-#if __cpp_concepts >= 202002L
+#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 	    requires (!::jbc::indexed_array::concepts::checked_arg<Arg, Value>)
 #endif
 	    : data_{std::forward<Arg>(head), std::forward<Args>(list)...}
 	{
 	}
 	// safe_arg constructor
-#if __cpp_concepts >= 202002L
+#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 	template <::jbc::indexed_array::concepts::checked_arg<Value> Arg,
 	          ::jbc::indexed_array::concepts::checked_arg<Value>... Args>
 #else
@@ -92,7 +92,7 @@ class indexed_array
 		    "Argument mismatch");
 	}
 	// at and [] operators. Use enable_if to disable overloads that won't work
-#if __cpp_concepts >= 202002L
+#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 	template <typename... Args>
 	constexpr reference at(Args&&... args) requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
 #else
@@ -107,7 +107,7 @@ class indexed_array
 		return data_[Indexer::template at<true>(std::forward<Args>(args)...)];
 	}
 
-#if __cpp_concepts >= 202002L
+#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 	template <typename... Args>
 	constexpr const reference at(Args&&... args) const 
 	    requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
@@ -140,7 +140,7 @@ class indexed_array
 	}
 #else
 	// multiple arguments subscript not supported, restrict to single argument
-#if __cpp_concepts >= 202002L
+#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 	template <typename Arg>
 	constexpr reference operator[](Arg&& arg)
 	    requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Arg>
@@ -156,7 +156,7 @@ class indexed_array
 		return data_[Indexer::template at<false>(std::forward<Arg>(arg))];
 	}
 
-#if __cpp_concepts >= 202002L
+#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 	template <typename Arg>
 	constexpr const_reference operator[](Arg&& arg) const
 	    requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Arg>
@@ -173,7 +173,7 @@ class indexed_array
 	}
 #endif
 
-#if __cpp_concepts >= 202002L
+#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 	template <typename... Args>
 	constexpr reference operator[](std::tuple<Args...> arg)
 	    requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
@@ -191,7 +191,7 @@ class indexed_array
 		return data_[i];
 	}
 
-#if __cpp_concepts >= 202002L
+#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 	template <typename... Args>
 	constexpr const_reference operator[](std::tuple<Args...> arg) const
 	    requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
@@ -209,7 +209,7 @@ class indexed_array
 		return data_[i];
 	}
 
-#if __cpp_concepts >= 202002L
+#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 	template <typename... Args>
 	constexpr reference operator()(Args&&... args)
 	    requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
@@ -226,7 +226,7 @@ class indexed_array
 		return data_[i];
 	}
 
-#if __cpp_concepts >= 202002L
+#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 	template <typename... Args>
 	constexpr const_reference operator()(Args&&... args) const
 	    requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>

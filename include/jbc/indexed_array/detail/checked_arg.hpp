@@ -116,7 +116,7 @@ constexpr bool is_checked_arg_v = is_checked_arg<T>::value;
 
 } // namespace jbc::indexed_array::detail
 
-#if __cpp_concepts >= 202002L
+#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 namespace jbc::indexed_array::concepts
 {
 template <class From, class To>

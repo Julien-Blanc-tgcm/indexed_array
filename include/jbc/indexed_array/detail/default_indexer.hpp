@@ -12,7 +12,7 @@
 
 #include <stdexcept>
 #include <type_traits>
-#if __cpp_concepts >= 202002L
+#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 #include <concepts>
 #endif
 
@@ -269,7 +269,7 @@ template <typename Arg>
 using add_default_indexer_t = typename add_default_indexer<Arg>::type;
 } // namespace jbc::indexed_array::detail
 
-#if __cpp_concepts >= 202002L
+#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 namespace jbc::indexed_array::concepts
 {
 template <typename Indexer, typename... Args>

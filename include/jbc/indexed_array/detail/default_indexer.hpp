@@ -12,6 +12,9 @@
 
 #include <stdexcept>
 #include <type_traits>
+#if __cpp_concepts >= 202002L
+#include <concepts>
+#endif
 
 #include <boost/config.hpp> // for BOOST_UNLIKELY
 #include <boost/mp11.hpp>
@@ -264,7 +267,17 @@ struct add_default_indexer<default_indexer<Arg> >
 
 template <typename Arg>
 using add_default_indexer_t = typename add_default_indexer<Arg>::type;
-
 } // namespace jbc::indexed_array::detail
+
+#if __cpp_concepts >= 202002L
+namespace jbc::indexed_array::concepts
+{
+template <typename Indexer, typename... Args>
+concept indexer_invocable_with = requires (Indexer i, Args&&... args) {
+	{i.template at<true>(::std::forward<Args>(args)...)} -> ::std::same_as<::std::size_t>;
+};
+} // jbc::indexed_array::concepts
+#endif
+
 
 #endif // JBC_INDEXED_ARRAY_DETAIL_DEFAULT_INDEXER_H

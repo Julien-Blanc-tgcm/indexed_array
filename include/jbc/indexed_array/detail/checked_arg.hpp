@@ -14,12 +14,12 @@
 namespace jbc::indexed_array::detail
 {
 
-template <typename Indexer, typename C>
+template <typename Indexer, typename Index>
 struct at_helper
 {
 	static constexpr auto at()
 	{
-		return Indexer::template at<true>(C::value);
+		return Indexer::template at<true>(Index::value);
 	}
 };
 
@@ -32,60 +32,50 @@ struct at_helper<Indexer, L<Args...> >
 	}
 };
 
-template <typename C, typename T>
+template <typename Index, typename Value>
 struct checked_arg
 {
-	using checked_arg_index = C;
-	using value_type = T;
-	T&& v;
-	explicit constexpr checked_arg(T&& val) : v{std::forward<T>(val)} {};
-	explicit constexpr operator T&&()
+	using checked_arg_index = Index;
+	using value_type = Value;
+	value_type&& v;
+	explicit constexpr checked_arg(value_type&& val) : v{std::forward<value_type>(val)} {};
+	explicit constexpr operator value_type&&()
 	{
-		return std::forward<T>(v);
+		return std::forward<value_type>(v);
 	}
 };
 
-template <typename C, typename T>
+template <typename Index, typename Value>
 struct checked_arg_h
 {
-	using checked_arg_index = C;
-	using value_type = T;
-	T&& v;
-	explicit constexpr checked_arg_h(T&& val) : v{std::forward<T>(val)} {};
-	constexpr operator T&&()
+	using checked_arg_index = Index;
+	using value_type = Value;
+	value_type&& v;
+	explicit constexpr checked_arg_h(value_type&& val) : v{std::forward<value_type>(val)} {};
+	constexpr operator value_type&&()
 	{
-		return std::forward<T>(v);
+		return std::forward<value_type>(v);
 	}
-	template <typename U = T, typename = typename std::enable_if_t<std::is_array<U>::value> >
-	constexpr operator checked_arg<C, std::decay_t<T>*>()
+	constexpr operator checked_arg<checked_arg_index, value_type>()
 	{
-		return checked_arg<C, std::decay_t<T>*>(v);
-	}
-	constexpr operator checked_arg<C, T>()
-	{
-		return checked_arg<C, T>(v);
+		return checked_arg<checked_arg_index, value_type>(v);
 	}
 };
 
-template <template <auto...> class L, typename T, auto... C>
-struct checked_arg_h<L<C...>, T>
+template <template <auto...> class List, typename Value, auto... Indexes>
+struct checked_arg_h<List<Indexes...>, Value>
 {
-	using checked_arg_index = boost::mp11::mp_list<std::integral_constant<decltype(C), C>...>;
-	using value_type = T;
-	T&& v;
-	explicit constexpr checked_arg_h(T&& val) : v{std::forward<T>(val)} {};
-	constexpr operator T&&()
+	using checked_arg_index = boost::mp11::mp_list<std::integral_constant<decltype(Indexes), Indexes>...>;
+	using value_type = Value;
+	value_type&& v;
+	explicit constexpr checked_arg_h(value_type&& val) : v{std::forward<value_type>(val)} {};
+	constexpr operator value_type&&()
 	{
-		return std::forward<T>(v);
+		return std::forward<value_type>(v);
 	}
-	template <typename U = T, typename = typename std::enable_if_t<std::is_array<U>::value> >
-	constexpr operator checked_arg<checked_arg_index, std::decay_t<T>*>()
+	constexpr operator checked_arg<checked_arg_index, value_type>()
 	{
-		return checked_arg<checked_arg_index, std::decay_t<T>*>(v);
-	}
-	constexpr operator checked_arg<checked_arg_index, T>()
-	{
-		return checked_arg<checked_arg_index, T>(v);
+		return checked_arg<checked_arg_index, value_type>(v);
 	}
 };
 
@@ -104,12 +94,38 @@ constexpr bool correct_index_()
 	return X == at_helper<Indexer, u>::at() && correct_index_<Indexer, X + 1, v...>();
 }
 
-template <typename Indexer, typename... v>
+template <typename Indexer, typename... Args>
 constexpr bool correct_index()
 {
-	return correct_index_<Indexer, 0, v...>();
+	return correct_index_<Indexer, 0, Args...>();
 }
 
+template <typename T, typename T2 = void>
+struct is_checked_arg : public std::false_type
+{
+};
+
+template <typename T>
+struct is_checked_arg<T, std::enable_if_t<std::is_class<typename T::checked_arg_index>::value, void> > :
+    public std::true_type
+{
+};
+
+template <typename T>
+constexpr bool is_checked_arg_v = is_checked_arg<T>::value;
+
 } // namespace jbc::indexed_array::detail
+
+#if __cpp_concepts >= 202002L
+namespace jbc::indexed_array::concepts
+{
+template <class From, class To>
+concept explicitly_convertible_to = requires(From f) { static_cast<To>(f); };
+
+template<typename Arg, typename Value>
+concept checked_arg = ::jbc::indexed_array::detail::is_checked_arg_v<Arg> && explicitly_convertible_to<Arg, Value>;
+
+} // jbc::indexed_array::concepts
+#endif
 
 #endif // JBC_INDEXED_ARRAY_DETAIL_CHECKED_ARG_H

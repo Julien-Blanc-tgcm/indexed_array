@@ -4,7 +4,9 @@
 
 cmake_minimum_required(VERSION 3.5)
 
-set(CMAKE_CXX_STANDARD 17)
+if (NOT "${CMAKE_CXX_STANDARD}")
+	set(CMAKE_CXX_STANDARD 17)
+endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(BOOSTROOT "$ENV{HOME}/development/boost_1.78" CACHE STRING "Where to find boost")

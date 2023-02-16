@@ -37,8 +37,8 @@ struct default_indexer<index_range<min, max>, std::enable_if_t<can_be_integral_v
 	static constexpr bool is_o1 = true;
 
 	using index = T;
-	template <bool throws_on_error, typename Arg>
-	static constexpr std::size_t at(Arg v) noexcept(!throws_on_error)
+	template <bool throws_on_error>
+	static constexpr std::size_t at(T v) noexcept(!throws_on_error)
 	{
 		if constexpr (throws_on_error)
 		{
@@ -47,8 +47,8 @@ struct default_indexer<index_range<min, max>, std::enable_if_t<can_be_integral_v
 		}
 		return std::size_t(static_cast<integral_index_type>(v) - integral_value_v<min>);
 	}
-	template <typename Arg>
-	static constexpr auto in_range(Arg v) noexcept
+
+	static constexpr auto in_range(T v) noexcept
 	{
 		return !(static_cast<integral_index_type>(v) < integral_value_v<min> ||
 		         static_cast<integral_index_type>(v) > integral_value_v<max>);
@@ -79,8 +79,7 @@ struct default_indexer<
 		                   integral_value_v<mp11::mp_front<mp11::mp_list_c<T, vals...> >::value>);
 	}
 
-	template <typename Arg>
-	static constexpr bool in_range(Arg i)
+	static constexpr bool in_range(index i)
 	{
 		return (static_cast<decltype(integral_value<T, T{}>::value)>(i) >=
 		        integral_value_v<mp11::mp_front<mp11::mp_list_c<T, vals...> >::
@@ -209,12 +208,10 @@ struct default_indexer<
     boost::mp11::mp_list<Arg, Args...>,
     typename std::enable_if_t<boost::mp11::mp_all<is_indexer<Arg>, is_indexer<Args>...>::value, void> >
 {
-//	using index = boost::mp11::mp_list<typename Arg::index, typename Args::index...>;
 	static inline constexpr std::size_t const size = product_v<Arg::size, Args::size...>;
 
 	template <bool throws_on_error = false, typename A1, typename... An>
-	static constexpr std::size_t at(A1 arg, An... args)
-	    noexcept(!throws_on_error)
+	static constexpr std::size_t at(A1 arg, An... args) noexcept(!throws_on_error)
 	{
 		return at_computation_helper<Arg, Args...>::template at<throws_on_error>(arg, args...);
 	}
@@ -237,13 +234,8 @@ struct has_root_indexer : public std::false_type
 };
 
 template <typename T, typename Arg>
-struct has_root_indexer<
-    T,
-    Arg,
-    std::enable_if_t<
-        std::is_class_v<typename T::root_indexer> /*&&
-            std::is_invocable_v<decltype(static_cast<bool (*)(std::decay_t<Arg>)>(T::root_indexer::in_range)), Arg>*/,
-        void> > : public std::true_type
+struct has_root_indexer<T, Arg, std::enable_if_t<std::is_class_v<typename T::root_indexer>, void> > :
+    public std::true_type
 {
 };
 
@@ -273,8 +265,9 @@ using add_default_indexer_t = typename add_default_indexer<Arg>::type;
 namespace jbc::indexed_array::concepts
 {
 template <typename Indexer, typename... Args>
-concept indexer_invocable_with = requires (Indexer i, Args&&... args) {
-	{i.template at<true>(::std::forward<Args>(args)...)} -> ::std::same_as<::std::size_t>;
+concept indexer_invocable_with = requires (Indexer i, Args&&... args)
+{
+	{ i.template at<true>(::std::forward<Args>(args)...) } -> ::std::same_as< ::std::size_t>;
 };
 } // jbc::indexed_array::concepts
 #endif

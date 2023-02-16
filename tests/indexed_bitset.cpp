@@ -55,3 +55,13 @@ BOOST_AUTO_TEST_CASE(internal_bitset)
 	BOOST_TEST(static_cast<std::bitset<9> const&>(b).test(0));
 	BOOST_TEST(b.to_ullong() == static_cast<std::bitset<9> const&>(b).to_ullong());
 }
+
+BOOST_AUTO_TEST_CASE(operator_brackets)
+{
+	indexed_bitset<index_range<2, 10> > b(0x11u);
+	BOOST_TEST(b.size() == 9);
+	BOOST_TEST(b[2]);
+	BOOST_TEST(!b[3]);
+	b[3] = 1;
+	BOOST_TEST(b[3]);
+}

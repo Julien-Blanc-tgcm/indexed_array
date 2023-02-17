@@ -30,24 +30,25 @@ enum class Material
 
 BOOST_DESCRIBE_ENUM(Material, Wood, Metal, Stone, Leather);
 
-BOOST_AUTO_TEST_CASE(bidimensional)
+BOOST_AUTO_TEST_CASE(bidimensional) // NOLINT(clazy-non-pod-global-static)
 {
 	indexed_array<std::string, Color, Material> arr;
 	using T = decltype(arr)::indexer;
 	static_assert(std::is_same_v<T::root_indexer, T::root_indexer>, "vv");
-	//auto s = T::root_indexer::in_range(Color::White);
+	auto s = T::root_indexer::in_range(Color::White);
+	BOOST_TEST(s);
 	static_assert(detail::has_root_indexer<T, Color>::value, "Has root indexer");
-	//static_assert(!detail::has_root_indexer<T, int>::value, "Wrong signature results in no root indexer");
+	// static_assert(!detail::has_root_indexer<T, int>::value, "Wrong signature results in no root indexer");
 	BOOST_TEST(arr.size() == 20);
 }
 
-BOOST_AUTO_TEST_CASE(bidimensional2)
+BOOST_AUTO_TEST_CASE(bidimensional2) // NOLINT(clazy-non-pod-global-static)
 {
 	indexed_array<std::string, detail::default_indexer<Color>, Color> arr;
 	BOOST_TEST(arr.size() == 25);
 }
 
-BOOST_AUTO_TEST_CASE(bidimensional3)
+BOOST_AUTO_TEST_CASE(bidimensional3) // NOLINT(clazy-non-pod-global-static)
 {
 	indexed_array<std::string, Color, index_range<3, 8> > arr;
 	BOOST_TEST(arr.size() == 30);
@@ -82,7 +83,7 @@ struct custom_indexer
 	}
 };
 
-BOOST_AUTO_TEST_CASE(multidimensional)
+BOOST_AUTO_TEST_CASE(multidimensional) // NOLINT(clazy-non-pod-global-static)
 {
 	indexed_array<std::unique_ptr<std::string>, Color, index_range<3, 8>, custom_indexer, Material> arr;
 	BOOST_TEST(arr.size() == 5 * 6 * 8 * 4);
@@ -94,7 +95,7 @@ BOOST_AUTO_TEST_CASE(multidimensional)
 	BOOST_TEST(*arr.at(Color::White, 4, 6, Material::Stone) == "814");
 }
 
-BOOST_AUTO_TEST_CASE(multidimensional_init)
+BOOST_AUTO_TEST_CASE(multidimensional_init) // NOLINT(clazy-non-pod-global-static)
 {
 	indexed_array<std::unique_ptr<std::string>, index_range<3, 4>, index_range<5, 6>, index_range<7, 8> > arr{
 	    std::make_unique<std::string>("357"),
@@ -109,7 +110,7 @@ BOOST_AUTO_TEST_CASE(multidimensional_init)
 	BOOST_TEST(*arr.at(4, 5, 7) == "457");
 }
 
-BOOST_AUTO_TEST_CASE(multidimensional_operator_bracket)
+BOOST_AUTO_TEST_CASE(multidimensional_operator_bracket) // NOLINT(clazy-non-pod-global-static)
 {
 	indexed_array<std::unique_ptr<std::string>, index_range<3, 4>, index_range<5, 6>, index_range<7, 8> > arr{
 	    std::make_unique<std::string>("357"),
@@ -125,7 +126,7 @@ BOOST_AUTO_TEST_CASE(multidimensional_operator_bracket)
 	BOOST_TEST((*arr[std::tuple{4, 5, 7}] == "457"));
 }
 
-BOOST_AUTO_TEST_CASE(multidimensional_safe_initialization)
+BOOST_AUTO_TEST_CASE(multidimensional_safe_initialization) // NOLINT(clazy-non-pod-global-static)
 {
 	auto blue3 = std::make_unique<std::string>("Blue3");
 	indexed_array<std::unique_ptr<std::string>, Color, index_range<3, 4> > arr{
@@ -144,7 +145,7 @@ BOOST_AUTO_TEST_CASE(multidimensional_safe_initialization)
 	BOOST_TEST(*arr.at(Color::Blue, 3) == "Blue3");
 }
 
-BOOST_AUTO_TEST_CASE(multidimensional_slices)
+BOOST_AUTO_TEST_CASE(multidimensional_slices) // NOLINT(clazy-non-pod-global-static)
 {
 	indexed_array<std::unique_ptr<std::string>, Color, Material, index_range<-3, 6> > arr{};
 	int i = 0;
@@ -161,7 +162,7 @@ BOOST_AUTO_TEST_CASE(multidimensional_slices)
 	BOOST_TEST(*slice2[6] == "59");
 }
 
-BOOST_AUTO_TEST_CASE(multidimensional_const_slices)
+BOOST_AUTO_TEST_CASE(multidimensional_const_slices) // NOLINT(clazy-non-pod-global-static)
 {
 	indexed_array<std::unique_ptr<std::string>, Color, Material, index_range<-3, 6> > arr{};
 	int i = 0;
@@ -184,7 +185,7 @@ BOOST_AUTO_TEST_CASE(multidimensional_const_slices)
 	BOOST_TEST(*slice2[6] == "59");
 }
 
-BOOST_AUTO_TEST_CASE(multidimensional_o1)
+BOOST_AUTO_TEST_CASE(multidimensional_o1) // NOLINT(clazy-non-pod-global-static)
 {
 	using T = indexed_array<int, index_range<-2, 5>, index_range<10, 15>, index_range<4, 8> >;
 	BOOST_TEST(T::is_o1);
@@ -194,7 +195,7 @@ BOOST_AUTO_TEST_CASE(multidimensional_o1)
 	BOOST_TEST(T3::is_o1);
 }
 
-BOOST_AUTO_TEST_CASE(multidimensional_in_range)
+BOOST_AUTO_TEST_CASE(multidimensional_in_range) // NOLINT(clazy-non-pod-global-static)
 {
 	using T = indexed_array<std::unique_ptr<std::string>, Color, Material, index_range<-3, 6> >;
 	BOOST_TEST(T::in_range(Color::Black, Material::Wood, 4));
@@ -204,3 +205,9 @@ BOOST_AUTO_TEST_CASE(multidimensional_in_range)
 	BOOST_TEST(T::in_range(Color::White, Material::Wood, 6));
 	BOOST_TEST(T::in_range(Color::White, Material::Wood, -3));
 }
+
+using T = indexed_array<std::unique_ptr<std::string>, Color, Material, index_range<-3, 6> >;
+using Indexer = T::indexer;
+static_assert(detail::is_indexer_invocable_with_v<Indexer, Color, Material, int>);
+static_assert(!detail::is_indexer_invocable_with_v<Indexer, int, Material, int>);
+static_assert(!detail::is_indexer_invocable_with_v<Indexer, Color, Material, Color>);

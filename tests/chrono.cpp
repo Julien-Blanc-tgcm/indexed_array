@@ -60,6 +60,16 @@ struct heterogeneous_index2
 	}
 };
 
+BOOST_AUTO_TEST_CASE(chrono_heterogeneous_bitset)
+{
+	using het_index = lambda_indexer<heterogeneous_index2{}, 19>;
+	indexed_bitset<het_index> bits(0xAAAAAAAAu); // odd bits set to 1, even to 0
+	BOOST_TEST(!bits[std::chrono::Monday]);
+	BOOST_TEST(bits[std::chrono::Tuesday]);
+	BOOST_TEST(bits[std::chrono::January]); // should be bit 7, which is odd
+	BOOST_TEST(!bits[std::chrono::December]); // should be bit 18, which is even
+}
+
 /*BOOST_AUTO_TEST_CASE(chrono_heterogeneous_safe_arg)
 {
 	using namespace std::chrono;

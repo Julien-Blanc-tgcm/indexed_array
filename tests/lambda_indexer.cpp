@@ -48,10 +48,17 @@ BOOST_AUTO_TEST_CASE(day_of_month_indexer)
 BOOST_AUTO_TEST_CASE(weekday_indexer)
 {
 	using namespace std::chrono;
-	constexpr auto weekday_to_unsigned = [](weekday w) { return w.iso_encoding(); };
+	constexpr auto weekday_to_unsigned = [](weekday w) -> std::size_t { return w.iso_encoding() - 1; };
 	using wday_indexer =
 	    lambda_indexer<weekday_to_unsigned, 7u>;
 	using Base = indexed_array<int, wday_indexer>;
 	Base b;
 	BOOST_TEST(b.size() == 7);
+
+	static_assert(detail::is_indexer_invocable_with<wday_indexer, weekday>::value);
+	static_assert(detail::is_indexer_invocable_with_detail<wday_indexer, boost::mp11::mp_list<weekday> >::value);
+	static_assert(!detail::is_indexer_invocable_with_detail<wday_indexer, boost::mp11::mp_list<month> >::value);
+#if __cpp_concepts >= 202002L
+	static_assert(!jbc::indexed_array::concepts::indexer_invocable_with<wday_indexer, month>);
+#endif
 }

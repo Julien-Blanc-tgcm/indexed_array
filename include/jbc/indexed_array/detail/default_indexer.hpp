@@ -157,8 +157,9 @@ inline constexpr const auto product_v = product<Args...>::value;
 template <typename Arg, typename... Args>
 struct at_computation_helper
 {
-	template <bool c>
-	static constexpr std::size_t at(typename Arg::index idx, typename Args::index... rem)
+	template <bool c, typename A1, typename... An>
+	static constexpr auto at(A1 idx, An... rem) -> decltype(Arg::template at<c>(idx) * product_v<Args::size...> +
+	                                                        at_computation_helper<Args...>::template at<c>(rem...))
 	{
 		return Arg::template at<c>(idx) * product_v<Args::size...> +
 		       at_computation_helper<Args...>::template at<c>(rem...);
@@ -167,10 +168,10 @@ struct at_computation_helper
 template <typename Arg>
 struct at_computation_helper<Arg>
 {
-	template <bool c>
-	static constexpr std::size_t at(typename Arg::index idx)
+	template <bool c, typename A1>
+	static constexpr auto at(A1 idx) -> decltype(static_cast<std::size_t>(Arg::template at<c>(idx)))
 	{
-		return Arg::template at<c>(idx);
+		return static_cast<std::size_t>(Arg::template at<c>(idx));
 	}
 };
 
@@ -210,8 +211,11 @@ struct default_indexer<
 {
 	static inline constexpr std::size_t const size = product_v<Arg::size, Args::size...>;
 
+	// trailing return type syntax needed for SFINAE friendliness, otherwise is_indexer_invocable_with won't work
+	// correctly
 	template <bool throws_on_error = false, typename A1, typename... An>
-	static constexpr std::size_t at(A1 arg, An... args) noexcept(!throws_on_error)
+	static constexpr auto at(A1 arg, An... args) noexcept(!throws_on_error)
+	    -> decltype(at_computation_helper<Arg, Args...>::template at<throws_on_error>(arg, args...))
 	{
 		return at_computation_helper<Arg, Args...>::template at<throws_on_error>(arg, args...);
 	}
@@ -239,6 +243,30 @@ struct has_root_indexer<T, Arg, std::enable_if_t<std::is_class_v<typename T::roo
 {
 };
 
+template <typename Indexer, typename L = void, typename b = std::true_type>
+struct is_indexer_invocable_with_detail : public std::false_type
+{
+};
+
+template <typename Indexer, typename... Args>
+struct is_indexer_invocable_with_detail<
+    Indexer,
+    boost::mp11::mp_list<Args...>,
+    std::integral_constant<
+        bool,
+        std::is_same_v<decltype(Indexer::template at<false>(std::declval<Args>()...)), std::size_t> > > :
+    public std::true_type
+{
+};
+
+template <typename Indexer, typename... Args>
+struct is_indexer_invocable_with : public is_indexer_invocable_with_detail<Indexer, boost::mp11::mp_list<Args...> >
+{
+};
+
+template <typename Indexer, typename... Args>
+constexpr bool is_indexer_invocable_with_v = is_indexer_invocable_with<Indexer, Args...>::value;
+
 template <typename Arg>
 struct wrong_indexer
 {
@@ -262,15 +290,16 @@ using add_default_indexer_t = typename add_default_indexer<Arg>::type;
 } // namespace jbc::indexed_array::detail
 
 #if defined(__cpp_concepts) && __cpp_concepts >= 202002L
+// clang-format off
 namespace jbc::indexed_array::concepts
 {
 template <typename Indexer, typename... Args>
-concept indexer_invocable_with = requires (Indexer i, Args&&... args)
+concept indexer_invocable_with = requires (Indexer i, Args... args)
 {
-	{ i.template at<true>(::std::forward<Args>(args)...) } -> ::std::same_as< ::std::size_t>;
+	{ i.template at<true>(args...) } -> ::std::same_as<::std::size_t>;
 };
 } // jbc::indexed_array::concepts
+// clang-format on
 #endif
-
 
 #endif // JBC_INDEXED_ARRAY_DETAIL_DEFAULT_INDEXER_H

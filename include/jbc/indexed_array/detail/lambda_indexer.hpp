@@ -25,8 +25,12 @@ struct lambda_indexer
   public:
 	static constexpr auto const size = internal_indexer_::size;
 	static constexpr bool is_o1 = is_o1_;
+
+	// Trailing return type used is here is needed for SFINAE friendliness. Otherwise, attempts to detect if the call
+	// is working (such as invocable_v) will incorrectly work. This is needed to make the trait
+	// is_indexer_invocable_with work correctly
 	template <bool throws_on_error, typename... Args>
-	static constexpr std::size_t at(Args... args)
+	static constexpr auto at(Args... args) -> decltype(internal_indexer_::template at<throws_on_error>(F(args...)))
 	{
 		return internal_indexer_::template at<throws_on_error>(F(args...));
 	}

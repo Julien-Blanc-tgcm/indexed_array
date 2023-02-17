@@ -86,11 +86,7 @@ class indexed_bitset
 #if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 	template <typename... Args> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
 #else
-	template <typename... Args,
-	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Args>...)>(
-	                                                   Indexer::template at<true>)),
-	                                               Args...>,
-	                           int> = 0>
+	template <typename... Args, typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...> > >
 #endif
 	constexpr bool test(Args&&... args) const
 	{
@@ -100,11 +96,7 @@ class indexed_bitset
 #if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 	template <typename... Args> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
 #else
-	template <typename... Args,
-	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Args>...)>(
-	                                                   Indexer::template at<true>)),
-	                                               Args...>,
-	                           int> = 0>
+	template <typename... Args, typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...> > >
 #endif
 	constexpr indexed_bitset& set(Args&&... args)
 	{
@@ -115,11 +107,7 @@ class indexed_bitset
 #if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 	template <typename... Args> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
 #else
-	template <typename... Args,
-	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Args>...)>(
-	                                                   Indexer::template at<true>)),
-	                                               Args...>,
-	                           int> = 0>
+	template <typename... Args, typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...> > >
 #endif
 	constexpr indexed_bitset& reset(Args&&... args)
 	{
@@ -130,11 +118,7 @@ class indexed_bitset
 #if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 	template <typename... Args> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
 #else
-	template <typename... Args,
-	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Args>...)>(
-	                                                   Indexer::template at<true>)),
-	                                               Args...>,
-	                           int> = 0>
+	template <typename... Args, typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...> > >
 #endif
 	constexpr indexed_bitset& flip(Args&&... args)
 	{
@@ -143,15 +127,22 @@ class indexed_bitset
 	}
 
 #if defined(__cpp_multidimensional_subscript)
-	// assume concepts available
+#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 	template <typename... Args> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
+#else
+	template <typename... Args, typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...> > >
+#endif
 	constexpr reference operator[](Args&&... args)
 	{
 		auto i = indexer::template at<false>(std::forward<Args>(args)...);
 		return data_[i];
 	}
 
+#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 	template <typename... Args> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
+#else
+	template <typename... Args, typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...> > >
+#endif
 	constexpr const_reference operator[](Args&&... args) const
 	{
 		auto i = indexer::template at<false>(std::forward<Args>(args)...);
@@ -161,11 +152,7 @@ class indexed_bitset
 #if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 	template <typename Arg> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Arg>
 #else
-	template <typename Arg,
-	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Arg>)>(
-	                                                   Indexer::template at<true>)),
-	                                               Arg>,
-	                           int> = 0>
+	template <typename Arg, typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Arg> > >
 #endif
 	constexpr reference operator[](Arg&& arg)
 	{
@@ -175,11 +162,7 @@ class indexed_bitset
 #if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 	template <typename Arg> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Arg>
 #else
-	template <typename Arg,
-	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Arg>)>(
-	                                                   Indexer::template at<true>)),
-	                                               Arg>,
-	                           int> = 0>
+	template <typename Arg, typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Arg> > >
 #endif
 	constexpr const_reference operator[](Arg&& arg) const
 	{
@@ -190,11 +173,7 @@ class indexed_bitset
 #if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 	template <typename... Args> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
 #else
-	template <typename... Args,
-	          std::enable_if_t<std::is_invocable_v<decltype(static_cast<std::size_t (*)(std::decay_t<Args>...)>(
-	                                                   Indexer::template at<true>)),
-	                                               Args...>,
-	                           int> = 0>
+	template <typename... Args, typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...> > >
 #endif
 	constexpr bool in_range(Args&&... args)
 	{

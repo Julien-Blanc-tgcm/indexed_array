@@ -37,8 +37,9 @@ BOOST_AUTO_TEST_CASE(bidimensional) // NOLINT(clazy-non-pod-global-static)
 	static_assert(std::is_same_v<T::root_indexer, T::root_indexer>, "vv");
 	auto s = T::root_indexer::in_range(Color::White);
 	BOOST_TEST(s);
+	static_assert(detail::is_indexer_invocable_with_v<T::root_indexer, Color>);
 	static_assert(detail::has_root_indexer<T, Color>::value, "Has root indexer");
-	// static_assert(!detail::has_root_indexer<T, int>::value, "Wrong signature results in no root indexer");
+	static_assert(!detail::has_root_indexer<T, int>::value, "Wrong signature results in no root indexer");
 	BOOST_TEST(arr.size() == 20);
 }
 

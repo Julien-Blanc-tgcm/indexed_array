@@ -65,6 +65,7 @@ BOOST_AUTO_TEST_CASE(index_range_enum_out_of_bound)
 		catched = true;
 	}
 	BOOST_TEST(catched);
+	BOOST_TEST(a == 0);
 }
 
 BOOST_AUTO_TEST_CASE(index_range_enum_empty)

@@ -39,4 +39,5 @@ BOOST_AUTO_TEST_CASE(out_of_bound_index_range)
 		catched = true;
 	}
 	BOOST_TEST(catched);
+	BOOST_TEST(a == 0); // not changed
 }

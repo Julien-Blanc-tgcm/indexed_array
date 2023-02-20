@@ -13,7 +13,6 @@ constexpr auto l = [](std::chrono::weekday d) { return static_cast<std::size_t>(
 
 BOOST_AUTO_TEST_CASE(chrono_indexer)
 {
-	int a = 2;
 	indexed_array<int, lambda_indexer<l, 7>> arr{1, 2, 3, 4, 5, 6, 7};
 	BOOST_TEST(arr.size() == 7);
 	BOOST_TEST(arr[std::chrono::Thursday] == 4);

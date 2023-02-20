@@ -20,7 +20,7 @@ template <auto F, std::size_t number_of_items, bool is_o1_ = true>
 struct lambda_indexer
 {
   private:
-	using internal_indexer_ = default_indexer<index_range<0, number_of_items - 1u> >;
+	using internal_indexer_ = default_indexer<index_range<std::size_t(0), number_of_items - 1u> >;
 
   public:
 	static constexpr auto const size = internal_indexer_::size;

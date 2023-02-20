@@ -82,7 +82,6 @@ BOOST_AUTO_TEST_CASE(indexed_span_slice_at2)
 BOOST_AUTO_TEST_CASE(indexed_span_slice_const)
 {
 	indexed_array<int, index_range<2, 4>, index_range<3, 5> > const arr{0, 1, 2, 3, 4, 5, 6, 7, 8};
-	bool catched = false;
 	BOOST_TEST((std::is_same_v<decltype(arr.slice_at(2)), indexed_span<int const, index_range<3, 5> > >));
 	BOOST_TEST((std::is_same_v<decltype(arr.slice(2)), indexed_span<int const, index_range<3, 5> > >));
 	BOOST_TEST(arr.slice(2)[5] == 2);

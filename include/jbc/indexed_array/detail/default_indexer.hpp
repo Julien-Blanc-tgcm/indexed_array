@@ -232,17 +232,6 @@ struct default_indexer<
 	}
 };
 
-template <typename T, typename Arg, typename = void>
-struct has_root_indexer : public std::false_type
-{
-};
-
-template <typename T, typename Arg>
-struct has_root_indexer<T, Arg, std::enable_if_t<std::is_class_v<typename T::root_indexer>, void> > :
-    public std::true_type
-{
-};
-
 template <typename Indexer, typename L = void, typename b = std::true_type>
 struct is_indexer_invocable_with_detail : public std::false_type
 {
@@ -271,6 +260,17 @@ template <typename Arg>
 struct wrong_indexer
 {
 	static_assert(std::is_same_v<Arg, std::true_type>, "There is a problem with the indexer");
+};
+
+template <typename Indexer, typename Arg, typename b = std::true_type>
+struct has_root_indexer : public std::false_type
+{
+};
+
+template <typename Indexer, typename Arg>
+struct has_root_indexer<Indexer, Arg, std::integral_constant<bool, is_indexer_invocable_with_v<typename Indexer::root_indexer, Arg> > > :
+    public std::true_type
+{
 };
 
 template <typename Arg>

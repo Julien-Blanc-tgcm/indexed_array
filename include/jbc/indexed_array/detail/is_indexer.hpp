@@ -21,8 +21,7 @@ struct is_indexer : public std::false_type
 template <typename T>
 struct is_indexer<
     T,
-    std::enable_if_t<std::is_integral<decltype(T::size)>::value && std::is_integral<decltype(T::is_o1)>::value,
-                     void> > : public std::true_type
+    std::enable_if_t<std::is_integral<decltype(T::size)>::value, void> > : public std::true_type
 {
 };
 
@@ -38,6 +37,5 @@ template <typename T>
 concept indexer = ::jbc::indexed_array::detail::is_indexer_v<T>;
 } // namespace jbc::indexed_array::concepts
 #endif
-
 
 #endif // JBC_INDEXED_ARRAY_DETAIL_IS_INDEXER_H

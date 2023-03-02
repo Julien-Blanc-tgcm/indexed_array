@@ -6,16 +6,22 @@
 
 #include "jbc/indexed_array.hpp"
 
-
 using namespace jbc::indexed_array;
 
 constexpr auto l = [](std::chrono::weekday d) { return static_cast<std::size_t>(d.iso_encoding() - 1); };
 
 BOOST_AUTO_TEST_CASE(chrono_indexer)
 {
-	indexed_array<int, lambda_indexer<l, 7>> arr{1, 2, 3, 4, 5, 6, 7};
-	BOOST_TEST(arr.size() == 7);
-	BOOST_TEST(arr[std::chrono::Thursday] == 4);
+	indexed_array<std::string, lambda_indexer<l, 7>> french_names {
+	    "lundi",
+	    "mardi",
+	    "mercredi",
+	    "jeudi",
+	    "vendredi",
+	    "samedi",
+	    "dimanche"};
+	BOOST_TEST(french_names.size() == 7);
+	BOOST_TEST(french_names[std::chrono::Thursday] == "jeudi");
 }
 
 struct heterogenous_index

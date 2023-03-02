@@ -45,7 +45,7 @@ foo.at(Foo::Bar2, Foo::Bar2) = "an example string"; // modify the “central” 
 
 The library has the following requirements:
 
-* A `C++17` capable compiler
+* A `C++17` capable compiler (`C++20` is required for some features)
 * `boost::mp11`
 
 Optional, but strongly recommended, is one of the following:

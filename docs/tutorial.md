@@ -204,13 +204,13 @@ assert(d[2] == 2);
 The library also supports multidimensional indexing. Declaring a multidimensional indexed array
 is very similar to declaring a single dimension:
 
-```
+```cpp
 indexed_array<int, index_range<1, 4>, Foo> data;
 assert(data.size() == 4 * 5); // 5 is the number of enum values in Foo
 ```
 
 Accessing the elements can de bone by two ways:
-```
+```cpp
 int v1 = data.at(2, Foo::bar1);
 int v2 = data[{2, Foo::bar1}];
 ```
@@ -224,7 +224,7 @@ The data layout is the following:
 
 It is also possible to get a view on a single row:
 
-```
+```cpp
 auto second_row = data[2];
 int v3 = second_row[Foo::bar3];
 ```
@@ -233,5 +233,43 @@ There is no limit on the number of dimensions.
 
 *Note: iteration on both keys and values is currently not implemented for multidimensional arrays*
 
+## Lambda indexing
+
+*This feature requires the use of a `C++20` compiler*.
+
+To help reducing the need to write a custom indexer, the library provides a generic indexer, that
+is parametrized by a size and a lamdba function. The provide lamda function is in charge of
+taking a value of the type used for indexing, and return a `size_t` in the range `[0, size - 1]`.
+
+Example use:
+```cpp
+constexpr auto wday_indexing_l = [](std::chrono::weekday wd) { return static_cast<std::size_t>(wd.iso_encoding() - 1); };
+using wday_indexer = lambda_indexer<wday_indexing_l, 7>;
+indexed_array<std::string, wday_indexer> french_names{"lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"};
+```
+
+The same can be achieved using a custom indexer with `C++17`:
+```cpp
+struct wday_indexer
+{
+	using index = std::chrono::weekday;
+	static constexpr std::size_t size = 7u;
+	template <bool b>
+	static constexpr std::size_t at(std::chrono::weekday wd)
+	{
+		auto v = wd.iso_encoding();
+		if constexpr (b)
+		{
+			if (v < 1 || v > 7)
+				throw std::out_of_range("Invalid value");
+		}
+		return static_cast<std::size_t>(v - 1);
+	}
+	static constexpr bool in_range(std::chrono::weekday wd)
+	{
+		auto v = wd.iso_encoding();
+		return v > 0 && v <= 7;
+	}
+};
 
 Back to [index](index.md), or see [advanced usage](advancedusage.md)

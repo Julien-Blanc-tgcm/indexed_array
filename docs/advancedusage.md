@@ -233,4 +233,36 @@ static constexpr auto at(index floor) noexcept(!b)
 	return static_cast<size_t>(floor) - 1;
 ```
 
+## Heterogeneous indexing
+
+*This feature relies on lambda indexing, and as such a `C++20` compiler is required.*
+
+Heterogeneous indexing means using different types to access the same array. Two use cases are
+supported:
+
+* aliasing, ie using two different types to access the same area of the array. This can be seen
+as a way to do compile-time multi-indexing (for example, accessing with both a numeric index or a
+string identifier)
+* slicing, ie using different types to access different sections of the same underlying array.
+
+Taking back our example with from the lift industry, we could rewrite it like this:
+
+```cpp
+// don't alter the Floor enum. Instead, define a new enum holding our special values
+enum SpecialFloors
+{
+	Machinery = 0,
+	Pit
+};
+
+struct LiftFloorIndexer
+{
+	// we put special floors at start, so we can handle any number of floors
+	std::size_t operator()(DS417::Floor c) { return static_cast<std::size_t>(c) + 2; };
+	std::size_t operator()(SpecialFloors c) { return static_cast<std::size_t>(c); };
+};
+
+using floors_indexer = lamdba_indexer<LiftFloorIndexer{}, 34>; // supports 2 special floors + 32 floors
+```
+
 Back to the [index](index.md) or continue to [multidimensional indexing](multidimensional.md)

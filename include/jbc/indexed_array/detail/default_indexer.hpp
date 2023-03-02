@@ -28,6 +28,17 @@ struct default_indexer
 {
 };
 
+template <typename indexer, typename T = void>
+struct is_o1_indexer : public std::false_type
+{
+};
+
+template <typename indexer>
+struct is_o1_indexer<indexer, std::enable_if_t<std::is_same_v<decltype(indexer::is_o1), bool const>, void>> :
+public std::integral_constant<bool, indexer::is_o1>
+{
+};
+
 template <typename T, T min, T max>
 struct default_indexer<index_range<min, max>, std::enable_if_t<can_be_integral_value<T, min>::value, void> >
 {
@@ -176,29 +187,29 @@ struct at_computation_helper<Arg>
 };
 
 template <typename T, typename = void>
-struct add_default_handler_if_needed
+struct add_default_indexer_if_needed
 {
 	using type = default_indexer<T>;
 };
 template <typename T>
-struct add_default_handler_if_needed<T, std::enable_if_t<is_indexer_v<T>, void> >
+struct add_default_indexer_if_needed<T, std::enable_if_t<is_indexer_v<T>, void> >
 {
 	using type = T;
 };
 
 template <typename T>
-using add_default_handler_if_needed_t = typename add_default_handler_if_needed<T>::type;
+using add_default_indexer_if_needed_t = typename add_default_indexer_if_needed<T>::type;
 
 template <typename... Args>
 struct to_single_indexer
 {
-	using type = default_indexer<boost::mp11::mp_list<add_default_handler_if_needed_t<Args>...> >;
+	using type = default_indexer<boost::mp11::mp_list<add_default_indexer_if_needed_t<Args>...> >;
 };
 
 template <typename Arg>
 struct to_single_indexer<Arg>
 {
-	using type = add_default_handler_if_needed_t<Arg>;
+	using type = add_default_indexer_if_needed_t<Arg>;
 };
 
 template <typename... Args>

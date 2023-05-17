@@ -74,8 +74,6 @@ if(${Doxygen_FOUND})
 			DEPENDS doc
 			SOURCES ${doc_sources}
 		)
-	else()
-		message(FATAL_ERROR "${Sphinx_DIR}" )
 	endif()
 endif()
 

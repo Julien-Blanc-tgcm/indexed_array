@@ -59,65 +59,33 @@ class indexed_span
 	template <typename... Args,
 	          typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...>>>
 #endif
-	constexpr reference at(Args&&... args)
-	{
-		return data_[Indexer::template at<true>(std::forward<Args>(args)...)];
-	}
-
-#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
-	template <typename... Args> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
-#else
-	template <typename... Args,
-	          typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...>>>
-#endif
-	constexpr const_reference at(Args&&... args) const
+	constexpr reference at(Args&&... args) const
 	{
 		return data_[Indexer::template at<true>(std::forward<Args>(args)...)];
 	}
 
 #if defined(__cpp_multidimensional_subscript)
+// define variadic operator[] for cpp23
 #if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 	template <typename... Args> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
 #else
 	template <typename... Args,
 	          typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...>>>
 #endif
-	constexpr reference operator[](Args&&... args)
-	{
-		auto i = indexer::template at<false>(std::forward<Args>(args)...);
-		return data_[i];
-	}
-
-#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
-	template <typename... Args> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
-#else
-	template <typename... Args,
-	          typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...>>>
-#endif
-	constexpr const_reference operator[](Args&&... args) const
+	constexpr reference operator[](Args&&... args) const
 	{
 		auto i = indexer::template at<false>(std::forward<Args>(args)...);
 		return data_[i];
 	}
 #else
+// define standard single dimension operator[] otherwise
 #if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 	template <typename Arg> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Arg>
 #else
 	template <typename Arg,
 	          typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Arg>>>
 #endif
-	constexpr reference operator[](Arg&& arg)
-	{
-		return data_[Indexer::template at<false>(std::forward<Arg>(arg))];
-	}
-
-#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
-	template <typename Arg> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Arg>
-#else
-	template <typename Arg,
-	          typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Arg>>>
-#endif
-	constexpr const_reference operator[](Arg&& arg) const
+	constexpr reference operator[](Arg&& arg) const
 	{
 		return data_[Indexer::template at<false>(std::forward<Arg>(arg))];
 	}
@@ -129,35 +97,10 @@ class indexed_span
 	template <typename... Args,
 	          typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...>>>
 #endif
-	constexpr reference operator[](std::tuple<Args...> arg)
-	{
-		auto f = static_cast<std::size_t (*)(std::decay_t<Args>...)>(Indexer::template at<false>);
-		auto i = std::apply(f, std::forward<std::tuple<Args...> >(arg));
-		return data_[i];
-	}
-
-#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
-	template <typename... Args> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
-#else
-	template <typename... Args,
-	          typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...>>>
-#endif
-	constexpr const_reference operator[](std::tuple<Args...> arg) const
+	constexpr reference operator[](std::tuple<Args...> arg) const
 	{
 		auto f = static_cast<std::size_t (*)(std::decay_t<Args>...)>(Indexer::template at<false>);
 		auto i = std::apply(f, arg);
-		return data_[i];
-	}
-
-#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
-	template <typename... Args> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
-#else
-	template <typename... Args,
-	          typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...>>>
-#endif
-	constexpr reference operator()(Args&&... args)
-	{
-		auto i = indexer::template at<false>(std::forward<Args>(args)...);
 		return data_[i];
 	}
 
@@ -174,24 +117,10 @@ class indexed_span
 	}
 
 	template <typename Arg, std::enable_if_t<detail::has_root_indexer<Indexer, Arg>::value, int> = 0>
-	constexpr auto slice(Arg idx)
-	{
-		return indexed_span<Value, typename Indexer::slice_indexer>(
-		    data_ + Indexer::root_indexer::template at<false>(idx) * Indexer::slice_indexer::size);
-	}
-
-	template <typename Arg, std::enable_if_t<detail::has_root_indexer<Indexer, Arg>::value, int> = 0>
 	constexpr auto slice(Arg idx) const
 	{
 		return indexed_span<Value const, typename Indexer::slice_indexer>(
 		    data_ + Indexer::root_indexer::template at<false>(idx) * Indexer::slice_indexer::size);
-	}
-
-	template <typename Arg, std::enable_if_t<detail::has_root_indexer<Indexer, Arg>::value, int> = 0>
-	constexpr auto slice_at(Arg idx)
-	{
-		return indexed_span<Value, typename Indexer::slice_indexer>(
-		    data_ + Indexer::root_indexer::template at<true>(idx) * Indexer::slice_indexer::size);
 	}
 
 	template <typename Arg, std::enable_if_t<detail::has_root_indexer<Indexer, Arg>::value, int> = 0>
@@ -219,54 +148,30 @@ class indexed_span
 
 	static constexpr bool is_o1 = Indexer::is_o1;
 
-	// standard array operations
-	auto begin()
+	// standard span operations
+	constexpr auto begin() const
 	{
 		return data_;
 	}
-	auto begin() const
-	{
-		return data_;
-	}
-	auto end()
-	{
-		return data_ + Indexer::size;
-	}
-	auto end() const
+	constexpr auto end() const
 	{
 		return data_ + Indexer::size;
 	}
 
-	auto rbegin()
+	constexpr auto rbegin() const
 	{
 		return std::make_reverse_iterator(end());
 	}
-	auto rbegin() const
-	{
-		return std::make_reverse_iterator(end());
-	}
-	auto rend()
-	{
-		return std::make_reverse_iterator(data_);
-	}
-	auto rend() const
+	constexpr auto rend() const
 	{
 		return std::make_reverse_iterator(data_);
 	}
 
-	constexpr reference front()
+	constexpr reference front() const
 	{
 		return *data_;
 	}
-	constexpr const_reference front() const
-	{
-		return *data_;
-	}
-	constexpr reference back()
-	{
-		return *(data_ + Indexer::size - 1);
-	}
-	constexpr const_reference back() const
+	constexpr reference back() const
 	{
 		return *(data_ + Indexer::size - 1);
 	}
@@ -278,6 +183,11 @@ class indexed_span
 	constexpr bool empty() const
 	{
 		return size() == 0;
+	}
+
+	constexpr pointer data() const
+	{
+		return data_;
 	}
 };
 

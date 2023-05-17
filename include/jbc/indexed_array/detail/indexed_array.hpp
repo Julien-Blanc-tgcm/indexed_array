@@ -52,6 +52,10 @@ class indexed_array
 
 	constexpr indexed_array& operator=(indexed_array<Value, Indexer>&& other) = default;
 
+	/**
+	 * Constructor via an array of the same size and the same value content. Copy the array
+	 * into the indexed_array content.
+	 */
 	constexpr indexed_array(std::array<Value, Indexer::size> const& other)
 	    noexcept(std::is_nothrow_copy_constructible_v<Value>) :
 	    data_{other}
@@ -59,29 +63,42 @@ class indexed_array
 	}
 
 	// standard constructor
+	/**
+	 * Standard construction via a list of values. Behavior is the same as aggregate initialization
+	 * of an std::array. No check is done on the number of values.
+	 * @param list the list of values with which the array content will be initialized. Not that
+	 * some values may be left uninitialized
+	 */
 #if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 	template <std::convertible_to<Value> Arg, std::convertible_to<Value>... Args>
-	requires(!::jbc::indexed_array::concepts::checked_arg<Arg, Value>)
+	requires(!(::jbc::indexed_array::concepts::checked_arg<Arg, Value> || (::jbc::indexed_array::concepts::checked_arg<Args, Value> || ...)))
 #else
-	template <typename Arg,
-	          typename... Args,
-	          std::enable_if_t<!is_checked_arg<boost::mp11::mp_first<boost::mp11::mp_list<Arg, Args...> > >::value &&
+	template <typename Arg, typename... Args,
+	          std::enable_if_t<!is_checked_arg<Arg>::value &&
 	                               !std::is_invocable_v<indexed_array(indexed_array const&), Arg&&, Args&&...>,
 	                           bool> = true>
 #endif
-	    constexpr explicit indexed_array(Arg&& head, Args&&... list)
+	    constexpr explicit indexed_array(Arg&& arg, Args&&... args)
 	        noexcept(std::is_nothrow_copy_constructible_v<Value>) :
-	    data_{std::forward<Arg>(head), std::forward<Args>(list)...}
+	    data_{std::forward<Arg>(arg), std::forward<Args>(args)...}
 	{
 	}
+
 	// safe_arg constructor
+	/**
+	 * @brief Specialization of the constructor that takes a `safe_arg` list of
+	 * values. This is equivalent to aggregate initialization, but
+	 * additional checks are done at compile time:
+	 * @li the number of arguments must match with the array size
+	 * @li the explicit index of each argument must match the order of the indexer
+	 */
 #if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 	template < ::jbc::indexed_array::concepts::checked_arg<Value> Arg,
 	           ::jbc::indexed_array::concepts::checked_arg<Value>... Args>
 #else
 	template <typename Arg,
 	          typename... Args,
-	          std::enable_if_t<is_checked_arg<boost::mp11::mp_first<boost::mp11::mp_list<Arg, Args...> > >::value,
+	          std::enable_if_t<is_checked_arg<Arg>::value,
 	                           bool> = true>
 #endif
 	constexpr explicit indexed_array(Arg&& head, Args&&... args) noexcept(std::is_nothrow_copy_constructible_v<Value>) :

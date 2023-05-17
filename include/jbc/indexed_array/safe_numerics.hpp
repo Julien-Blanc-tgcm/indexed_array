@@ -12,6 +12,13 @@
 namespace jbc::indexed_array
 {
 
+/**
+ * @brief Indexer that will allow using a safe_numics::safe_signed_range as the index. This allows
+ * some compile-time checking of the indexes in certain circunstances.
+ *
+ * @tparam min The minimum value for the range
+ * @tparam max The maximum value for the range
+ */
 template<int min, int max>
 struct safe_signed_range_indexer
 {

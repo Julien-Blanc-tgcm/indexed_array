@@ -105,3 +105,11 @@ BOOST_AUTO_TEST_CASE(indexed_span_reverse_iterator)
 		BOOST_TEST(*it == 8 - i);
 	}
 }
+
+BOOST_AUTO_TEST_CASE(indexed_span_data)
+{
+	char const* d = "toto";
+	indexed_span<char const, index_range<0, 3> > sp(d);
+	BOOST_TEST(sp.data() == d);
+	
+}

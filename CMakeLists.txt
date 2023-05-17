@@ -40,9 +40,42 @@ add_executable(indexed_array "main.cpp"
 	"include/jbc/indexed_array/detail/is_indexer.hpp"
 	"include/jbc/indexed_array/detail/lambda_indexer.hpp"
 	"include/jbc/indexed_array/detail/union_of.hpp"
+	"include/jbc/indexed_array/detail/value_sequence.hpp"
 )
-target_compile_options(indexed_array PRIVATE -Wall)
+target_compile_options(indexed_array PRIVATE -Wall -Wconversion -Wextra)
 target_include_directories(indexed_array PRIVATE ${Boost_INCLUDE_DIRS} ${MAGICENUM}/include ${WISE_ENUM} )
 target_compile_definitions(indexed_array PRIVATE -DINDEXED_ARRAY_HAS_DESCRIBE)
 
 add_subdirectory(tests)
+
+# documentation generation
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules")
+find_package(Doxygen)
+find_package(Sphinx)
+
+if(${Doxygen_FOUND})
+	set(DOXYGEN_GENERATE_XML YES)
+	set(DOXYGEN_GENERATE_HTML YES)
+	doxygen_add_docs(doc ${SOURCES} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+	if (${Sphinx_FOUND})
+		set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/doc)
+		set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/docs/sphinx)
+
+		file(GLOB doc_sources "${CMAKE_CURRENT_SOURCE_DIR}/doc/*.rst")
+
+		add_custom_target(Sphinx
+			COMMAND
+			${SPHINX_EXECUTABLE} -b html -c ${CMAKE_CURRENT_SOURCE_DIR}/sphinx_conf
+			-Dbreathe_projects.indexed_array=${CMAKE_CURRENT_BINARY_DIR}/xml
+			${SPHINX_SOURCE} ${SPHINX_BUILD}
+			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+			COMMENT "Generating documentation with Sphinx"
+			DEPENDS doc
+			SOURCES ${doc_sources}
+		)
+	else()
+		message(FATAL_ERROR "${Sphinx_DIR}" )
+	endif()
+endif()
+

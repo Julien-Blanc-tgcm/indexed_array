@@ -2,7 +2,7 @@ name: Build docs
 
 on:
   push:
-    branches: [ gh-pages ]
+    branches: [ gh-pages, main ]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)

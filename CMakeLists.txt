@@ -42,9 +42,9 @@ add_executable(indexed_array "main.cpp"
 	"include/jbc/indexed_array/detail/union_of.hpp"
 	"include/jbc/indexed_array/detail/value_sequence.hpp"
 )
-target_compile_options(indexed_array PRIVATE -Wall -Wextra)
+target_compile_options(indexed_array PRIVATE -Wall)
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-	target_compile_options(indexed_array PRIVATE "-Wconversion")
+	target_compile_options(indexed_array PRIVATE "-Wconversion" "-Wextra")
 endif()
 target_include_directories(indexed_array PRIVATE ${Boost_INCLUDE_DIRS} ${MAGICENUM}/include ${WISE_ENUM} )
 target_compile_definitions(indexed_array PRIVATE -DINDEXED_ARRAY_HAS_DESCRIBE)

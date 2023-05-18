@@ -66,8 +66,7 @@ Optional, but strongly recommended, is one of the following:
 * ``wise_enum``
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`

@@ -72,6 +72,6 @@ Copy operators
 
 Copy operators are defaulted, and thus have the same semantic as the ones defined for std::array.
 
-.. cpp:function:: constexpr indexed_array(indexed_array const&) = default
+.. cpp:function:: constexpr indexed_array::operator=(indexed_array const&) = default
 
-.. cpp:function:: constexpr indexed_array(indexed_array &&) = default
+.. cpp:function:: constexpr indexed_array::operator=(indexed_array &&) = default

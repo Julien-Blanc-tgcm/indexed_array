@@ -320,8 +320,15 @@ Taking back our example with from the lift industry, we could rewrite it like th
     struct LiftFloorIndexer
     {
     	// we put special floors at start, so we can handle any number of floors
-    	std::size_t operator()(DS417::Floor c) { return static_cast<std::size_t>(c) + 2; };
-    	std::size_t operator()(SpecialFloors c) { return static_cast<std::size_t>(c); };
+    	std::size_t operator()(DS417::Floor c) 
+    	{
+    		// +1 because Floor starts at 1, +2 special floors, -1 for floor offset
+    		return static_cast<std::size_t>(c) + 1; 
+    	}
+    	std::size_t operator()(SpecialFloors c)
+    	{
+    		return static_cast<std::size_t>(c);
+    	}
     };
     
     using floors_indexer = lamdba_indexer<LiftFloorIndexer{}, 34>; // supports 2 special floors + 32 floors

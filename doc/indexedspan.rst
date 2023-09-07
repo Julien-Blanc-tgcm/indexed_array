@@ -34,14 +34,13 @@ Constructors
    // constructor from a Value*
    constexpr indexed_span(Value* begin);
 
-..
-   Constructs a new ``indexed_span`` over the range
-   ``[begin, begin + Indexer::size]``, which must be a valid contiguous
-   memory segment containing objects of type ``Value``. Behaviour is
-   undefined otherwise.
+Constructs a new ``indexed_span`` over the range
+``[begin, begin + Indexer::size]``, which must be a valid contiguous
+memory segment containing objects of type ``Value``. Behaviour is
+undefined otherwise.
 
-   Since the extent of the span depends on the indexer, the constructor
-   from a raw data pointer does not takes a size parameter.
+Since the extent of the span depends on the indexer, the constructor
+from a raw data pointer does not takes a size parameter.
 
 Member functions
 ----------------
@@ -49,68 +48,84 @@ Member functions
 Data access
 ^^^^^^^^^^^
 
-.. cpp:function:: reference at(Index i) const
-.. cpp:function:: reference operator[](Index i) const noexcept
+.. code:: cpp
+    
+    reference at(Index i) const
+    reference operator[](Index i) const noexcept
 
-   :returns: A reference to the item at index i
+Element access. ``at`` is range-checked, and throws
+``std::out_of_range`` on error. In case of multidimensional span,
+``operator[]`` signature is ``std::tuple<Index1, Index2, ...>``
+whereas ``at`` signature is ``at(Index1, Index2, ...)``. If using
+``C++23``, ``operator[]`` is also available as ``[Index1, Index2, ...]```
 
-   Element access. ``at`` is range-checked, and throws
-   ``std::out_of_range`` on error. In case of multidimensional span,
-   ``operator[]`` signature is ``std::tuple<Index1, Index2, ...>``
-   whereas ``at`` signature is ``at(Index1, Index2, ...)``. If using
-   ``C++23``, ``operator[]`` is also available as ``[Index1, Index2, ...]```
+   **Returns:** A reference to the item at index i
 
-.. cpp:function:: Value* data() const
+.. code:: cpp
+    
+    Value* data() const
 
-    :returns: A pointer to the start of the sequence of elements
+Gives access to the underlying storage.
 
-    Gives access to the underlying storage.
+    **Returns:** A pointer to the start of the sequence of elements
 
-.. cpp:function:: constexpr Value& front() const
+.. code:: cpp
+    
+    constexpr Value& front() const
 
-    Returns the first element of the span. This is the same as ``*begin()``.
+Returns the first element of the span. This is the same as ``*begin()``.
 
-.. cpp:function:: constexpr Value& back() const
+.. code:: cpp
+    
+    constexpr Value& back() const
 
-    Returns the last element of the span. This is the same as ``*rbegin()``.
+Returns the last element of the span. This is the same as ``*rbegin()``.
 
 Observers
 ^^^^^^^^^
 
-.. cpp:function:: constexpr bool empty() const
+.. code:: cpp
+    
+    constexpr bool empty() const
 
-    Returns true if the sequence of elements is empty.
+Returns true if the sequence of elements is empty.
 
-.. cpp:function:: constexpr size_t size() const
+.. code:: cpp
+    
+    constexpr size_t size() const
 
-    Returns the number of elements in the span
+Returns the number of elements in the span
 
 Iteration
 ^^^^^^^^^
 
-.. cpp:function:: constexpr iterator begin() const
-.. cpp:function:: constexpr iterator end() const
-.. cpp:function:: constexpr reverse_iterator rbegin() const
-.. cpp:function:: constexpr reverse_iterator rend() const
+.. code:: cpp
 
-   Standard iteration. Same semantic as the corresponding methods in ``std::span``.
+    constexpr iterator begin() const
+    constexpr iterator end() const
+    constexpr reverse_iterator rbegin() const
+    constexpr reverse_iterator rend() const
+
+Standard iteration. Same semantic as the corresponding methods in ``std::span``.
 
 Subrank accessing
 ^^^^^^^^^^^^^^^^^
 
-.. cpp:function:: slice(oneDimensionIndex index) noexcept
+.. code:: cpp
+    
+    slice(oneDimensionIndex index) noexcept
+    slice_at(oneDimensionIndex)
 
-.. cpp:function:: slice_at(oneDimensionIndex)
+Both functions returns a slice of the span, at the given index. For multidimensional
+spans of rank ``n``, it returns an ``indexed_span`` of rank
+``n-1``. For single dimension span, it returns the element at the
+given index. ``slice`` does not do any bound checking, ``slice_at``
+throws ``std::out_of_range`` on error.
 
-    :arg: index The index of the slice. It must be an index of the type of the higher-level
-        rank of the indexer.
-    :returns: An ``indexed_span`` of lower rank, a view of the data at index ``index``
-
-    Both functions returns a slice of the span, at the given index. For multidimensional
-    spans of rank ``n``, it returns an ``indexed_span`` of rank
-    ``n-1``. For single dimension span, it returns the element at the
-    given index. ``slice`` does not do any bound checking, ``slice_at``
-    throws ``std::out_of_range`` on error.
+    **Arg:** ``index`` The index of the slice. It must be an index of the type of the higher-level
+    rank of the indexer.
+    
+    **Returns:** An ``indexed_span`` of lower rank, a view of the data at index ``index``
 
 Note that there is no ``first``/``last``/``subspan`` methods. They do not fit
 well with the concept of custom indexing, because the return type shall

@@ -18,6 +18,8 @@ extensions = ['breathe']
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
+add_function_parentheses = False
+
 # breathe configuration
 breathe_default_project = 'indexed_array'
 

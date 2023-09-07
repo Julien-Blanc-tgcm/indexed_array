@@ -206,7 +206,7 @@ a convenience helper:
 .. code-block:: cpp
     :caption: Iteration on both key and value
 
-    indexed_array<int, index_range<1, 10>> d1;
+    indexed_array<int, index_range<1, 10>> d;
     for_each(d, [](int key, int& val)
     {
     	val = key;

@@ -36,6 +36,10 @@ class indexed_array
 	using const_reference = value_type const&;
 	using pointer = value_type*;
 	using const_pointer = value_type const*;
+	using iterator = typename std::array<Value, Indexer::size>::iterator;
+	using const_iterator = typename std::array<Value, Indexer::size>::const_iterator;
+	using reverse_iterator = typename std::array<Value, Indexer::size>::reverse_iterator;
+	using const_reverse_iterator = typename std::array<Value, Indexer::size>::const_reverse_iterator;
 
 	// specific
 	using indexer = Indexer;
@@ -70,17 +74,21 @@ class indexed_array
 	 * some values may be left uninitialized
 	 */
 #if defined(__cpp_concepts) && __cpp_concepts >= 202002L
-	template <std::convertible_to<Value> Arg, std::convertible_to<Value>... Args>
-	requires(!(::jbc::indexed_array::concepts::checked_arg<Arg, Value> || (::jbc::indexed_array::concepts::checked_arg<Args, Value> || ...)))
+    template<std::convertible_to<Value> Arg, std::convertible_to<Value>... Args>
+        requires(!(::jbc::indexed_array::concepts::checked_arg<Arg, Value>
+                   || (::jbc::indexed_array::concepts::checked_arg<Args, Value> || ...)))
 #else
-	template <typename Arg, typename... Args,
-	          std::enable_if_t<!is_checked_arg<Arg>::value &&
-	                               !std::is_invocable_v<indexed_array(indexed_array const&), Arg&&, Args&&...>,
-	                           bool> = true>
+    template<typename Arg,
+             typename... Args,
+             std::enable_if_t<
+                 !is_checked_arg<Arg>::value
+                     && !std::is_invocable_v<indexed_array(indexed_array const &), Arg &&, Args &&...>,
+                 bool>
+             = true>
 #endif
-	    constexpr explicit indexed_array(Arg&& arg, Args&&... args)
-	        noexcept(std::is_nothrow_copy_constructible_v<Value>) :
-	    data_{std::forward<Arg>(arg), std::forward<Args>(args)...}
+    constexpr explicit indexed_array(Arg&& arg, Args&&... args) noexcept(
+        std::is_nothrow_copy_constructible_v<Value>)
+        : data_{std::forward<Arg>(arg), std::forward<Args>(args)...}
 	{
 	}
 
@@ -264,51 +272,67 @@ class indexed_array
 	static constexpr bool is_o1 = Indexer::is_o1;
 
 	// standard array operations
-	constexpr decltype(auto) begin()
+
+	/**
+	 * @brief Returns an iterator to the beginning of the array. Will return end() 
+	 * if the array is empty.
+	 */
+	constexpr iterator begin()
 	{
 		return data_.begin();
 	}
-	constexpr decltype(auto) begin() const
+
+	constexpr const_iterator begin() const
 	{
 		return data_.begin();
 	}
-	constexpr decltype(auto) cbegin() const
+
+	constexpr const_iterator cbegin() const
 	{
 		return data_.cbegin();
 	}
-	constexpr decltype(auto) end()
+
+	constexpr iterator end()
 	{
 		return data_.end();
 	}
-	constexpr decltype(auto) end() const
+
+	constexpr const_iterator end() const
 	{
 		return data_.end();
 	}
-	constexpr decltype(auto) cend() const
+
+	constexpr const_iterator cend() const
 	{
 		return data_.cend();
 	}
-	constexpr decltype(auto) rbegin()
+
+	constexpr reverse_iterator rbegin()
 	{
 		return data_.rbegin();
 	}
-	constexpr decltype(auto) rbegin() const
+
+	constexpr const_reverse_iterator rbegin() const
 	{
 		return data_.rbegin();
 	}
-	constexpr decltype(auto) crbegin() const
+
+	constexpr const_reverse_iterator crbegin() const
 	{
 		return data_.crbegin();
 	}
-	constexpr decltype(auto) rend()
+
+	constexpr reverse_iterator rend()
 	{
 		return data_.rend();
 	}
-	constexpr decltype(auto) rend() const
+
+	constexpr const_reverse_iterator rend() const
 	{
 		return data_.rend();
 	}
-	constexpr decltype(auto) crend() const
+
+	constexpr const_reverse_iterator crend() const
 	{
 		return data_.crend();
 	}
@@ -317,10 +341,12 @@ class indexed_array
 	{
 		return data_.front();
 	}
+
 	constexpr const_reference front() const
 	{
 		return data_.front();
 	}
+
 	constexpr reference back()
 	{
 		return data_.back();
@@ -334,21 +360,35 @@ class indexed_array
 	{
 		return Indexer::size;
 	}
+
 	constexpr bool empty() const
 	{
 		return size() == 0;
 	}
+
 	constexpr size_type max_size() const
 	{
 		return size();
 	}
+
 	void fill(value_type const& value)
 	{
 		data_.fill(value);
 	}
+
 	void swap(indexed_array& other) noexcept(std::is_nothrow_swappable_v<decltype(data_)>)
 	{
 		data_.swap(other.data_);
+	}
+
+	constexpr value_type* data() noexcept
+	{
+		return data_.data();
+	}
+
+	constexpr value_type const* data() const noexcept
+	{
+		return data_.data();
 	}
 
   private:

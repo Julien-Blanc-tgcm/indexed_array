@@ -30,8 +30,8 @@ Compile-time safe indexing using safe_numerics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Since anything can be used as an index, it is possible to
-use ``safe_numerics`` `web
-page <https://www.boost.org/doc/libs/1_80_0/libs/safe_numerics/doc/html/index.html>`__
+use ``safe_numerics`` `(web
+page) <https://www.boost.org/doc/libs/1_80_0/libs/safe_numerics/doc/html/index.html>`__
 to gain compile time check of array accesses. This requires writing
 a custom indexer for ``safe_range``.
 

@@ -63,14 +63,6 @@ The data layout is the following:
 | 4, Foo::bar1 | 4, Foo::bar2 | ... | 4, Foo::bar4 |
 +--------------+--------------+-----+--------------+
 
-It is also possible to get a view on a single row:
-
-.. code-block:: cpp
-    :caption: Get a view on a row
-
-    auto second_row = data[2];
-    int v3 = second_row[Foo::bar3];
-
 There is no limit on the number of dimensions.
 
 .. code-block:: cpp
@@ -168,6 +160,7 @@ When writing a custom multidimensional indexer, we must provide two additional m
 * ``slice_indexer``, which is the indexer for the remaining dimensions
 
 .. code-block:: cpp
+    :caption: Unrealistic example of custom multidimensional indexer
     
     // 3-dimensional indexer with top-level reverse fibonnaci indexing
     struct fib_multidim_indexer

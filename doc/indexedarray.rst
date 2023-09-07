@@ -5,6 +5,14 @@
 Indexed_array
 =============
 
+.. toctree::
+    :hidden:
+
+    indexedarray_constructors
+    indexedarray_dataaccess
+    indexedarray_iterators
+    indexedarray_observers
+
 .. code:: cpp
 
    template <typename Value, typename Indexer>
@@ -16,115 +24,90 @@ integer indexing. It is an aggregate type and intend to be a drop-in
 replacement for ``std::array``. The storage is guaranted to be
 contiguous, and can be accessed as a C-array.
 
-Constructor
------------
+Construction and destruction
+----------------------------
 
-The following constructors are explicitly defaulted:
++-----------------------------------------------------------------------+---------------------------------+
+| *Constructors*                                                                                          |
++=======================================================================+=================================+
+| :ref:`indexed_array() = default <indexed_array_default_ctr>`          | Default construction            |
++-----------------------------------------------------------------------+---------------------------------+
+| | :ref:`indexed_array(indexed_array const&) <indexed_array_copy_ctr>` | Copy and move constructors      |
+| | :ref:`indexed_array(indexed_array&&) <indexed_array_move_ctr>`      |                                 |
++-----------------------------------------------------------------------+---------------------------------+
+| :ref:`indexed_array(Args&&...) <indexed_array_aggregate>`             | Aggregate-like initialization   |
++-----------------------------------------------------------------------+---------------------------------+
+| :ref:`indexed_array(checked_arg&&...) <indexed_array_safe_init>`      | Safe initialization             |
++-----------------------------------------------------------------------+---------------------------------+
+| :ref:`indexed_array(std::array const&) <indexed_array_array_ctr>`     | Construction by copy of an array|
++-----------------------------------------------------------------------+---------------------------------+
 
-Default constructor. May result in the values in the array not being initialized:
-
-.. doxygenfunction:: jbc::indexed_array::detail::indexed_array::indexed_array()
-
-Copy / move constructors:
-
-.. doxygenfunction:: jbc::indexed_array::detail::indexed_array::indexed_array(indexed_array<Value, Indexer> const& other)
-
-.. doxygenfunction:: jbc::indexed_array::detail::indexed_array::indexed_array(indexed_array<Value, Indexer> &&)
-
-Construction from a list of values is possible as well:
-
-.. cpp:function:: template<typename... Args> jbc::indexed_array::detail::indexed_array::indexed_array(Args&&... args)
-
-    Construction with a list of values. Roughly equivalent to aggregate initialization of ``std::array``
-    
-.. cpp:function:: template<typename... Args> jbc::indexed_array::detail::indexed_array::indexed_array(SafeArg<Args, Value>&&... list)
-
-    Construction from a list of safe args. This is equivalent to aggregate initialization, but additional checks are done at compile time:
-    
-    * the number of arguments must match with the array size
-    * the explicit index of each argument must match the order of the indexer
-
+Destructor is explicitly defaulted.
 
 Member functions
 ----------------
 
-.. doxygenclass:: jbc::indexed_array::detail::indexed_array
-    :members-only:
-    :members: at, operator[], begin, end, rbegin, rend, cbegin, cend, crbegin, crend, size, fill, swap
-    :undoc-members:
+Data Access
+^^^^^^^^^^^
 
-.. code:: cpp
++-----------------------------------------------------------------------+---------------------------------+
+| *Standard std::array members*                                                                           |
++=======================================================================+=================================+
+| | :ref:`at <indexed_array_at>`                                        | Index-based element access      |
+| | :ref:`operator[] <indexed_array_at>`                                |                                 |
++-----------------------------------------------------------------------+---------------------------------+
+| :ref:`front <indexed_array_front>`                                    | Access to first element         |
++-----------------------------------------------------------------------+---------------------------------+
+| :ref:`back <indexed_array_back>`                                      | Access to last element          |
++-----------------------------------------------------------------------+---------------------------------+
+| :ref:`data <indexed_array_data>`                                      | Access to raw content           |
++-----------------------------------------------------------------------+---------------------------------+
+| *Additional members*                                                                                    |
++-----------------------------------------------------------------------+---------------------------------+
++ | :ref:`slice <indexed_array_slice>`                                  | Returns a view on the lower-rank+
++ | :ref:`slice_at <indexed_array_slice_at>`                            | content.                        +
++-----------------------------------------------------------------------+---------------------------------+
 
-   at(/* index */)
-   operator[/* index */] noexcept
+Access to the underlying data.
 
-..
++-------------------------------------------+------------------------------------+
+| *Iteration*                                                                    +
++===========================================+====================================+
+| | :ref:`begin <indexed_array_begin>`      | Iterator to the start of the array |
+| | :ref:`cbegin <indexed_array_begin>`     |                                    |
++-------------------------------------------+------------------------------------+
+| | :ref:`indexed_array_end`                | Iterator to the end of the array   |
+| | :ref:`cend <indexed_array_end>`         | (past last element)                |
++-------------------------------------------+------------------------------------+
+| | :ref:`indexed_array_rbegin`             | Reverse iterator to the            |
+| | :ref:`crbegin <indexed_array_rbegin>`   | “beginning” of the array           |
++-------------------------------------------+------------------------------------+
+| | :ref:`indexed_array_rend`               | Reverse iterator to the “end”      |
+| | :ref:`crend <indexed_array_rend>`       | of the array                       |
++-------------------------------------------+------------------------------------+
 
-   Access to an element of the array. ``at`` is range-checked and throws
-   ``std::out_of_range`` if the value is incorrect. In case of a
-   multidimensional array, ``operator[]`` signature is
-   ``(std::tuple<index1, index2, ...>)``, whereas ``at`` signature is
-   ``(index1, index2, ...)``.
 
-.. code:: cpp
+Observers
+^^^^^^^^^
 
-   front()
-   back()
-   data()
-   begin()
-   cbegin()
-   end()
-   cend()
-   rbegin()
-   crbegin()
-   rend()
-   crend()
-   empty()
-   size()
-   max_size()
-   fill()
-   swap()
-
-..
-
-   Same semantic and guarantees as ``std::array``.
-
-.. code:: cpp
-
-   is_o1
-
-..
-
-   static constexpr property that is ``true`` if the array element
-   access is ``O(1)`` and false otherwise
-
-.. code:: cpp
-
-   in_range(/* index */)
-
-..
-
-   static constexpr method that returns ``true`` if the argument is a
-   valid index value for this array, ie calling ``operator[value]`` is
-   well defined behavior. Returns ``false`` otherwise.
-
-.. code:: cpp
-
-   slice(/* 1-dimension index */) noexcept
-   slice_at(/* 1-dimension index */)
-
-..
-
-   Returns a slice of the array, at the given index. For
-   multidimensional arrays of extent ``n``, it returns an
-   ``indexed_span`` (see below) of extent ``n-1``. For single dimension
-   array, it returns the element at the given index. ``slice`` does not
-   do any bound checking, ``slice_at`` throws ``std::out_of_range`` on
-   error.
-
-.. code:: cpp
-
-   indexed_array<int, Color, Material, index_range<1, 10>> foo;
-   auto reds = foo.slice(Color::Red); // reds is indexed_span<int, Material, index_range<1, 10>>
++-------------------------------------------------+------------------------------------+
+| *std::array members*                                                                 +
++=================================================+====================================+
+| :ref:`empty <indexed_array_empty>`              | Checks if container is empty       |
++-------------------------------------------------+------------------------------------+
++ | :ref:`size <indexed_array_size>`              | Returns the size of the array      |
++ | :ref:`max_size <indexed_array_max_size>`      | ( ``max_size() == size()`` )       |
++-------------------------------------------------+------------------------------------+
++ :ref:`fill <indexed_array_fill>`                | Fills the array with value         |
++-------------------------------------------------+------------------------------------+
++ :ref:`swap <indexed_array_swap>`                | Swap two indexed_array contents    |
++-------------------------------------------------+------------------------------------+
++ *extensions*                                                                         +
++-------------------------------------------------+------------------------------------+
++ :ref:`in_range <indexed_array_in_range>`        | Checks if an index is in the       |
++                                                 | acceptable range                   |
++-------------------------------------------------+------------------------------------+
++ :ref:`is_o1 <indexed_array_is_o1>`              | Tells if element access is O(1)    +
++-------------------------------------------------+------------------------------------+
 
 

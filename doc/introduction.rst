@@ -8,7 +8,7 @@ Introduction
 The problem
 -----------
 
-In C++, which inherited this feature from C, arrays (both C arrays and ``std::array``s)
+In C++, which inherited this feature from C, arrays (both C arrays and ``std::array``)
 are indexed by unsigned integer values (``std::size_t``), starting at zero. This gives us
 information about the valid values for indexing, but this gives a very little information
 about **what** (ie, the semantic) is actually used as the index. Is it a day, a number of
@@ -87,15 +87,15 @@ C++11 has introduced enum class to give type safety to enum. So let's try to use
 .. code-block:: cpp
     :caption: Sample of scoped enums
 
-    enum day_of_week { sunday, monday, tuesday, wednesday, thursday, friday, saturday };
-    enum month { january, february, march, april, may, june, july, august, september, october, november, december };
+    enum class day_of_week { sunday, monday, tuesday, wednesday, thursday, friday, saturday };
+    enum class month { january, february, march, april, may, june, july, august, september, october, november, december };
 
 But now we need to write:
 
 .. code-block:: cpp
     :caption: Sample usage with scoped enums
 
-    // recurring_schedules[day_of_week::sunday].add(...); // Does not compile
+    // recurring_schedules[day_of_week::sunday].add(...); // Does not compile :(
     recurring_schedules[static_cast<std::size_t>(day_of_week::sunday).add(...); // OK
     
     recurring_schedules[static_cast<std::size_t>(month::january)].add(...); // Ooops, still compiles fine

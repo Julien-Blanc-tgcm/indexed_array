@@ -20,37 +20,38 @@ Usage
 Declaring an ``indexed_bitset`` follows the same pattern as
 ``indexed_array``, but there is no value type: it is always a bool:
 
-    .. code-block:: cpp
-        :caption: Sample indexed bitset
-        
-        indexed_bitset<index_range<1, 10>> b(0b1001001001u);
-        assert(b.size() == 10);
+.. code-block:: cpp
+    :caption: Sample indexed bitset
+    
+    indexed_bitset<index_range<1, 10>> b(0b1001001001u);
+    assert(b.size() == 10);
 
 Operations available
 --------------------
 
 The common operations on bitset are available:
 
-    .. code-block:: cpp
-        :caption: Sample operations
+.. code-block:: cpp
+    :caption: Sample operations
         
-        // construct from unsigned value
-        test
-        set
-        reset
-        flip
-        operator[]
-        size
-        to_ulong
-        to_ullong
+    // construct from unsigned value
+    test
+    set
+    reset
+    flip
+    operator[]
+    size
+    to_ulong
+    to_ullong
 
 and additionally ``in_range`` to check if a value is in the range of acceptable
 values for the indexer. Notably, assignment operators are disabled,
-because they are too error prone. If assignment is needed, first cast to
+because they are too error prone. If assignment is needed, first cast it to
 the underlying ``std::bitset``:
 
-    .. code-block:: cpp
-        :caption: Assignment from value
-        
-        static_cast<std::bitset&>(b) = 0x08u;
-        assert(b[4].test()); // 1-based indexing !
+.. code-block:: cpp
+    :caption: Assignment from value
+    
+    indexed_bitset<index_range<1, 10>> b(0u);
+    static_cast<std::bitset&>(b) = 0x08u;
+    assert(b[4].test()); // 1-based indexing !

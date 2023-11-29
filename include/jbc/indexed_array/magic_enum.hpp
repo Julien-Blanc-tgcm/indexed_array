@@ -7,7 +7,7 @@
 
 #include "detail/default_indexer.hpp"
 
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 namespace jbc::indexed_array::detail
 {

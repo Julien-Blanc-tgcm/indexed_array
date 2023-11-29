@@ -1,6 +1,6 @@
 #define BOOST_TEST_MODULE Indexed Array
 #include <boost/test/unit_test.hpp>
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 #include "jbc/indexed_array.hpp"
 

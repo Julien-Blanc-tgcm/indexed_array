@@ -43,8 +43,8 @@ the last element of the array). If the array is empty, then it is equal to ``ren
 See https://en.cppreference.com/w/cpp/container/array/rbegin for a detailed explanation on reverse iteration.
 
 .. cpp:function:: constexpr reverse_iterator indexed_array::rbegin()
-.. cpp:function:: constexpr reverse_const_iterator indexed_array::rbegin() const
-.. cpp:function:: constexpr reverse_const_iterator indexed_array::crbegin() const
+.. cpp:function:: constexpr const_reverse_iterator indexed_array::rbegin() const
+.. cpp:function:: constexpr const_reverse_iterator indexed_array::crbegin() const
 
 .. _indexed_array_rend:
 
@@ -55,6 +55,13 @@ These functions return a reverse iterator which is past the last element of the 
 is undefined behaviour to try to dereference such an iterator.
 
 .. cpp:function:: constexpr reverse_iterator indexed_array::rend()
-.. cpp:function:: constexpr reverse_const_iterator indexed_array::rend() const
-.. cpp:function:: constexpr reverse_const_iterator indexed_array::crend() const
+.. cpp:function:: constexpr const_reverse_iterator indexed_array::rend() const
+.. cpp:function:: constexpr const_reverse_iterator indexed_array::crend() const
 
+Multidimensional arrays
+-----------------------
+
+.. warning::
+
+    Special care should be taken when using iterators and multidimensional arrays. Iterators
+    always iterate through the whole array, and not through the highest-rank dimension.

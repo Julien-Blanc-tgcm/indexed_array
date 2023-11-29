@@ -5,42 +5,39 @@
 indexed_span
 ============
 
-.. code:: cpp
+.. toctree::
+    :hidden:
 
-   template<typename Value, typename Indexer>
-   /* */ indexed_span
+    indexedspan_constructors
+    indexedspan_dataaccess
+    indexedspan_iterators
+    indexedspan_observers
 
-Span-like class which allows accessing elements through a custom
-indexer. ``indexed_span`` does not own the data, and its size is always
-known at compile time (it always cover the full ``Indexer`` range). It
-is multidimensional if the Indexer is. It is related to
-``std::span<T, std::static_extent>`` and has a similar interface.
+.. cpp:class:: template<typename Value, typename Indexer> indexed_span
+
+    Span-like class which allows accessing elements through a custom
+    indexer. ``indexed_span`` does not own the data, and its size is always
+    known at compile time (it always cover the full ``Indexer`` range). It
+    is multidimensional if the Indexer is. It is related to
+    ``std::span<T, std::static_extent>`` and has a similar interface.
 
 The primary use case for ``indexed_span`` is that it is the type returned
 by a multidimensional ``indexed_array`` when accessing a lower-rank
 dimension via the ``slice()`` method.
 
-Constructors
-------------
+Construction and destruction
+----------------------------
 
-.. code:: cpp
-
-   indexed_span() = delete // empty constructor is deleted
-   // copy/move operators defaulted
-   constexpr indexed_span(indexed_span const&)
-   constexpr indexed_span(indexed_span &&)
-   constexpr operator=(indexed_span const&)
-   constexpr operator=(indexed_span &&)
-   // constructor from a Value*
-   constexpr indexed_span(Value* begin);
-
-Constructs a new ``indexed_span`` over the range
-``[begin, begin + Indexer::size]``, which must be a valid contiguous
-memory segment containing objects of type ``Value``. Behaviour is
-undefined otherwise.
-
-Since the extent of the span depends on the indexer, the constructor
-from a raw data pointer does not takes a size parameter.
++---------------------------------------------------------------------+--------------------------------+
+| *Constructors*                                                      |                                |
++=====================================================================+================================+
+| ``indexed_span() = delete``                                         | default constructor is deleted |
++---------------------------------------------------------------------+--------------------------------+
+| | :ref:`indexed_span(indexed_span const&) <indexed_span_ctr_def>`   | copy/move operators defaulted  |
+| | :ref:`operator=(indexed_span const&) <indexed_span_ctr_def>`      |                                |
++---------------------------------------------------------------------+--------------------------------+
+| :ref:`indexed_span(Value*) <indexed_span_ctr_val>`                  | constructor from a ``Value*``  |
++---------------------------------------------------------------------+--------------------------------+
 
 Member functions
 ----------------
@@ -48,86 +45,49 @@ Member functions
 Data access
 ^^^^^^^^^^^
 
-.. code:: cpp
-    
-    reference at(Index i) const
-    reference operator[](Index i) const noexcept
-
-Element access. ``at`` is range-checked, and throws
-``std::out_of_range`` on error. In case of multidimensional span,
-``operator[]`` signature is ``std::tuple<Index1, Index2, ...>``
-whereas ``at`` signature is ``at(Index1, Index2, ...)``. If using
-``C++23``, ``operator[]`` is also available as ``[Index1, Index2, ...]```
-
-   **Returns:** A reference to the item at index i
-
-.. code:: cpp
-    
-    Value* data() const
-
-Gives access to the underlying storage.
-
-    **Returns:** A pointer to the start of the sequence of elements
-
-.. code:: cpp
-    
-    constexpr Value& front() const
-
-Returns the first element of the span. This is the same as ``*begin()``.
-
-.. code:: cpp
-    
-    constexpr Value& back() const
-
-Returns the last element of the span. This is the same as ``*rbegin()``.
++---------------------------------------------------------------------+--------------------------------+
+| *Functions always present*                                          |                                |
++=====================================================================+================================+
+| :ref:`indexed_span::at(index) const <indexed_span_at>`              | Element access (range-checked) |
++---------------------------------------------------------------------+--------------------------------+
+| :ref:`indexed_span::operator[](index) const <indexed_span_bracket>` | Element access (unchecked)     |
++---------------------------------------------------------------------+--------------------------------+
+| :ref:`indexed_span::data() const <indexed_span_data>`               | Access to raw storage          |
++---------------------------------------------------------------------+--------------------------------+
+| :ref:`indexed_span::front() const <indexed_span_front>`             | Access to first element        |
++---------------------------------------------------------------------+--------------------------------+
+| :ref:`indexed_span::back() const <indexed_span_back>`               | Access to last element         |
++---------------------------------------------------------------------+--------------------------------+
+| *Multidimensional specific*                                         |                                |
++---------------------------------------------------------------------+--------------------------------+
+| | :ref:`indexed_span::slice(1d-index) const <indexed_span_slice>`   | Access to subrank              |
+| | :ref:`indexed_span::slice_at(1d-index) const <indexed_span_slice>`|                                |
++---------------------------------------------------------------------+--------------------------------+
 
 Observers
 ^^^^^^^^^
 
-.. code:: cpp
-    
-    constexpr bool empty() const
-
-Returns true if the sequence of elements is empty.
-
-.. code:: cpp
-    
-    constexpr size_t size() const
-
-Returns the number of elements in the span
++------------------------------------------------------------------+-----------------------------------+
+| :ref:`indexed_span::empty() const <indexed_span_empty>`          | Checks sequence for emptiness     |
++------------------------------------------------------------------+-----------------------------------+
+| :ref:`indexed_span::size() const <indexed_span_size>`            | Returns the size of the sequence  |
++------------------------------------------------------------------+-----------------------------------+
 
 Iteration
 ^^^^^^^^^
 
-.. code:: cpp
++---------------------------------------------------------------------+-------------------------------+
+| | :ref:`indexed_span::begin() <indexed_span_begin>`                 | Iterator to start of sequence |
+| | :ref:`indexed_span::cbegin() <indexed_span_begin>`                |                               |
++---------------------------------------------------------------------+-------------------------------+
+| | :ref:`indexed_span::end() <indexed_span_end>`                     | Iterator past the end of      |
+| | :ref:`indexed_span::cend() <indexed_span_end>`                    | the sequence                  |
++---------------------------------------------------------------------+-------------------------------+
+| | :ref:`indexed_span::rbegin() <indexed_span_rbegin>`               | Iterator to start of reverse  |
+| | :ref:`indexed_span::crbegin() <indexed_span_rbegin>`              | sequence                      |
++---------------------------------------------------------------------+-------------------------------+
+| | :ref:`indexed_span::rend() <indexed_span_rend>`                   | Iterator past the end of      |
+| | :ref:`indexed_span::crend() <indexed_span_rend>`                  | the reverse sequence          |
++---------------------------------------------------------------------+-------------------------------+
 
-    constexpr iterator begin() const
-    constexpr iterator end() const
-    constexpr reverse_iterator rbegin() const
-    constexpr reverse_iterator rend() const
-
-Standard iteration. Same semantic as the corresponding methods in ``std::span``.
-
-Subrank accessing
-^^^^^^^^^^^^^^^^^
-
-.. code:: cpp
-    
-    slice(oneDimensionIndex index) noexcept
-    slice_at(oneDimensionIndex)
-
-Both functions returns a slice of the span, at the given index. For multidimensional
-spans of rank ``n``, it returns an ``indexed_span`` of rank
-``n-1``. For single dimension span, it returns the element at the
-given index. ``slice`` does not do any bound checking, ``slice_at``
-throws ``std::out_of_range`` on error.
-
-    **Arg:** ``index`` The index of the slice. It must be an index of the type of the higher-level
-    rank of the indexer.
-    
-    **Returns:** An ``indexed_span`` of lower rank, a view of the data at index ``index``
-
-Note that there is no ``first``/``last``/``subspan`` methods. They do not fit
-well with the concept of custom indexing, because the return type shall
-be known at compile time, as it would depend on the parameters.
 

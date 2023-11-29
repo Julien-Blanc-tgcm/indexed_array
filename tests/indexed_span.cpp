@@ -111,5 +111,16 @@ BOOST_AUTO_TEST_CASE(indexed_span_data)
 	char const* d = "toto";
 	indexed_span<char const, index_range<0, 3> > sp(d);
 	BOOST_TEST(sp.data() == d);
-	
+}
+
+BOOST_AUTO_TEST_CASE(indexed_span_citer)
+{
+	indexed_array<int, index_range<2, 4>, index_range<3, 5> > arr{0, 1, 2, 3, 4, 5, 6, 7, 8};
+	auto v = arr.slice(3);
+	auto i = v.begin();
+	*i = 7;
+	auto i2 = v.cbegin();
+	BOOST_TEST(*i2 == 7);
+	++i2;
+	BOOST_TEST(*i2, 4);
 }

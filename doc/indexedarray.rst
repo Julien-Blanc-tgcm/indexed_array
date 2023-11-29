@@ -15,16 +15,13 @@ Indexed_array
     indexedarray_iterators
     indexedarray_observers
 
-.. code:: cpp
+.. cpp:class:: template <typename Value, typename Indexer> indexed_array
 
-   template <typename Value, typename Indexer>
-   /* */ indexed_array
-
-Container that encapsulate a fixed size array, whose elements are
-accessible using a custom indexing mechanism instead of a zero-based
-integer indexing. It is an aggregate type and intend to be a drop-in
-replacement for ``std::array``. The storage is guaranted to be
-contiguous, and can be accessed as a C-array.
+    Container that encapsulate a fixed size array, whose elements are
+    accessible using a custom indexing mechanism instead of a zero-based
+    integer indexing. It is an aggregate type and intend to be a drop-in
+    replacement for ``std::array``. The storage is guaranted to be
+    contiguous, and can be accessed as a C-array.
 
 Construction and destruction
 ----------------------------
@@ -42,6 +39,11 @@ Construction and destruction
 | :ref:`indexed_array(checked_arg&&...) <indexed_array_safe_init>`      | Safe initialization             |
 +-----------------------------------------------------------------------+---------------------------------+
 | :ref:`indexed_array(std::array const&) <indexed_array_array_ctr>`     | Construction by copy of an array|
++-----------------------------------------------------------------------+---------------------------------+
+| *Operators*                                                                                             |
++-----------------------------------------------------------------------+---------------------------------+
+| | :ref:`operator=(indexed_array const&) <indexed_array_copy>`         | Copy / move assignment          |
+| | :ref:`operator=(indexed_array &&) <indexed_array_copy>`             |                                 |
 +-----------------------------------------------------------------------+---------------------------------+
 
 Destructor is explicitly defaulted.

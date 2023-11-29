@@ -46,11 +46,7 @@ class indexed_span
 
 	constexpr indexed_span(indexed_span const& other) = default;
 
-	constexpr indexed_span(indexed_span&& other) = default;
-
 	constexpr indexed_span& operator=(indexed_span const& other) = default;
-
-	constexpr indexed_span& operator=(indexed_span&& other) = default;
 
 	// at and [] operators. Use enable_if to disable overloads that won't work
 #if defined(__cpp_concepts) && __cpp_concepts >= 202002L
@@ -144,27 +140,49 @@ class indexed_span
 	using iterator = Value*;
 	using const_iterator = Value const*;
 	using reverse_iterator = std::reverse_iterator<Value*>;
-	using reverse_const_iterator = std::reverse_iterator<Value const*>;
+	using const_reverse_iterator = std::reverse_iterator<Value const*>;
 
 	static constexpr bool is_o1 = Indexer::is_o1;
 
 	// standard span operations
-	constexpr auto begin() const
+	constexpr iterator begin() const
 	{
 		return data_;
 	}
-	constexpr auto end() const
+
+	constexpr const_iterator cbegin() const
+	{
+		return begin();
+	}
+
+	constexpr iterator end() const
 	{
 		return data_ + Indexer::size;
 	}
 
-	constexpr auto rbegin() const
+	constexpr const_iterator cend() const
+	{
+		return end();
+	}
+
+	constexpr reverse_iterator rbegin() const
 	{
 		return std::make_reverse_iterator(end());
 	}
-	constexpr auto rend() const
+
+	constexpr const_reverse_iterator crbegin() const
+	{
+		return rbegin();
+	}
+
+	constexpr reverse_iterator rend() const
 	{
 		return std::make_reverse_iterator(data_);
+	}
+
+	constexpr const_reverse_iterator crend() const
+	{
+		return rend();
 	}
 
 	constexpr reference front() const

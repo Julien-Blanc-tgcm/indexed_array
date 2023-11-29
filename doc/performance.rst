@@ -119,9 +119,9 @@ If starting at a non-zero value, this is equivalent to range indexing.
 Complex indexing schemes
 ------------------------
 
-Compile time indexes are optimized by the compiler. So, the following code :
+Compile time indexes are optimized by the compiler. So, the following code:
 
-.. code-block::cpp
+.. code-block:: cpp
 
     extern int f(int);
 
@@ -132,7 +132,7 @@ Compile time indexes are optimized by the compiler. So, the following code :
     	blue = 4,
     	black = 8
     };
-    using idxarray = indexed_array<int, std::integer_sequence<color, color::red, color::green, color::blue, color::black>>;
+    using idxarray = indexed_array<int, value_sequence<color, color::red, color::green, color::blue, color::black>>;
     const idxarray vals_idx{0xFF0000, 0x00FF00, 0x0000FF, 0};
 
     int test_idx(idxarray const& arr)

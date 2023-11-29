@@ -35,15 +35,15 @@ and guarantees. The only difference is in the type of the index parameter.
 
 .. _indexed_array_front:
 
-.. cpp:function:: constexpr reference front()
-.. cpp:function:: constexpr const_reference front() const
+.. cpp:function:: constexpr reference indexed_array::front()
+.. cpp:function:: constexpr const_reference indexed_array::front() const
 
     Access to the first element of the array, via a reference (or a const reference).
 
 .. _indexed_array_back:
    
-.. cpp:function:: constexpr reference back()
-.. cpp:function:: constexpr const_reference back() const
+.. cpp:function:: constexpr reference indexed_array::back()
+.. cpp:function:: constexpr const_reference indexed_array::back() const
 
     Access to the last element of the array.
 
@@ -53,8 +53,8 @@ and guarantees. The only difference is in the type of the index parameter.
 
 .. _indexed_array_data:
 
-.. cpp:function:: constexpr value_type* data() noexcept
-.. cpp:function:: constexpr value_type const* data() const noexcept
+.. cpp:function:: constexpr value_type* indexed_array::data() noexcept
+.. cpp:function:: constexpr value_type const* indexed_array::data() const noexcept
 
     Access to the underlying data, via raw pointer access. Like ``std::array``, the pointer is not derefenceable
     if ``empty()``, but the range [``data()``, ``data() + size()``] is always valid.

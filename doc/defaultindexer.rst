@@ -84,8 +84,7 @@ make_default_indexer
 
 The ``make_default_indexer`` template is an helper class to define
 indexers. Its usage is not necessary when using ``indexed_array`` or
-``indexed_span``, but is when defining a custom indexer (see `Advanced
-usage <advancedusage.md>`__.
+``indexed_span``, but is when defining a custom indexer (see :ref:`advancedusage` ).
 
 ``indexed_array<int, X>`` is an alias for
 ``indexed_array<int, make_default_indexer<X>>`` if ``X`` is not already

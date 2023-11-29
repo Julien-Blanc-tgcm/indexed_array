@@ -162,7 +162,7 @@ overload only when it will gives a performance boost:
    };
 
 The overall performance improvement is about 10 to 15% with gcc or clang
-for a common enum (around 10 values). The code may also smaller,
+for a common enum (around 10 values). The code may also be smaller,
 especially when the enum has a lot of values (around 25% smaller with an
 enum with thirty values). The bigger the number of values in the enum,
 the bigger the gains.
@@ -296,5 +296,3 @@ Now, accesses to array content must be done using the following syntax:
 
 This check is done purely at compile time, and will not incurs any
 runtime cost.
-
-Back to the `Index <index.md>`__, or continue to `Bitset <bitset.md>`__

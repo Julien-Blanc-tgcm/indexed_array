@@ -3,3 +3,5 @@ CMakeLists.txt.user
 *.swp
 magic_enum
 wise_enum
+*.o
+*.s

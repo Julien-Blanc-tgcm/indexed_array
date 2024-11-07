@@ -6,6 +6,7 @@
 #define JBC_INDEXED_ARRAY_DETAIL_DESCRIBE_H
 
 #include "detail/default_indexer.hpp"
+#include "detail/foreach.hpp"
 
 #include <boost/describe.hpp>
 

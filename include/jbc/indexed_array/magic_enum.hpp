@@ -6,6 +6,7 @@
 #define JBC_INDEXED_ARRAY_MAGIC_ENUM_H
 
 #include "detail/default_indexer.hpp"
+#include "detail/foreach.hpp"
 
 #include <magic_enum/magic_enum.hpp>
 

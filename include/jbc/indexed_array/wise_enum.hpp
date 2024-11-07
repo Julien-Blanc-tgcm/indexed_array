@@ -6,6 +6,7 @@
 #define JBC_INDEXED_ARRAY_WISE_ENUM_H
 
 #include "detail/default_indexer.hpp"
+#include "detail/foreach.hpp"
 
 #include <wise_enum/wise_enum.h>
 

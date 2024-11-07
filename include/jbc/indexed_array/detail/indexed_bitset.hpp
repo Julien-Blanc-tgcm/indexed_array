@@ -72,7 +72,9 @@ class indexed_bitset
 	}
 
 	// safe_arg constructor
-	template <typename Arg, typename... Args, std::enable_if_t<is_checked_arg<Arg>::value, bool> = true>
+	template <typename Arg,
+	          typename... Args,
+	          std::enable_if_t<is_checked_arg<Arg>::value && sizeof...(Args) < sizeof(unsigned long long), bool> = true>
 	constexpr explicit indexed_bitset(Arg&& head, Args&&... args) noexcept :
 	    data_(bitset_safe_arg_sum<Arg, Args...>(0, std::forward<Arg>(head), std::forward<Args>(args)...))
 	{

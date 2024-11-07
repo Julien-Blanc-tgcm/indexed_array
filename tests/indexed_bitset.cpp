@@ -8,7 +8,7 @@
 
 enum class Color
 {
-	Red,
+	Red = -1,
 	Green,
 	Blue
 };
@@ -64,4 +64,10 @@ BOOST_AUTO_TEST_CASE(operator_brackets)
 	BOOST_TEST(!b[3]);
 	b[3] = 1;
 	BOOST_TEST(b[3]);
+}
+
+BOOST_AUTO_TEST_CASE(safe_arg_init)
+{
+	indexed_bitset<Color> b{safe_arg<Color::Red>(true), safe_arg<Color::Green>(false), safe_arg<Color::Blue>(true)};
+	BOOST_TEST(b.to_ullong() == 0b101);
 }

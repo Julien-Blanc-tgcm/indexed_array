@@ -185,6 +185,57 @@ class indexed_bitset
 #else
 	template <typename... Args, typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...> > >
 #endif
+	    constexpr reference operator[](std::tuple<Args...> arg)
+	{
+		auto f = static_cast<std::size_t (*)(std::decay_t<Args>...)>(Indexer::template at<false>);
+		auto i = std::apply(f, std::forward<std::tuple<Args...> >(arg));
+		return data_[i];
+	}
+
+#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
+	template <typename... Args>
+	requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
+#else
+	template <typename... Args, typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...> > >
+#endif
+	    constexpr const_reference operator[](std::tuple<Args...> arg) const
+	{
+		auto f = static_cast<std::size_t (*)(std::decay_t<Args>...)>(Indexer::template at<false>);
+		auto i = std::apply(f, std::forward<std::tuple<Args...> >(arg));
+		return data_[i];
+	}
+
+#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
+	template <typename... Args>
+	requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
+#else
+	template <typename... Args, typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...> > >
+#endif
+	    constexpr reference operator()(Args&&... args)
+	{
+		auto i = indexer::template at<false>(std::forward<Args>(args)...);
+		return data_[i];
+	}
+
+#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
+	template <typename... Args>
+	requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
+#else
+	template <typename... Args, typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...> > >
+#endif
+	    constexpr const_reference operator()(Args&&... args) const
+	{
+		auto i = indexer::template at<false>(std::forward<Args>(args)...);
+		return data_[i];
+	}
+
+
+#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
+	template <typename... Args>
+	requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
+#else
+	template <typename... Args, typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...> > >
+#endif
 	    constexpr bool in_range(Args&&... args)
 	{
 		return Indexer::in_range(std::forward<Args>(args)...);
@@ -195,6 +246,26 @@ class indexed_bitset
 	constexpr size_type size() const
 	{
 		return Indexer::size;
+	}
+
+	constexpr std::size_t count() const
+	{
+		return data_.count();
+	}
+
+	constexpr bool all() const
+	{
+		return data_.all();
+	}
+
+	constexpr bool any() const
+	{
+		return data_.any();
+	}
+
+	constexpr bool none() const
+	{
+		return data_.none();
 	}
 
 	unsigned long to_ulong() const

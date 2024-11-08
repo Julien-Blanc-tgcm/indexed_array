@@ -32,7 +32,7 @@ Construction and destruction
 | | :ref:`indexed_bitset(indexed_bitset const&) <indexed_bitset_copy_ctr>` | Copy and move constructors      |
 | | :ref:`indexed_bitset(indexed_bitset&&) <indexed_bitset_move_ctr>`      |                                 |
 +--------------------------------------------------------------------------+---------------------------------+
-| :ref:`indexed_bitset(Args&&...) <indexed_bitset_aggregate>`              | Aggregate-like initialization   |
+| :ref:`indexed_bitset(unsigned long long) <indexed_bitset_ull>`           | Initialization from a ulonglong |
 +--------------------------------------------------------------------------+---------------------------------+
 | :ref:`indexed_bitset(checked_arg&&...) <indexed_bitset_safe_init>`       | Safe initialization             |
 +--------------------------------------------------------------------------+---------------------------------+
@@ -52,7 +52,33 @@ Member functions
 Data Access
 ^^^^^^^^^^^
 
++-------------------------------------------------------------------------+--------------------------------+
+| *Functions always present*                                              |                                |
++=========================================================================+================================+
+| :ref:`indexed_bitset::test(indexd) const <indexed_bitset_test>`         | Element access (range-checked) |
++-------------------------------------------------------------------------+--------------------------------+
+| :ref:`indexed_bitset::operator[](index) const <indexed_bitset_bracket>` | Element access (unchecked)     |
++-------------------------------------------------------------------------+--------------------------------+
+| :ref:`indexed_bitset::all() const <indexed_bitset_all>`                 |                                |
++-------------------------------------------------------------------------+ Checks if all/any/none are set +
+| :ref:`indexed_bitset::any() const <indexed_bitset_any>`                 | to ``true``                    |
++-------------------------------------------------------------------------+                                +
+| :ref:`indexed_bitset::none() const <indexed_bitset_none>`               |                                |
++-------------------------------------------------------------------------+--------------------------------+
+| :ref:`indexed_bitset::count() const <indexed_bitset_count>`             | Number of bits set to ``true`` |
++-------------------------------------------------------------------------+--------------------------------+
+
 Observers
 ^^^^^^^^^
 
++-------------------------------------------------------------------+----------------------------------+
+| *Capacity*                                                        |                                  |
++===================================================================+==================================+
+| :ref:`indexed_bitset::size() const <indexed_bitset_size>`         | Number of elements in the bitset |
++-------------------------------------------------------------------+----------------------------------+
++ *Extensions*                                                                                         +
++-------------------------------------------------------------------+----------------------------------+
++ :ref:`in_range <indexed_bitset_in_range>`                         | Checks if an index is in the     |
++                                                                   | acceptable range                 |
++-------------------------------------------------------------------+----------------------------------+
 

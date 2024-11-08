@@ -5,27 +5,18 @@
 Indexed_bitset observers
 ========================
 
-Default constructors
---------------------
+.. _indexed_bitset_size:
+.. cpp:function:: constexpr size_t indexed_bitset::size() const
 
-The following constructors are explicitly defaulted:
+    :returns: The number of individual bits in the bitset
 
-.. _indexed_bitset_default_ctr:
+Extensions
+----------
 
-.. cpp:function:: indexed_bitset::indexed_bitset()
+.. _indexed_bitset_in_range:
 
-    Default constructor. All bits are set to zero.
+.. cpp:function:: static constexpr bool indexed_bitset::in_range(index)
 
-.. _indexed_bitset_copy_ctr:
-
-.. cpp:function:: indexed_bitset::indexed_bitset(indexed_bitset<Indexer> const& other)
-
-    Copy constructor.
-
-.. _indexed_bitset_move_ctr:
-
-.. cpp:function:: indexed_bitset::indexed_bitset(indexed_bitset<Indexer>&& other)
-
-    Move constructor. It is guaranteed to leave other in a valid but unspecified state.
-
-
+   static constexpr method that returns ``true`` if the argument is a
+   valid index value for this bitset, ie calling ``operator[value]`` is
+   well defined behavior. Returns ``false`` otherwise.

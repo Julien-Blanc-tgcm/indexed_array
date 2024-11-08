@@ -66,8 +66,80 @@ BOOST_AUTO_TEST_CASE(operator_brackets)
 	BOOST_TEST(b[3]);
 }
 
+BOOST_AUTO_TEST_CASE(count)
+{
+	indexed_bitset<index_range<2, 10> > b(0x11u);
+	BOOST_TEST(b.count() == 2);
+	b[7] = true;
+	BOOST_TEST(b.count() == 3);
+	b[2] = true;
+	BOOST_TEST(b.count() == 3);
+	b[2] = false;
+	BOOST_TEST(b.count() == 2);
+}
+
+BOOST_AUTO_TEST_CASE(all)
+{
+	indexed_bitset<index_range<2, 10> > b(0x11u);
+	BOOST_TEST(!b.all());
+	for (auto i = 2u; i <= 10u; ++i)
+		b[i] = true;
+	BOOST_TEST(b.all());
+	b[5] = false;
+	BOOST_TEST(!b.all());
+}
+
+BOOST_AUTO_TEST_CASE(none)
+{
+	indexed_bitset<index_range<2, 10> > b(0x11u);
+	BOOST_TEST(!b.none());
+	for (auto i = 2u; i <= 10u; ++i)
+		b[i] = false;
+	BOOST_TEST(b.none());
+	b[5] = true;
+	BOOST_TEST(!b.none());
+}
+
+BOOST_AUTO_TEST_CASE(any)
+{
+	indexed_bitset<index_range<2, 10> > b(0x11u);
+	BOOST_TEST(b.any());
+	for (auto i = 2u; i <= 10u; ++i)
+		b[i] = false;
+	BOOST_TEST(!b.any());
+	b[5] = true;
+	BOOST_TEST(b.any());
+}
+
 BOOST_AUTO_TEST_CASE(safe_arg_init)
 {
 	indexed_bitset<Color> b{safe_arg<Color::Red>(true), safe_arg<Color::Green>(false), safe_arg<Color::Blue>(true)};
 	BOOST_TEST(b.to_ullong() == 0b101);
+}
+
+BOOST_AUTO_TEST_CASE(multidimensional)
+{
+	indexed_bitset<Color, interval<2,3>> b{
+        safe_arg<Color::Red, 2>(true), 
+        safe_arg<Color::Red, 3>(true), 
+        safe_arg<Color::Green, 2>(false),
+        safe_arg<Color::Green, 3>(true),
+        safe_arg<Color::Blue, 2>(true),
+        safe_arg<Color::Blue, 3>(false)};
+
+	BOOST_TEST(b.test(Color::Red, 2));
+	BOOST_TEST(!b.test(Color::Green, 2));
+	BOOST_TEST(!b.test(Color::Blue, 3));
+
+	BOOST_TEST(b.to_ullong(), 0b011011);
+
+	BOOST_TEST((b[std::tuple{Color::Red, 2}]));
+	BOOST_TEST(b(Color::Red, 3));
+	BOOST_TEST(b.test(Color::Green, 3));
+
+	auto const& b2 = b;
+	BOOST_TEST((b2[std::tuple{Color::Red, 2}]));
+	BOOST_TEST(b2(Color::Red, 3));
+	BOOST_TEST(b2.test(Color::Green, 3));
+
 }

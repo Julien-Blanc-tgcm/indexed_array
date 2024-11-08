@@ -11,7 +11,7 @@ indexed_span observers
     :returns: true if the sequence of elements is empty, ie ``size() == 0``
 
 .. _indexed_span_size:
-.. cpp:function:: constexpr size_t size() const
+.. cpp:function:: constexpr size_t indexed_span::size() const
 
     :returns: The number of elements in the span (ie, `Indexer::size``).
 

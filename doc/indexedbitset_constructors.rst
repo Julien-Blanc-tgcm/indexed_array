@@ -28,6 +28,24 @@ The following constructors are explicitly defaulted:
 
     Move constructor. It is guaranteed to leave other in a valid but unspecified state.
 
+.. _indexed_bitset_ull:
+
+.. cpp:function:: indexed_bitset::indexed_bitset(unsigned long long val)
+
+    Construct an indexed bitset whose underlying value is ``val``. 
+ 
+    .. warning:: Be careful that custom
+        index is **not** used here, so building an ``indexed_bitset<interval<-2, 1>> b`` with the
+        value ``5`` is valid, and will result in ``b[-2] == true && b[0] == true``.
+
+.. _indexed_bitset_safe_init:
+
+.. cpp:function:: indexed_bitset::indexed_bitset(safe_arg<Indexer::value_type, bool>&&... values)
+
+    Construct an indexed bitset with the given parameters. Each parameter must contain a single bool,
+    and be a valid safe argument (its index will be checked). See :ref:`safe_initialization` for
+    details.
+
 .. _indexed_bitset_bitset_ctr:
 
 .. cpp:function:: indexed_bitset::indexed_bitset(std::bitset<Indexer::size> const& other)

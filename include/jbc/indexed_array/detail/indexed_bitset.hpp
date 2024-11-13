@@ -33,13 +33,31 @@ template <typename Indexer>
 #endif
 class indexed_bitset
 {
-	std::bitset<Indexer::size> data_;
+//	std::bitset<Indexer::size> data_;
+    std::array<std::byte, Indexer::size / 8 + ((Indexer::size % 8 == 0)? 0 : 1)> d_;
 
   public:
+	struct reference {
+		indexed_bitset& ref;
+		std::size_t index;
+		constexpr operator bool() const {
+			return ref.test_(index);
+		}
+		constexpr reference& operator=(bool v) {
+			if (v)
+				ref.set_(index);
+			else
+				ref.reset_(index);
+			return *this;
+		}
+/*		constexpr bool operator!() const {
+			return !ref.test_(index);
+		} */
+	};
 	// standard bitset members
 	using value_type = bool;
 	using size_type = std::size_t;
-	using reference = typename decltype(data_)::reference;
+//	using reference = typename decltype(data_)::reference;
 	using const_reference = bool;
 
 	// specific
@@ -53,30 +71,30 @@ class indexed_bitset
 
 	constexpr indexed_bitset(indexed_bitset<Indexer>&& other) = default;
 
-	constexpr indexed_bitset(unsigned long long v) noexcept : data_{v}
+#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
+	template <typename T>
+        requires (std::is_unsigned_v<T>)
+#else
+	template <typename T, typename E = std::enable_if_t<std::is_unsigned_v<T>>>
+#endif
+	constexpr indexed_bitset(T v) noexcept : d_{}
 	{
+		for (auto i = 0u; i < sizeof(T) && i < d_.size(); ++i)
+		{
+			d_[i] = static_cast<std::byte>((v >> (i * 8u)) & 0xFFu);
+		}
 	}
 
 	constexpr indexed_bitset& operator=(indexed_bitset<Indexer> const& other) = default;
 
 	constexpr indexed_bitset& operator=(indexed_bitset<Indexer>&& other) = default;
 
-	constexpr explicit operator std::bitset<Indexer::size> const&() const
-	{
-		return data_;
-	}
-
-	constexpr explicit operator std::bitset<Indexer::size>&()
-	{
-		return data_;
-	}
-
 	// safe_arg constructor
 	template <typename Arg,
 	          typename... Args,
 	          std::enable_if_t<is_checked_arg<Arg>::value && sizeof...(Args) < sizeof(unsigned long long), bool> = true>
 	constexpr explicit indexed_bitset(Arg&& head, Args&&... args) noexcept :
-	    data_(bitset_safe_arg_sum<Arg, Args...>(0, std::forward<Arg>(head), std::forward<Args>(args)...))
+	    indexed_bitset(bitset_safe_arg_sum<Arg, Args...>(0, std::forward<Arg>(head), std::forward<Args>(args)...))
 	{
 		static_assert(
 		    detail::correct_index<Indexer, typename Arg::checked_arg_index, typename Args::checked_arg_index...>(),
@@ -92,7 +110,7 @@ class indexed_bitset
 #endif
 	    constexpr bool test(Args&&... args) const
 	{
-		return data_.test(Indexer::template at<true>(std::forward<Args>(args)...));
+		return test_(Indexer::template at<true>(std::forward<Args>(args)...));
 	}
 
 #if defined(__cpp_concepts) && __cpp_concepts >= 202002L
@@ -103,7 +121,7 @@ class indexed_bitset
 #endif
 	    constexpr indexed_bitset& set(Args&&... args)
 	{
-		data_.set(Indexer::template at<true>(std::forward<Args>(args)...));
+		set_(Indexer::template at<true>(std::forward<Args>(args)...));
 		return *this;
 	}
 
@@ -115,7 +133,7 @@ class indexed_bitset
 #endif
 	    constexpr indexed_bitset& reset(Args&&... args)
 	{
-		data_.reset(Indexer::template at<true>(std::forward<Args>(args)...));
+		reset_(Indexer::template at<true>(std::forward<Args>(args)...));
 		return *this;
 	}
 
@@ -127,7 +145,7 @@ class indexed_bitset
 #endif
 	    constexpr indexed_bitset& flip(Args&&... args)
 	{
-		data_.flip(Indexer::template at<true>(std::forward<Args>(args)...));
+		flip_(Indexer::template at<true>(std::forward<Args>(args)...));
 		return *this;
 	}
 
@@ -141,7 +159,7 @@ class indexed_bitset
 	    constexpr reference operator[](Args&&... args)
 	{
 		auto i = indexer::template at<false>(std::forward<Args>(args)...);
-		return data_[i];
+		return reference{*this, i};
 	}
 
 #if defined(__cpp_concepts) && __cpp_concepts >= 202002L
@@ -153,7 +171,7 @@ class indexed_bitset
 	    constexpr const_reference operator[](Args&&... args) const
 	{
 		auto i = indexer::template at<false>(std::forward<Args>(args)...);
-		return data_[i];
+		return test_(i);
 	}
 #else
 #if defined(__cpp_concepts) && __cpp_concepts >= 202002L
@@ -164,7 +182,8 @@ class indexed_bitset
 #endif
 	    constexpr reference operator[](Arg&& arg)
 	{
-		return data_[Indexer::template at<false>(std::forward<Arg>(arg))];
+		auto i = Indexer::template at<false>(std::forward<Arg>(arg));
+		return reference{*this, i};
 	}
 
 #if defined(__cpp_concepts) && __cpp_concepts >= 202002L
@@ -175,7 +194,7 @@ class indexed_bitset
 #endif
 	    constexpr const_reference operator[](Arg&& arg) const
 	{
-		return data_[Indexer::template at<false>(std::forward<Arg>(arg))];
+		return test_(Indexer::template at<false>(std::forward<Arg>(arg)));
 	}
 #endif
 
@@ -189,7 +208,7 @@ class indexed_bitset
 	{
 		auto f = static_cast<std::size_t (*)(std::decay_t<Args>...)>(Indexer::template at<false>);
 		auto i = std::apply(f, std::forward<std::tuple<Args...> >(arg));
-		return data_[i];
+		return reference{*this, i};
 	}
 
 #if defined(__cpp_concepts) && __cpp_concepts >= 202002L
@@ -202,7 +221,7 @@ class indexed_bitset
 	{
 		auto f = static_cast<std::size_t (*)(std::decay_t<Args>...)>(Indexer::template at<false>);
 		auto i = std::apply(f, std::forward<std::tuple<Args...> >(arg));
-		return data_[i];
+		return test_(i);
 	}
 
 #if defined(__cpp_concepts) && __cpp_concepts >= 202002L
@@ -214,7 +233,7 @@ class indexed_bitset
 	    constexpr reference operator()(Args&&... args)
 	{
 		auto i = indexer::template at<false>(std::forward<Args>(args)...);
-		return data_[i];
+		return reference{*this, i};
 	}
 
 #if defined(__cpp_concepts) && __cpp_concepts >= 202002L
@@ -226,7 +245,7 @@ class indexed_bitset
 	    constexpr const_reference operator()(Args&&... args) const
 	{
 		auto i = indexer::template at<false>(std::forward<Args>(args)...);
-		return data_[i];
+		return test_(i);
 	}
 
 
@@ -250,32 +269,82 @@ class indexed_bitset
 
 	constexpr std::size_t count() const
 	{
-		return data_.count();
+		std::size_t res = 0;
+		for (auto i = 0u; i < size(); ++i)
+		{
+			if (test_(i))
+				res += 1;
+		}
+		return res;
 	}
 
 	constexpr bool all() const
 	{
-		return data_.all();
+		return count() == size();
 	}
 
 	constexpr bool any() const
 	{
-		return data_.any();
+		return !none();
 	}
 
 	constexpr bool none() const
 	{
-		return data_.none();
+		for (auto c : d_)
+		{
+			if (static_cast<std::uint_fast8_t>(c) != 0)
+				return false;
+		}
+		return true;
 	}
 
-	unsigned long to_ulong() const
+#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
+	template <typename T>
+        requires (std::is_unsigned_v<T> && sizeof(T) * 8 >= Indexer::size)
+#else
+	template <typename T, typename E = std::enable_if_t<std::is_unsigned_v<T> && sizeof(T) * 8 >= Indexer::size>>
+#endif
+	constexpr T to() const
 	{
-		return data_.to_ulong();
+		T t{0u};
+		for (std::size_t i = 0; i < d_.size(); ++i)
+			t |= static_cast<T>(d_[i]) << (8u * i);
+		return t;
 	}
 
-	unsigned long long to_ullong() const
+  private:
+	constexpr bool test_(std::size_t i) const
 	{
-		return data_.to_ullong();
+		auto s = i / 8u;
+		auto r = i % 8u;
+		return (static_cast<std::uint_fast8_t>(d_[s]) >> r) & 0x1u;
+	}
+
+	constexpr void set_(std::size_t i)
+	{
+		auto s = i / 8u;
+		auto r = i % 8u;
+		auto v = static_cast<std::uint_fast8_t>(d_[s]);
+		v |= 1u << r;
+		d_[s] = static_cast<std::byte>(v);
+	}
+
+	constexpr void reset_(std::size_t i)
+	{
+		auto s = i / 8u;
+		auto r = i % 8u;
+		auto v = static_cast<std::uint_fast8_t>(d_[s]);
+		v &= ~(1u << r);
+		d_[s] = static_cast<std::byte>(v);
+	}
+
+	constexpr void flip_(std::size_t i) 
+	{
+		auto s = i >> 3u; /// 8u;
+		auto r = i & 0x7u; // % 8u;
+		auto v = static_cast<std::uint_fast8_t>(d_[s]);
+		v ^= (1u << r);
+		d_[s] = static_cast<std::byte>(v);
 	}
 };
 

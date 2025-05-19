@@ -5,11 +5,11 @@
 cmake_minimum_required(VERSION 3.5)
 
 if (NOT "${CMAKE_CXX_STANDARD}")
-	set(CMAKE_CXX_STANDARD 17)
+	set(CMAKE_CXX_STANDARD 20)
 endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(BOOSTROOT "$ENV{HOME}/development/boost_1.78" CACHE STRING "Where to find boost")
+#set(BOOSTROOT "$ENV{HOME}/development/boost_1.78" CACHE STRING "Where to find boost")
 set(MAGICENUM "${CMAKE_CURRENT_SOURCE_DIR}/magic_enum" CACHE STRING "Where to find magic enum")
 set(WISEENUM "${CMAKE_CURRENT_SOURCE_DIR}/wise_enum" CACHE STRING "Where to find wise enum")
 set(ENABLE_COVERAGE OFF CACHE BOOL "Enable coverage generation")

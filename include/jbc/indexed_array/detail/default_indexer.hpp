@@ -300,7 +300,6 @@ template <typename Arg>
 using add_default_indexer_t = typename add_default_indexer<Arg>::type;
 } // namespace jbc::indexed_array::detail
 
-#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 // clang-format off
 namespace jbc::indexed_array::concepts
 {
@@ -311,6 +310,5 @@ concept indexer_invocable_with = requires (Indexer i, Args... args)
 };
 } // jbc::indexed_array::concepts
 // clang-format on
-#endif
 
 #endif // JBC_INDEXED_ARRAY_DETAIL_DEFAULT_INDEXER_H

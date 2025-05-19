@@ -17,7 +17,7 @@ jobs:
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     strategy:
       matrix:
-        os: [{name: "ubuntu-22.04", toolset: "gcc", link: "shared", platform: ""}, {name: "windows-2022", toolset: "msvc", link: "static", platform: "2022"}]
+        os: [{name: "ubuntu-24.04", toolset: "gcc", link: "shared", platform: ""}, {name: "windows-2022", toolset: "msvc", link: "static", platform: "2022"}]
     runs-on: ${{ matrix.os.name }}
     steps:
     - uses: actions/checkout@v3

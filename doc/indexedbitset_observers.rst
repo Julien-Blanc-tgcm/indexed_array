@@ -20,3 +20,15 @@ Extensions
    static constexpr method that returns ``true`` if the argument is a
    valid index value for this bitset, ie calling ``operator[value]`` is
    well defined behavior. Returns ``false`` otherwise.
+
+Conversions
+-----------
+
+.. _indexed_bitset_to:
+
+.. cpp:function:: constexpr T indexed_bitset::to() const
+
+    Convert the bitset to an integer value that has the same bits on, bit 0
+    being the least significant of the resulting integer. ``T`` can be any
+    unsigned integral type that has at least the same number of bits than
+    the bitset.

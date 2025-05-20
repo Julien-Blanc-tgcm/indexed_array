@@ -12,7 +12,7 @@ jobs:
   build:
     runs-on: "ubuntu-22.04"
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Install boost
       uses: MarkusJx/install-boost@v2.4.1
       id: install-boost
@@ -37,7 +37,7 @@ jobs:
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target Sphinx
     - name: Upload artifact
-      uses: actions/upload-pages-artifact@v1
+      uses: actions/upload-pages-artifact@v3
       with:
         path: ./build/docs/sphinx
         name: github-pages

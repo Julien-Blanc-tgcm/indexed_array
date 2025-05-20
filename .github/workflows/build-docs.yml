@@ -50,7 +50,7 @@ jobs:
       pages: write
     steps:
       - name: Deploy GitHub Pages site
-        uses: actions/deploy-pages@v2.0.1
+        uses: actions/deploy-pages@v4
         with:
           # GitHub token
           token: ${{ github.token }}

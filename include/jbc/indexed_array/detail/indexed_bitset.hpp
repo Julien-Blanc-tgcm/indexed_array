@@ -401,7 +401,12 @@ class indexed_bitset
 			d_[s] = static_cast<item_type>(v);
 		}
 	}
+	constexpr friend bool operator==(indexed_bitset const& f, indexed_bitset const& s)
+	{
+		return f.data_ == s.data_;
+	}
 };
+
 
 } // namespace jbc::indexed_array::detail
 

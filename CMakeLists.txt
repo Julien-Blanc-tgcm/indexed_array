@@ -2,12 +2,13 @@
 #·Distributed·under·the·Boost·Software·License,·Version·1.0.
 #·https://www.boost.org/LICENSE_1_0.txt
 
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.25)
 
 if (NOT "${CMAKE_CXX_STANDARD}")
 	set(CMAKE_CXX_STANDARD 20)
 endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+SET(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 #set(BOOSTROOT "$ENV{HOME}/development/boost_1.78" CACHE STRING "Where to find boost")
 set(MAGICENUM "${CMAKE_CURRENT_SOURCE_DIR}/magic_enum" CACHE STRING "Where to find magic enum")

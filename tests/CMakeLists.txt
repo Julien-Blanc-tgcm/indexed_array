@@ -2,7 +2,7 @@
 #·Distributed·under·the·Boost·Software·License,·Version·1.0.
 #·https://www.boost.org/LICENSE_1_0.txt
 
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.25)
 
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 

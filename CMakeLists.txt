@@ -15,6 +15,17 @@ set(MAGICENUM "${CMAKE_CURRENT_SOURCE_DIR}/magic_enum" CACHE STRING "Where to fi
 set(WISEENUM "${CMAKE_CURRENT_SOURCE_DIR}/wise_enum" CACHE STRING "Where to find wise enum")
 set(ENABLE_COVERAGE OFF CACHE BOOL "Enable coverage generation")
 
+if(IS_DIRECTORY ${MAGICENUM})
+	set(MAGICENUM_FOUND ON)
+else()
+	set(MAGICENUM_FOUND OFF)
+endif()
+if(IS_DIRECTORY ${WISEENUM})
+	set(WISEENUM_FOUND ON)
+else()
+	set(WISEENUM_FOUND OFF)
+endif()
+
 project(indexed_array LANGUAGES CXX)
 
 if(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")

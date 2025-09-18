@@ -157,3 +157,22 @@ BOOST_AUTO_TEST_CASE(multidimensional)
 	BOOST_TEST(static_cast<bool>(b2(Color::Red, 3)));
 	BOOST_TEST(static_cast<bool>(b2.test(Color::Green, 3)));
 }
+
+BOOST_AUTO_TEST_CASE(large)
+{
+	indexed_bitset<Color, interval<0, 150>> b;
+	BOOST_TEST(!b.test(Color::Red, 45));
+	BOOST_TEST(!b.test(Color::Green, 23));
+	BOOST_TEST(!b.test(Color::Blue, 62));
+
+	b.set(Color::Green, 150);
+	b.set(Color::Red, 64);
+	BOOST_TEST(!b.test(Color::Red, 63));
+	BOOST_TEST(!b.test(Color::Green, 149));
+	BOOST_TEST(!b.test(Color::Blue, 150));
+	BOOST_TEST(b.test(Color::Green, 150));
+	BOOST_TEST(b.test(Color::Red, 64));
+
+	auto res = b == b;
+	BOOST_TEST(res);
+}

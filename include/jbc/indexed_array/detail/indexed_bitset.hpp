@@ -403,7 +403,7 @@ class indexed_bitset
 	}
 	constexpr friend bool operator==(indexed_bitset const& f, indexed_bitset const& s)
 	{
-		return f.data_ == s.data_;
+		return f.d_ == s.d_;
 	}
 };
 

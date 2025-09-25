@@ -33,7 +33,7 @@ if(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
 	add_link_options(-stdlib=libc++)
 endif()
 
-find_package(Boost 1.78.0 REQUIRED)
+find_package(Boost 1.78.0 CONFIG REQUIRED)
 
 enable_testing()
 

@@ -4,7 +4,7 @@
 
 cmake_minimum_required(VERSION 3.25)
 
-find_package(Boost COMPONENTS unit_test_framework REQUIRED)
+find_package(Boost CONFIG COMPONENTS unit_test_framework REQUIRED)
 
 message("Boost libraries found : ${Boost_LIBRARIES}")
 

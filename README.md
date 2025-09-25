@@ -1,6 +1,6 @@
 # Indexed Array
 
-A C++17 fixed size container, with arbitrary indexes. Provides support
+A C++20 fixed size container, with arbitrary indexes. Provides support
 for indexing via enum values, arbitrary intervals (starting at non-zero
 values), and non-contiguous sets. Extensible to support virtually any
 kind of indexing, including multi-dimensional indexing.
@@ -47,8 +47,9 @@ when compiling.
 
 * GCC 9 and later
 * Clang 11 and later
+* MSVC (Visual Studio 2022 and later)
 
-(Not tested with other compilers, but should work with any `C++17` compliant
+(Not tested with other compilers, but should work with any `C++20` compliant
 compiler)
 
 ## Requirements

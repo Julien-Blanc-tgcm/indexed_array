@@ -74,3 +74,14 @@ BOOST_AUTO_TEST_CASE(index_range_enum_empty)
 	BOOST_TEST(arr.size() == 1);
 	BOOST_TEST(arr[Foo::bar] == 3);
 }
+
+#ifdef INDEXED_ARRAY_HAS_REFLECTION
+BOOST_AUTO_TEST_CASE(index_reflection)
+{
+	using Idx = jbc::indexed_array::detail::default_indexer<Foo>;
+	static_assert(Idx::is_o1);
+	indexed_array<int, Foo> arr{2,3,4,5,6};
+	BOOST_TEST(arr.size() == 5);
+	BOOST_TEST(arr[Foo::bar] == 2);
+}
+#endif

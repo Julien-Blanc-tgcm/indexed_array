@@ -186,15 +186,21 @@ struct at_computation_helper<Arg>
 	}
 };
 
-template <typename T, typename = void>
-struct add_default_indexer_if_needed
-{
-	using type = default_indexer<T>;
-};
 template <typename T>
-struct add_default_indexer_if_needed<T, std::enable_if_t<is_indexer_v<T>, void> >
+struct add_default_indexer_if_needed;
+
+template <typename T>
+requires (concepts::indexer<T>)
+struct add_default_indexer_if_needed<T>
 {
 	using type = T;
+};
+
+template <typename T>
+requires (!concepts::indexer<T>)
+struct add_default_indexer_if_needed<T>
+{
+	using type = default_indexer<T>;
 };
 
 template <typename T>
@@ -284,16 +290,21 @@ struct has_root_indexer<Indexer, Arg, std::integral_constant<bool, is_indexer_in
 {
 };
 
-template <typename Arg>
-struct add_default_indexer
+template <typename T>
+struct add_default_indexer;
+
+template <typename T>
+requires (!concepts::indexer<T>)
+struct add_default_indexer<T>
 {
-	using type = default_indexer<Arg>;
+	using type = default_indexer<T>;
 };
 
-template <typename Arg>
-struct add_default_indexer<default_indexer<Arg> >
+template <typename T>
+requires (concepts::indexer<T>)
+struct add_default_indexer<T>
 {
-	using type = default_indexer<Arg>;
+	using type = T;
 };
 
 template <typename Arg>
@@ -303,6 +314,12 @@ using add_default_indexer_t = typename add_default_indexer<Arg>::type;
 // clang-format off
 namespace jbc::indexed_array::concepts
 {
+template <typename T>
+concept indexerable = indexer<detail::default_indexer<T>>;
+
+template <typename T>
+concept indexer_or_indexerable = indexer<T> || indexerable<T>;
+
 template <typename Indexer, typename... Args>
 concept indexer_invocable_with = requires (Indexer i, Args... args)
 {

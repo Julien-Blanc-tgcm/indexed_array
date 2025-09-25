@@ -5,6 +5,8 @@
 #ifndef JBC_INDEXED_ARRAY_DETAIL_DESCRIBE_H
 #define JBC_INDEXED_ARRAY_DETAIL_DESCRIBE_H
 
+#ifndef INDEXED_ARRAY_HAS_REFLECTION
+
 #include "detail/default_indexer.hpp"
 #include "detail/foreach.hpp"
 
@@ -50,5 +52,9 @@ struct create_list_helper<
 	using type = typename create_list_helper<default_indexer<typename default_indexer<Enum>::helper_list_type> >::type;
 };
 
+
 } // namespace jbc::indexed_array::detail
+
+#endif
+
 #endif // JBC_INDEXED_ARRAY_DETAIL_DESCRIBE_H

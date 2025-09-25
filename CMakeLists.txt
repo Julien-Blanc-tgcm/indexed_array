@@ -14,6 +14,8 @@ SET(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(MAGICENUM "${CMAKE_CURRENT_SOURCE_DIR}/magic_enum" CACHE STRING "Where to find magic enum")
 set(WISEENUM "${CMAKE_CURRENT_SOURCE_DIR}/wise_enum" CACHE STRING "Where to find wise enum")
 set(ENABLE_COVERAGE OFF CACHE BOOL "Enable coverage generation")
+set(USE_CPP26_REFLECTION OFF CACHE BOOL "Enable support of c++26 reflection")
+set(USE_LIBCXX OFF CACHE BOOL "Compile with libc++ when using clang")
 
 if(IS_DIRECTORY ${MAGICENUM})
 	set(MAGICENUM_FOUND ON)
@@ -28,7 +30,7 @@ endif()
 
 project(indexed_array LANGUAGES CXX)
 
-if(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
+if(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang" AND ${USE_LIBCXX})
 	add_compile_options(-stdlib=libc++)
 	add_link_options(-stdlib=libc++)
 endif()
@@ -36,6 +38,12 @@ endif()
 find_package(Boost 1.78.0 CONFIG REQUIRED)
 
 enable_testing()
+
+if(${USE_CPP26_REFLECTION})
+	set(CMAKE_CXX_STANDARD 26 )
+	add_definitions( -DINDEXED_ARRAY_HAS_REFLECTION)
+	add_compile_options(-freflection -fexpansion-statements)
+endif()
 
 add_executable(indexed_array "main.cpp" 
 	"include/jbc/indexed_array.hpp"
@@ -60,8 +68,9 @@ if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
 	target_compile_options(indexed_array PRIVATE "-Wconversion" "-Wextra")
 endif()
 target_include_directories(indexed_array PRIVATE ${Boost_INCLUDE_DIRS} ${MAGICENUM}/include ${WISE_ENUM} )
-target_compile_definitions(indexed_array PRIVATE -DINDEXED_ARRAY_HAS_DESCRIBE)
-
+if (NOT ${USE_CPP26_REFLECTION})
+	target_compile_definitions(indexed_array PRIVATE -DINDEXED_ARRAY_HAS_DESCRIBE)
+endif()
 add_subdirectory(tests)
 
 # documentation generation

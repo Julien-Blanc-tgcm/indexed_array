@@ -5,3 +5,4 @@ magic_enum
 wise_enum
 *.o
 *.s
+build/*

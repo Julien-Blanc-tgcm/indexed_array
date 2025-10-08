@@ -44,9 +44,9 @@ enum class Color
 	Black = 6,
 	White = 8
 };
-
+#ifndef INDEXED_ARRAY_HAS_REFLECTION
 BOOST_DESCRIBE_ENUM(Color, Red, Green, Blue, Black, White);
-
+#endif
 using Test3 = indexed_array<std::string, Color>;
 
 BOOST_AUTO_TEST_CASE(foreach3)

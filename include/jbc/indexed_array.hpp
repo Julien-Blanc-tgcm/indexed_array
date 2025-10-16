@@ -1,6 +1,6 @@
-//·Copyright·2022·Julien Blanc
-//·Distributed·under·the·Boost·Software·License,·Version·1.0.
-//·https://www.boost.org/LICENSE_1_0.txt
+// Copyright 2022 Julien Blanc
+// Distributed under the Boost Software License, Version 1.0.
+// https://www.boost.org/LICENSE_1_0.txt
 
 #ifndef JBC_INDEXED_ARRAY_H
 #define JBC_INDEXED_ARRAY_H
@@ -22,7 +22,10 @@
 #endif
 
 #ifdef INDEXED_ARRAY_HAS_DESCRIBE
-#include "indexed_array/describe.hpp"
+#include "indexed_array/describe.hpp" // must be included before reflection.hpp if needed
+#endif
+#ifdef INDEXED_ARRAY_HAS_REFLECTION
+#include "indexed_array/reflection.hpp"
 #endif
 #ifdef INDEXED_ARRAY_HAS_MAGIC_ENUM
 #include "indexed_array/magic_enum.hpp"
@@ -34,19 +37,22 @@
 namespace jbc::indexed_array
 {
 
-template <typename Value, typename Index1, typename... Indexes>
-using indexed_array = detail::indexed_array<Value, detail::to_single_indexer_t<Index1, Indexes...> >;
+template <typename Value, typename... Indexes>
+requires (sizeof...(Indexes) > 0 && (concepts::indexer_or_indexerable<Indexes> && ...))
+using indexed_array = detail::indexed_array<Value, detail::to_single_indexer_t<Indexes...> >;
 
-template <typename Index1, typename... Indexes>
-using indexed_bitset = detail::indexed_bitset<detail::to_single_indexer_t<Index1, Indexes...> >;
+template <typename...  Indexes>
+requires (sizeof...(Indexes) > 0 && (concepts::indexer_or_indexerable<Indexes> && ...))
+using indexed_bitset = detail::indexed_bitset<detail::to_single_indexer_t<Indexes...> >;
 
 using detail::index_range;
 using detail::interval;
 using detail::lambda_indexer;
 using detail::single_value;
 using detail::union_of;
-template <typename Value, typename... Index>
-using indexed_span = detail::indexed_span<Value, detail::to_single_indexer_t<Index...> >;
+template <typename Value, typename... Indexes>
+requires (sizeof...(Indexes) > 0 && (concepts::indexer_or_indexerable<Indexes> && ...))
+using indexed_span = detail::indexed_span<Value, detail::to_single_indexer_t<Indexes...> >;
 
 template <typename... Args>
 using make_default_indexer = detail::to_single_indexer_t<Args...>;

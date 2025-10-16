@@ -31,3 +31,28 @@ BOOST_AUTO_TEST_CASE(subindexer)
 
 	BOOST_TEST((std::is_same<Slice2, detail::to_single_indexer_t<index_range<-2, 4>>>::value));
 }
+
+enum class Duplicates
+{
+	A = 3,
+	Alias = A,
+	B,
+	C
+};
+
+BOOST_DESCRIBE_ENUM(Duplicates, A, Alias, B, C);
+
+BOOST_AUTO_TEST_CASE(duplicates)
+{
+	using Base = indexed_array<int, Duplicates>;
+	Base b{};
+	BOOST_TEST(b.size(), 3);
+	BOOST_TEST(Base::is_o1);
+}
+
+BOOST_AUTO_TEST_CASE(error)
+{
+	using Base = indexed_array<int, Color>;
+	Base b;
+	b[Color::Red] = 0;
+}

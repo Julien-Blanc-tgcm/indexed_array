@@ -10,6 +10,9 @@
 #include "union_of.hpp"
 
 #include <boost/mp11.hpp>
+#if defined(INDEXED_ARRAY_HAS_REFLECTION)
+#include <meta>
+#endif
 
 namespace jbc::indexed_array::detail
 {
@@ -37,6 +40,7 @@ struct for_each_ // default implementation, does nothing
 {
 };
 
+
 template <typename Content, typename Indexer, typename Func>
 struct for_each_<indexed_array<Content, Indexer>, Func>
 {
@@ -59,6 +63,35 @@ struct for_each_<indexed_array<Content, Indexer>, Func>
 		});
 	}
 };
+#if defined(INDEXED_ARRAY_HAS_REFLECTION)
+template <typename Content, typename Enum, typename Func>
+requires (std::is_enum_v<Enum>
+#if defined(INDEXED_ARRAY_HAS_DESCRIBE)
+		&& !boost::describe::has_describe_enumerators<Enum>::value
+#endif
+	 )
+struct for_each_<indexed_array<Content, detail::default_indexer<Enum>>, Func>
+{
+	static void apply(Func&& f, indexed_array<Content, detail::default_indexer<Enum>>& data)
+	{
+		auto current = data.begin();
+		template for(constexpr auto m : std::define_static_array(std::meta::enumerators_of(^^Enum)))
+		{
+			f([:m:], *current);
+			++current;
+		}
+	}
+	static void apply(Func&& f, indexed_array<Content, detail::default_indexer<Enum>> const& data)
+	{
+		auto current = data.begin();
+		template for(constexpr auto m : std::define_static_array(std::meta::enumerators_of(^^Enum)))
+		{
+			f([:m:], *current);
+			++current;
+		}
+	}
+};
+#endif
 
 template <typename Content, typename Indexer, typename Func>
 struct for_each_<indexed_span<Content, Indexer>, Func>

@@ -1,6 +1,6 @@
-// ·Copyright·2022·Julien Blanc
-// ·Distributed·under·the·Boost·Software·License,·Version·1.0.
-// ·https://www.boost.org/LICENSE_1_0.txt
+// Copyright 2022 Julien Blanc
+// Distributed under the Boost Software License, Version 1.0.
+// https://www.boost.org/LICENSE_1_0.txt
 
 #ifndef JBC_INDEXED_ARRAY_DETAIL_LAMBDA_INDEXER_H
 #define JBC_INDEXED_ARRAY_DETAIL_LAMBDA_INDEXER_H
@@ -20,7 +20,7 @@ template <auto F, std::size_t number_of_items, bool is_o1_ = true>
 struct lambda_indexer
 {
   private:
-	using internal_indexer_ = default_indexer<index_range<std::size_t(0), number_of_items - 1u> >;
+	using internal_indexer_ = default_indexer<index_range<std::size_t(0), number_of_items - 1u>>;
 
   public:
 	static constexpr auto const size = internal_indexer_::size;

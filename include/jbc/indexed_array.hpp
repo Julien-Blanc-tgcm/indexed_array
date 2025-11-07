@@ -39,11 +39,11 @@ namespace jbc::indexed_array
 
 template <typename Value, typename... Indexes>
 requires (sizeof...(Indexes) > 0 && (concepts::indexer_or_indexerable<Indexes> && ...))
-using indexed_array = detail::indexed_array<Value, detail::to_single_indexer_t<Indexes...> >;
+using indexed_array = detail::indexed_array<Value, detail::to_single_indexer_t<Indexes...>>;
 
 template <typename...  Indexes>
 requires (sizeof...(Indexes) > 0 && (concepts::indexer_or_indexerable<Indexes> && ...))
-using indexed_bitset = detail::indexed_bitset<detail::to_single_indexer_t<Indexes...> >;
+using indexed_bitset = detail::indexed_bitset<detail::to_single_indexer_t<Indexes...>>;
 
 using detail::index_range;
 using detail::interval;
@@ -52,7 +52,7 @@ using detail::single_value;
 using detail::union_of;
 template <typename Value, typename... Indexes>
 requires (sizeof...(Indexes) > 0 && (concepts::indexer_or_indexerable<Indexes> && ...))
-using indexed_span = detail::indexed_span<Value, detail::to_single_indexer_t<Indexes...> >;
+using indexed_span = detail::indexed_span<Value, detail::to_single_indexer_t<Indexes...>>;
 
 template <typename... Args>
 using make_default_indexer = detail::to_single_indexer_t<Args...>;

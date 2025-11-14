@@ -49,6 +49,7 @@ else()
 endif()
 add_single_test(chrono chrono.cpp)
 add_single_test(lambda_indexer lambda_indexer.cpp)
+add_single_test(list_indexer list_indexer.cpp)
 
 if(NOT ${USE_CPP26_REFLECTION} AND ${MAGICENUM_FOUND})
 	set(definitions -DINDEXED_ARRAY_HAS_MAGIC_ENUM)

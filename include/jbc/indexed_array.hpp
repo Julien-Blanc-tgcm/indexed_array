@@ -12,6 +12,7 @@
 #include "indexed_array/detail/indexed_bitset.hpp"
 #include "indexed_array/detail/is_contiguous.hpp"
 #include "indexed_array/detail/lambda_indexer.hpp"
+#include "indexed_array/detail/list_indexer.hpp"
 #include "indexed_array/detail/union_of.hpp"
 
 #if defined(INDEXED_ARRAY_HAS_MAGIC_ENUM) && defined(INDEXED_ARRAY_HAS_DESCRIBE)
@@ -38,21 +39,23 @@ namespace jbc::indexed_array
 {
 
 template <typename Value, typename... Indexes>
-requires (sizeof...(Indexes) > 0 && (concepts::indexer_or_indexerable<Indexes> && ...))
-using indexed_array = detail::indexed_array<Value, detail::to_single_indexer_t<Indexes...> >;
+    requires(sizeof...(Indexes) > 0 && (concepts::indexer_or_indexerable<Indexes> && ...))
+using indexed_array = detail::indexed_array<Value, detail::to_single_indexer_t<Indexes...>>;
 
-template <typename...  Indexes>
-requires (sizeof...(Indexes) > 0 && (concepts::indexer_or_indexerable<Indexes> && ...))
-using indexed_bitset = detail::indexed_bitset<detail::to_single_indexer_t<Indexes...> >;
+template <typename... Indexes>
+    requires(sizeof...(Indexes) > 0 && (concepts::indexer_or_indexerable<Indexes> && ...))
+using indexed_bitset = detail::indexed_bitset<detail::to_single_indexer_t<Indexes...>>;
 
 using detail::index_range;
 using detail::interval;
 using detail::lambda_indexer;
+using detail::list_indexer;
 using detail::single_value;
 using detail::union_of;
+using detail::value_list;
 template <typename Value, typename... Indexes>
-requires (sizeof...(Indexes) > 0 && (concepts::indexer_or_indexerable<Indexes> && ...))
-using indexed_span = detail::indexed_span<Value, detail::to_single_indexer_t<Indexes...> >;
+    requires(sizeof...(Indexes) > 0 && (concepts::indexer_or_indexerable<Indexes> && ...))
+using indexed_span = detail::indexed_span<Value, detail::to_single_indexer_t<Indexes...>>;
 
 template <typename... Args>
 using make_default_indexer = detail::to_single_indexer_t<Args...>;

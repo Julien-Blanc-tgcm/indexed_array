@@ -1,6 +1,6 @@
-// ·Copyright·2022·Julien Blanc
-// ·Distributed·under·the·Boost·Software·License,·Version·1.0.
-// ·https://www.boost.org/LICENSE_1_0.txt
+// Copyright 2022 Julien Blanc
+// Distributed under the Boost Software License, Version 1.0.
+// https://www.boost.org/LICENSE_1_0.txt
 
 #ifndef JBC_INDEXED_ARRAY_DETAIL_DEFAULT_INDEXER_H
 #define JBC_INDEXED_ARRAY_DETAIL_DEFAULT_INDEXER_H
@@ -35,12 +35,12 @@ struct is_o1_indexer : public std::false_type
 
 template <typename indexer>
 struct is_o1_indexer<indexer, std::enable_if_t<std::is_same_v<decltype(indexer::is_o1), bool const>, void>> :
-public std::integral_constant<bool, indexer::is_o1>
+    public std::integral_constant<bool, indexer::is_o1>
 {
 };
 
 template <typename T, T min, T max>
-struct default_indexer<index_range<min, max>, std::enable_if_t<can_be_integral_value<T, min>::value, void> >
+struct default_indexer<index_range<min, max>, std::enable_if_t<can_be_integral_value<T, min>::value, void>>
 {
 	using integral_index_type = decltype(integral_value_v<T{}>);
 	static inline constexpr auto const size = integral_value_v<max> - integral_value_v<min> + 1;
@@ -69,10 +69,10 @@ struct default_indexer<index_range<min, max>, std::enable_if_t<can_be_integral_v
 template <typename T, T... vals>
 struct default_indexer<
     value_sequence<T, vals...>,
-    typename std::enable_if_t<detail::is_contiguous_sequence<mp11::mp_list_c<T, vals...> >::value, void> >
+    typename std::enable_if_t<detail::is_contiguous_sequence<mp11::mp_list_c<T, vals...>>::value, void>>
 {
-	static inline constexpr auto const size = integral_value_v<mp11::mp_back<mp11::mp_list_c<T, vals...> >::value> -
-	                                          integral_value_v<mp11::mp_front<mp11::mp_list_c<T, vals...> >::value> + 1;
+	static inline constexpr auto const size = integral_value_v<mp11::mp_back<mp11::mp_list_c<T, vals...>>::value> -
+	                                          integral_value_v<mp11::mp_front<mp11::mp_list_c<T, vals...>>::value> + 1;
 
 	static constexpr bool is_o1 = true;
 
@@ -87,24 +87,24 @@ struct default_indexer<
 				throw std::out_of_range("Invalid index");
 		}
 		return std::size_t(static_cast<decltype(integral_value_v<T{}>)>(i) -
-		                   integral_value_v<mp11::mp_front<mp11::mp_list_c<T, vals...> >::value>);
+		                   integral_value_v<mp11::mp_front<mp11::mp_list_c<T, vals...>>::value>);
 	}
 
 	static constexpr bool in_range(index i)
 	{
 		return (static_cast<decltype(integral_value<T, T{}>::value)>(i) >=
-		        integral_value_v<mp11::mp_front<mp11::mp_list_c<T, vals...> >::
-		                             value>)&&(static_cast<decltype(integral_value<T, T{}>::value)>(i) <=
-		                                       integral_value_v<mp11::mp_back<mp11::mp_list_c<T, vals...> >::value>);
+		        integral_value_v<mp11::mp_front<mp11::mp_list_c<T, vals...>>::value>) &&
+		       (static_cast<decltype(integral_value<T, T{}>::value)>(i) <=
+		        integral_value_v<mp11::mp_back<mp11::mp_list_c<T, vals...>>::value>);
 	}
 };
 
 template <typename T, T... vals>
 struct default_indexer<
     value_sequence<T, vals...>,
-    typename std::enable_if_t<!detail::is_contiguous_sequence<mp11::mp_list_c<T, vals...> >::value, void> >
+    typename std::enable_if_t<!detail::is_contiguous_sequence<mp11::mp_list_c<T, vals...>>::value, void>>
 {
-	static inline constexpr auto size = mp11::mp_size<mp11::mp_unique<mp11::mp_list_c<T, vals...> > >::value;
+	static inline constexpr auto size = mp11::mp_size<mp11::mp_unique<mp11::mp_list_c<T, vals...>>>::value;
 
 	using index = T;
 
@@ -115,7 +115,7 @@ struct default_indexer<
 	{
 		std::size_t ret = 0;
 		bool found = false;
-		mp11::mp_for_each<mp11::mp_unique<mp11::mp_list_c<T, vals...> > >([v, &ret, &found](auto I) {
+		mp11::mp_for_each<mp11::mp_unique<mp11::mp_list_c<T, vals...>>>([v, &ret, &found](auto I) {
 			if (I.value == v)
 			{
 				found = true;
@@ -135,7 +135,7 @@ struct default_indexer<
 	static constexpr bool in_range(index v) noexcept
 	{
 		bool found = false;
-		mp11::mp_for_each<mp11::mp_unique<mp11::mp_list_c<T, vals...> > >([v, &found](auto I) {
+		mp11::mp_for_each<mp11::mp_unique<mp11::mp_list_c<T, vals...>>>([v, &found](auto I) {
 			if (I.value == v)
 			{
 				found = true;
@@ -146,7 +146,7 @@ struct default_indexer<
 };
 
 template <typename T, T... values>
-struct default_indexer<std::integer_sequence<T, values...> > : public default_indexer<value_sequence<T, values...> >
+struct default_indexer<std::integer_sequence<T, values...>> : public default_indexer<value_sequence<T, values...>>
 {
 };
 
@@ -209,7 +209,7 @@ using add_default_indexer_if_needed_t = typename add_default_indexer_if_needed<T
 template <typename... Args>
 struct to_single_indexer
 {
-	using type = default_indexer<boost::mp11::mp_list<add_default_indexer_if_needed_t<Args>...> >;
+	using type = default_indexer<boost::mp11::mp_list<add_default_indexer_if_needed_t<Args>...>>;
 };
 
 template <typename Arg>
@@ -224,7 +224,7 @@ using to_single_indexer_t = typename to_single_indexer<Args...>::type;
 template <typename Arg, typename... Args>
 struct default_indexer<
     boost::mp11::mp_list<Arg, Args...>,
-    typename std::enable_if_t<boost::mp11::mp_all<is_indexer<Arg>, is_indexer<Args>...>::value, void> >
+    typename std::enable_if_t<boost::mp11::mp_all<is_indexer<Arg>, is_indexer<Args>...>::value, void>>
 {
 	static inline constexpr std::size_t const size = product_v<Arg::size, Args::size...>;
 
@@ -260,13 +260,13 @@ struct is_indexer_invocable_with_detail<
     boost::mp11::mp_list<Args...>,
     std::integral_constant<
         bool,
-        std::is_same_v<decltype(Indexer::template at<false>(std::declval<Args>()...)), std::size_t> > > :
+        std::is_same_v<decltype(Indexer::template at<false>(std::declval<Args>()...)), std::size_t>>> :
     public std::true_type
 {
 };
 
 template <typename Indexer, typename... Args>
-struct is_indexer_invocable_with : public is_indexer_invocable_with_detail<Indexer, boost::mp11::mp_list<Args...> >
+struct is_indexer_invocable_with : public is_indexer_invocable_with_detail<Indexer, boost::mp11::mp_list<Args...>>
 {
 };
 
@@ -285,7 +285,10 @@ struct has_root_indexer : public std::false_type
 };
 
 template <typename Indexer, typename Arg>
-struct has_root_indexer<Indexer, Arg, std::integral_constant<bool, is_indexer_invocable_with_v<typename Indexer::root_indexer, Arg> > > :
+struct has_root_indexer<
+    Indexer,
+    Arg,
+    std::integral_constant<bool, is_indexer_invocable_with_v<typename Indexer::root_indexer, Arg>>> :
     public std::true_type
 {
 };

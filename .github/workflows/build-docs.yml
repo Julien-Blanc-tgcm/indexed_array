@@ -20,7 +20,7 @@ jobs:
         # REQUIRED: Specify the required boost version
         # A list of supported versions can be found here: 
         # https://github.com/actions/boost-versions/blob/main/versions-manifest.json
-        boost_version: 1.80.0
+        boost_version: 1.83.0
     - name: Install doxygen
       run: sudo apt install -y doxygen graphviz
     - name: Install sphinx

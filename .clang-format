@@ -6,7 +6,7 @@ IndentWidth: 4
 UseTab: ForIndentation
 TabWidth: 4
 Language: Cpp
-Standard: Cpp03
+Standard: c++20
 
 # Code layout
 AlignAfterOpenBracket: Align

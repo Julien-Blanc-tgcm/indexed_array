@@ -1,6 +1,6 @@
-//·Copyright·2022·Julien Blanc
-//·Distributed·under·the·Boost·Software·License,·Version·1.0.
-//·https://www.boost.org/LICENSE_1_0.txt
+// Copyright 2022 Julien Blanc
+// Distributed under the Boost Software License, Version 1.0.
+// https://www.boost.org/LICENSE_1_0.txt
 
 #ifndef JBC_INDEXED_ARRAY_DETAIL_CHECKED_ARG_H
 #define JBC_INDEXED_ARRAY_DETAIL_CHECKED_ARG_H
@@ -24,7 +24,7 @@ struct at_helper
 };
 
 template <typename Indexer, template <typename...> class L, typename... Args>
-struct at_helper<Indexer, L<Args...> >
+struct at_helper<Indexer, L<Args...>>
 {
 	static constexpr auto at()
 	{
@@ -106,7 +106,7 @@ struct is_checked_arg : public std::false_type
 };
 
 template <typename T>
-struct is_checked_arg<T, std::enable_if_t<std::is_class<typename T::checked_arg_index>::value, void> > :
+struct is_checked_arg<T, std::enable_if_t<std::is_class<typename T::checked_arg_index>::value, void>> :
     public std::true_type
 {
 };
@@ -122,10 +122,10 @@ namespace jbc::indexed_array::concepts
 template <class From, class To>
 concept explicitly_convertible_to = requires(From f) { static_cast<To>(f); };
 
-template<typename Arg, typename Value>
+template <typename Arg, typename Value>
 concept checked_arg = ::jbc::indexed_array::detail::is_checked_arg_v<Arg> && explicitly_convertible_to<Arg, Value>;
 
-} // jbc::indexed_array::concepts
+} // namespace jbc::indexed_array::concepts
 #endif
 
 #endif // JBC_INDEXED_ARRAY_DETAIL_CHECKED_ARG_H

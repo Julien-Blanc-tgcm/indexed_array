@@ -17,12 +17,7 @@
 
 namespace jbc::indexed_array::detail
 {
-
-#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 template <typename Value, jbc::indexed_array::concepts::indexer Indexer>
-#else
-template <typename Value, typename Indexer>
-#endif
 class indexed_array
 {
 	std::array<Value, Indexer::size> data_;
@@ -60,9 +55,8 @@ class indexed_array
 	 * Constructor via an array of the same size and the same value content. Copy the array
 	 * into the indexed_array content.
 	 */
-	constexpr indexed_array(std::array<Value, Indexer::size> const& other)
-	    noexcept(std::is_nothrow_copy_constructible_v<Value>) :
-	    data_{other}
+	constexpr indexed_array(std::array<Value, Indexer::size> const& other) noexcept(
+	    std::is_nothrow_copy_constructible_v<Value>) : data_{other}
 	{
 	}
 
@@ -73,22 +67,11 @@ class indexed_array
 	 * @param list the list of values with which the array content will be initialized. Not that
 	 * some values may be left uninitialized
 	 */
-#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
-    template<std::convertible_to<Value> Arg, std::convertible_to<Value>... Args>
-        requires(!(::jbc::indexed_array::concepts::checked_arg<Arg, Value>
-                   || (::jbc::indexed_array::concepts::checked_arg<Args, Value> || ...)))
-#else
-    template<typename Arg,
-             typename... Args,
-             std::enable_if_t<
-                 !is_checked_arg<Arg>::value
-                     && !std::is_invocable_v<indexed_array(indexed_array const &), Arg &&, Args &&...>,
-                 bool>
-             = true>
-#endif
-    constexpr explicit indexed_array(Arg&& arg, Args&&... args) noexcept(
-        std::is_nothrow_copy_constructible_v<Value>)
-        : data_{std::forward<Arg>(arg), std::forward<Args>(args)...}
+	template <std::convertible_to<Value> Arg, std::convertible_to<Value>... Args>
+	    requires(!(::jbc::indexed_array::concepts::checked_arg<Arg, Value> ||
+	               (::jbc::indexed_array::concepts::checked_arg<Args, Value> || ...)))
+	constexpr explicit indexed_array(Arg&& arg, Args&&... args) noexcept(std::is_nothrow_copy_constructible_v<Value>) :
+	    data_{std::forward<Arg>(arg), std::forward<Args>(args)...}
 	{
 	}
 
@@ -100,15 +83,8 @@ class indexed_array
 	 * @li the number of arguments must match with the array size
 	 * @li the explicit index of each argument must match the order of the indexer
 	 */
-#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
-	template < ::jbc::indexed_array::concepts::checked_arg<Value> Arg,
-	           ::jbc::indexed_array::concepts::checked_arg<Value>... Args>
-#else
-	template <typename Arg,
-	          typename... Args,
-	          std::enable_if_t<is_checked_arg<Arg>::value,
-	                           bool> = true>
-#endif
+	template <::jbc::indexed_array::concepts::checked_arg<Value> Arg,
+	          ::jbc::indexed_array::concepts::checked_arg<Value>... Args>
 	constexpr explicit indexed_array(Arg&& head, Args&&... args) noexcept(std::is_nothrow_copy_constructible_v<Value>) :
 	    data_{static_cast<Value>(head), static_cast<Value>(args)...}
 	{
@@ -118,45 +94,30 @@ class indexed_array
 	}
 
 	// at and [] operators. Use enable_if to disable overloads that won't work
-#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
 	template <typename... Args>
-	requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
-#else
-	template <typename... Args,
-	          typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...>>>
-#endif
-	    constexpr reference at(Args&&... args)
+	    requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
+	constexpr reference at(Args&&... args)
 	{
 		return data_[Indexer::template at<true>(std::forward<Args>(args)...)];
 	}
 
-#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
-	template <typename... Args> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
-#else
-	template <typename... Args, typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...> > >
-#endif
+	template <typename... Args>
+	    requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
 	constexpr const_reference at(Args&&... args) const
 	{
 		return data_[Indexer::template at<true>(std::forward<Args>(args)...)];
 	}
 
 #if defined(__cpp_multidimensional_subscript)
-// assume concepts are available
-#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
-	template <typename... Args> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
-#else
-	template <typename... Args, typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...> > >
-#endif
+	template <typename... Args>
+	    requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
 	constexpr reference operator[](Args&&... args)
 	{
 		auto i = indexer::template at<false>(std::forward<Args>(args)...);
 		return data_[i];
 	}
-#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
-	template <typename... Args> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
-#else
-	template <typename... Args, typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...> > >
-#endif
+	template <typename... Args>
+	    requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
 	constexpr const_reference operator[](Args&&... args) const
 	{
 		auto i = indexer::template at<false>(std::forward<Args>(args)...);
@@ -164,44 +125,32 @@ class indexed_array
 	}
 #else
 	// multiple arguments subscript not supported, restrict to single argument
-#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
-	template <typename Arg> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Arg>
-#else
-	template <typename Arg, typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Arg> > >
-#endif
+	template <typename Arg>
+	    requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Arg>
 	constexpr reference operator[](Arg&& arg)
 	{
 		return data_[Indexer::template at<false>(std::forward<Arg>(arg))];
 	}
 
-#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
-	template <typename Arg> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Arg>
-#else
-	template <typename Arg, typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Arg> > >
-#endif
+	template <typename Arg>
+	    requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Arg>
 	constexpr const_reference operator[](Arg&& arg) const
 	{
 		return data_[Indexer::template at<false>(std::forward<Arg>(arg))];
 	}
 #endif
 
-#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
-	template <typename... Args> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
-#else
-	template <typename... Args, typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...> > >
-#endif
+	template <typename... Args>
+	    requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
 	constexpr reference operator[](std::tuple<Args...> arg)
 	{
 		auto f = static_cast<std::size_t (*)(std::decay_t<Args>...)>(Indexer::template at<false>);
-		auto i = std::apply(f, std::forward<std::tuple<Args...> >(arg));
+		auto i = std::apply(f, std::forward<std::tuple<Args...>>(arg));
 		return data_[i];
 	}
 
-#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
-	template <typename... Args> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
-#else
-	template <typename... Args, typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...> > >
-#endif
+	template <typename... Args>
+	    requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
 	constexpr const_reference operator[](std::tuple<Args...> arg) const
 	{
 		auto f = static_cast<std::size_t (*)(std::decay_t<Args>...)>(Indexer::template at<false>);
@@ -209,22 +158,16 @@ class indexed_array
 		return data_[i];
 	}
 
-#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
-	template <typename... Args> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
-#else
-	template <typename... Args, typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...> > >
-#endif
+	template <typename... Args>
+	    requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
 	constexpr reference operator()(Args&&... args)
 	{
 		auto i = indexer::template at<false>(std::forward<Args>(args)...);
 		return data_[i];
 	}
 
-#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
-	template <typename... Args> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
-#else
-	template <typename... Args, typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...> > >
-#endif
+	template <typename... Args>
+	    requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
 	constexpr const_reference operator()(Args&&... args) const
 	{
 		auto i = indexer::template at<false>(std::forward<Args>(args)...);
@@ -259,11 +202,8 @@ class indexed_array
 		    data_.data() + Indexer::root_indexer::template at<true>(idx) * Indexer::slice_indexer::size);
 	}
 
-#if defined(__cpp_concepts) && __cpp_concepts >= 202002L
-	template <typename... Args> requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
-#else
-	template <typename... Args, typename T = std::enable_if_t<is_indexer_invocable_with_v<indexer, Args...> > >
-#endif
+	template <typename... Args>
+	    requires jbc::indexed_array::concepts::indexer_invocable_with<indexer, Args...>
 	static constexpr bool in_range(Args&&... args)
 	{
 		return Indexer::in_range(std::forward<Args>(args)...);
@@ -274,7 +214,7 @@ class indexed_array
 	// standard array operations
 
 	/**
-	 * @brief Returns an iterator to the beginning of the array. Will return end() 
+	 * @brief Returns an iterator to the beginning of the array. Will return end()
 	 * if the array is empty.
 	 */
 	constexpr iterator begin()
@@ -455,7 +395,7 @@ namespace std
 {
 // specialization of tuple_size for all indexed_array-s
 template <typename... Args>
-struct tuple_size<jbc::indexed_array::detail::indexed_array<Args...> > :
+struct tuple_size<jbc::indexed_array::detail::indexed_array<Args...>> :
     std::integral_constant<std::size_t, jbc::indexed_array::detail::indexed_array<Args...>::indexer::size>
 {
 };

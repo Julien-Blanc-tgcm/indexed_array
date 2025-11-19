@@ -7,6 +7,7 @@
 
 #include "default_indexer.hpp"
 #include "indexed_array.hpp"
+#include "indexed_bitset.hpp"
 #include "union_of.hpp"
 
 #include <boost/mp11.hpp>
@@ -23,23 +24,22 @@ struct create_list_helper
 };
 
 template <auto first, type_identity_t<decltype(first)>... idx>
-struct create_list_helper<default_indexer<value_sequence<decltype(first), first, idx...> > >
+struct create_list_helper<default_indexer<value_sequence<decltype(first), first, idx...>>>
 {
 	using type = boost::mp11::mp_list<std::integral_constant<decltype(first), first>,
 	                                  std::integral_constant<decltype(first), idx>...>;
 };
 
 template <auto v1, type_identity_t<decltype(v1)> v2>
-struct create_list_helper<default_indexer<index_range<v1, v2> > >
+struct create_list_helper<default_indexer<index_range<v1, v2>>>
 {
-	using type = typename union_of_helper<index_range<v1, v2> >::type;
+	using type = typename union_of_helper<index_range<v1, v2>>::type;
 };
 
 template <typename T, typename Func>
 struct for_each_ // default implementation, does nothing
 {
 };
-
 
 template <typename Content, typename Indexer, typename Func>
 struct for_each_<indexed_array<Content, Indexer>, Func>
@@ -65,17 +65,17 @@ struct for_each_<indexed_array<Content, Indexer>, Func>
 };
 #if defined(INDEXED_ARRAY_HAS_REFLECTION)
 template <typename Content, typename Enum, typename Func>
-requires (std::is_enum_v<Enum>
+    requires(std::is_enum_v<Enum>
 #if defined(INDEXED_ARRAY_HAS_DESCRIBE)
-		&& !boost::describe::has_describe_enumerators<Enum>::value
+             && !boost::describe::has_describe_enumerators<Enum>::value
 #endif
-	 )
+             )
 struct for_each_<indexed_array<Content, detail::default_indexer<Enum>>, Func>
 {
 	static void apply(Func&& f, indexed_array<Content, detail::default_indexer<Enum>>& data)
 	{
 		auto current = data.begin();
-		template for(constexpr auto m : std::define_static_array(std::meta::enumerators_of(^^Enum)))
+		template for (constexpr auto m : std::define_static_array(std::meta::enumerators_of(^^Enum)))
 		{
 			f([:m:], *current);
 			++current;
@@ -84,7 +84,7 @@ struct for_each_<indexed_array<Content, detail::default_indexer<Enum>>, Func>
 	static void apply(Func&& f, indexed_array<Content, detail::default_indexer<Enum>> const& data)
 	{
 		auto current = data.begin();
-		template for(constexpr auto m : std::define_static_array(std::meta::enumerators_of(^^Enum)))
+		template for (constexpr auto m : std::define_static_array(std::meta::enumerators_of(^^Enum)))
 		{
 			f([:m:], *current);
 			++current;
@@ -115,6 +115,76 @@ struct for_each_<indexed_span<Content, Indexer>, Func>
 		});
 	}
 };
+
+#if defined(INDEXED_ARRAY_HAS_REFLECTION)
+template <typename Content, typename Enum, typename Func>
+    requires(std::is_enum_v<Enum>
+#if defined(INDEXED_ARRAY_HAS_DESCRIBE)
+             && !boost::describe::has_describe_enumerators<Enum>::value
+#endif
+             )
+struct for_each_<indexed_span<Content, detail::default_indexer<Enum>>, Func>
+{
+	static void apply(Func&& f, indexed_span<Content, detail::default_indexer<Enum>>& data)
+	{
+		auto current = data.begin();
+		template for (constexpr auto m : std::define_static_array(std::meta::enumerators_of(^^Enum)))
+		{
+			f([:m:], *current);
+			++current;
+		}
+	}
+	static void apply(Func&& f, indexed_span<Content, detail::default_indexer<Enum>> const& data)
+	{
+		auto current = data.begin();
+		template for (constexpr auto m : std::define_static_array(std::meta::enumerators_of(^^Enum)))
+		{
+			f([:m:], *current);
+			++current;
+		}
+	}
+};
+#endif
+
+template <typename Indexer, typename Func>
+struct for_each_<indexed_bitset<Indexer>, Func>
+{
+	static void apply(Func&& f, indexed_bitset<Indexer>& data)
+	{
+		using list_type = typename create_list_helper<Indexer>::type;
+		boost::mp11::mp_for_each<list_type>([&f, &data](auto I) { f(I, data[I]); });
+	}
+	static void apply(Func&& f, indexed_bitset<Indexer> const& data)
+	{
+		using list_type = typename create_list_helper<Indexer>::type;
+		boost::mp11::mp_for_each<list_type>([&f, &data](auto I) { f(I, data[I]); });
+	}
+};
+#if defined(INDEXED_ARRAY_HAS_REFLECTION)
+template <typename Enum, typename Func>
+    requires(std::is_enum_v<Enum>
+#if defined(INDEXED_ARRAY_HAS_DESCRIBE)
+             && !boost::describe::has_describe_enumerators<Enum>::value
+#endif
+             )
+struct for_each_<indexed_bitset<detail::default_indexer<Enum>>, Func>
+{
+	static void apply(Func&& f, indexed_bitset<detail::default_indexer<Enum>>& data)
+	{
+		template for (constexpr auto m : std::define_static_array(std::meta::enumerators_of(^^Enum)))
+		{
+			f([:m:], data[[:m:]]);
+		}
+	}
+	static void apply(Func&& f, indexed_bitset<detail::default_indexer<Enum>> const& data)
+	{
+		template for (constexpr auto m : std::define_static_array(std::meta::enumerators_of(^^Enum)))
+		{
+			f([:m:], data[[:m:]]);
+		}
+	}
+};
+#endif
 
 } // namespace jbc::indexed_array::detail
 

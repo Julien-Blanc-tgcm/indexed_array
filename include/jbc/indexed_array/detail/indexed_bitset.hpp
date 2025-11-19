@@ -98,6 +98,14 @@ class indexed_bitset
 				ref.reset_(index);
 			return *this;
 		}
+		constexpr reference& flip()
+		{
+			if (ref.test_(index))
+				ref.reset_(index);
+			else
+				ref.set_(index);
+			return *this;
+		}
 	};
 	// standard bitset members
 	using value_type = bool;
@@ -406,7 +414,6 @@ class indexed_bitset
 		return f.d_ == s.d_;
 	}
 };
-
 
 } // namespace jbc::indexed_array::detail
 

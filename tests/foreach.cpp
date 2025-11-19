@@ -6,7 +6,7 @@
 
 using namespace jbc::indexed_array;
 
-using Test = indexed_array<int, index_range<1, 5> >;
+using Test = indexed_array<int, index_range<1, 5>>;
 
 BOOST_AUTO_TEST_CASE(foreach)
 {
@@ -26,7 +26,11 @@ enum class Foo : std::size_t
 	Bar6
 };
 
-using Test2 = indexed_array<int, index_range<Foo::Bar1, Foo::Bar6> >;
+#if defined(INDEXED_ARRAY_HAS_DESCRIBE)
+BOOST_DESCRIBE_ENUM(Foo, Bar1, Bar2, Bar3, Bar4, Bar5, Bar6)
+#endif
+
+using Test2 = indexed_array<int, index_range<Foo::Bar1, Foo::Bar6>>;
 
 BOOST_AUTO_TEST_CASE(foreach2)
 {
@@ -62,7 +66,7 @@ BOOST_AUTO_TEST_CASE(foreach3)
 	}
 }
 
-using Test4 = indexed_array<int, union_of<index_range<1, 5>, index_range<10, 15> > >;
+using Test4 = indexed_array<int, union_of<index_range<1, 5>, index_range<10, 15>>>;
 
 BOOST_AUTO_TEST_CASE(foreach4)
 {
@@ -84,7 +88,7 @@ BOOST_AUTO_TEST_CASE(foreach5)
 	});
 }
 
-using Test5 = indexed_array<int, index_range<1, 5>, index_range<3, 10> >;
+using Test5 = indexed_array<int, index_range<1, 5>, index_range<3, 10>>;
 
 BOOST_AUTO_TEST_CASE(foreach_span1)
 {
@@ -114,6 +118,58 @@ BOOST_AUTO_TEST_CASE(foreach_span2)
 	});
 }
 
+BOOST_AUTO_TEST_CASE(foreach_span3)
+{
+	std::array<int, 6> arr = {0, 1, 2, 3, 4, 5};
+	indexed_span<int, Foo> s(arr.data());
+	for_each(s, [](Foo key, int val) { //
+		BOOST_TEST(static_cast<int>(key) == val + 3);
+	});
+}
+
+using Test6 = indexed_bitset<index_range<1, 5>>;
+
+BOOST_AUTO_TEST_CASE(foreach_bitset)
+{
+	Test6 t;
+	int i = 0;
+	for (int i = 1; i <= 5; ++i)
+		t[i] = (i % 2) == 0;
+	for (int i = 1; i <= 5; ++i)
+		BOOST_TEST(t[i] == ((i % 2) == 0));
+	for_each(t, [&t](int key, Test6::reference val) {
+		BOOST_TEST(t[key] == val);
+		val = !val;
+	});
+	for (int i = 1; i <= 5; ++i)
+		BOOST_TEST(t[i] == ((i % 2) != 0));
+}
+
+using Test7 = indexed_bitset<Foo>;
+
+BOOST_AUTO_TEST_CASE(foreach_bitset2)
+{
+	Test7 t;
+	t[Foo::Bar1] = true;
+	t[Foo::Bar2] = false;
+	t[Foo::Bar3] = true;
+	t[Foo::Bar4] = false;
+	t[Foo::Bar5] = true;
+	t[Foo::Bar6] = false;
+	for_each(t, [&t](Foo key, Test7::reference val) {
+		bool old = val;
+		BOOST_TEST(t[key] == val);
+		val.flip();
+		BOOST_TEST(t[key] != old);
+	});
+	BOOST_TEST(!t[Foo::Bar1]);
+	BOOST_TEST(t[Foo::Bar2]);
+	BOOST_TEST(!t[Foo::Bar3]);
+	BOOST_TEST(t[Foo::Bar4]);
+	BOOST_TEST(!t[Foo::Bar5]);
+	BOOST_TEST(t[Foo::Bar6]);
+}
+
 /*
 Not implemented yet. Uncomment this when foreach is implemented for
 multidimensional arrays
@@ -121,16 +177,16 @@ using Test5 = indexed_array<int, index_range<1, 5>, index_range<10, 15> >;
 
 BOOST_AUTO_TEST_CASE(foreach5)
 {
-	Test5 t{};
-	int i = 0;
-	for (auto& v : t)
-		v = i++;
+    Test5 t{};
+    int i = 0;
+    for (auto& v : t)
+        v = i++;
 
-	for_each(t, [](int key1, auto& val) {
-		for_each(val, [key1](int key, int& v) {
-			v = key1 * 100 + key;
-		});
-	});
-	BOOST_TEST(t.at(2, 11) == 211);
+    for_each(t, [](int key1, auto& val) {
+        for_each(val, [key1](int key, int& v) {
+            v = key1 * 100 + key;
+        });
+    });
+    BOOST_TEST(t.at(2, 11) == 211);
 }
 */

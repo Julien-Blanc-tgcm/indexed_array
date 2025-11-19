@@ -123,6 +123,26 @@ BOOST_AUTO_TEST_CASE(any)
 	BOOST_TEST(b.any());
 }
 
+BOOST_AUTO_TEST_CASE(reference)
+{
+	indexed_bitset<index_range<2, 10>> b(0x11u);
+	auto ref2 = b[2];
+	auto ref5 = b[5];
+	auto ref6 = b[6];
+	BOOST_TEST(static_cast<bool>(ref2));
+	BOOST_TEST(~ref5);
+	BOOST_TEST(!static_cast<bool>(ref5));
+	BOOST_TEST(!(~ref6));
+	ref6.flip();
+	BOOST_TEST(~ref6);
+	ref5.flip();
+	BOOST_TEST(ref5);
+	ref2 = false;
+	BOOST_TEST(~ref2);
+	ref2 = true;
+	BOOST_TEST(static_cast<bool>(ref2));
+}
+
 BOOST_AUTO_TEST_CASE(safe_arg_init)
 {
 	indexed_bitset<Color> b{safe_arg<Color::Red>(true), safe_arg<Color::Green>(false), safe_arg<Color::Blue>(true)};

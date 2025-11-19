@@ -100,11 +100,12 @@ class indexed_bitset
 		}
 		constexpr reference& flip()
 		{
-			if (ref.test_(index))
-				ref.reset_(index);
-			else
-				ref.set_(index);
+			ref.flip_(index);
 			return *this;
+		}
+		constexpr bool operator~() const
+		{
+			return !ref.test_(index);
 		}
 	};
 	// standard bitset members

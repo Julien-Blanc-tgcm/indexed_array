@@ -102,3 +102,15 @@ if(${Doxygen_FOUND})
 	endif()
 endif()
 
+if (${ENABLE_COVERAGE})
+	add_custom_command(OUTPUT "${PROJECT_BINARY_DIR}/coverage"
+        COMMAND mkdir ARGS -p ${PROJECT_BINARY_DIR}/coverage
+	)
+
+	add_custom_target(coverage_html COMMAND
+        gcovr -r ${CMAKE_CURRENT_SOURCE_DIR} --object-directory ${PROJECT_BINARY_DIR} --html --html-details
+        --exclude-unreachable-branches --print-summary -o coverage.html
+        DEPENDS ${PROJECT_BINARY_DIR}/coverage
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/coverage
+)
+endif()

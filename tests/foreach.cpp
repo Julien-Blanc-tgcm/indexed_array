@@ -132,7 +132,6 @@ using Test6 = indexed_bitset<index_range<1, 5>>;
 BOOST_AUTO_TEST_CASE(foreach_bitset)
 {
 	Test6 t;
-	int i = 0;
 	for (int i = 1; i <= 5; ++i)
 		t[i] = (i % 2) == 0;
 	for (int i = 1; i <= 5; ++i)

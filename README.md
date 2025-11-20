@@ -36,11 +36,12 @@ the initialization
 
 Out of the box, `indexed_array` has support for the following enum reflection libraries:
 
-* [Boost Describe](https://www.boost.org/doc/libs/1_79_0/libs/describe/doc/html/describe.html)
+* [Boost Describe](https://www.boost.org/doc/libs/latest/libs/describe/doc/html/describe.html)
 * [Magic Enum](https://github.com/Neargye/magic_enum)
 * [Wise Enum](https://github.com/quicknir/wise_enum)
+* C++26 reflection
 
-To enable the integration, you must define the relevant `INDEXED_ARRAY_HAS_[DESCRIBE|MAGIC_ENUM|WISE_ENUM]` macro
+To enable the integration, you must define the relevant `INDEXED_ARRAY_HAS_[DESCRIBE|MAGIC_ENUM|WISE_ENUM|REFLECTION]` macro
 when compiling.
 
 ## Supported Compilers
@@ -50,7 +51,7 @@ when compiling.
 * MSVC (Visual Studio 2022 and later)
 
 (Not tested with other compilers, but should work with any `C++20` compliant
-compiler)
+compiler). Reflection requires a compiler with reflection enabled.
 
 ## Requirements
 

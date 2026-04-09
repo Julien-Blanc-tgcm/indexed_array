@@ -60,3 +60,25 @@ Extensions
     information can be used for static asserts when O(1) access is a requirement, or for 
     performance improvements by selecting different algorithm in function of this property.
 
+.. _indexed_array_has_limits:
+
+.. cpp:member:: static constexpr bool indexed_array::has_limits
+
+	static member that describe if the indexed array provides its limits as part of its
+    interface. Depending on the indexer used, this may or may not be the case, as some
+    indexers do not provide a way to know these limits. If this value is true, then
+    the indexed_array provides two additional members (see below).
+
+.. _indexed_array_low_limit:
+
+.. cpp:function:: static constexpr index_type indexed_array::low_limit()
+
+    Returns the lowest valid index for this array, ie the lowest value
+    for which array[value] has defined behaviour.
+
+.. _indexed_array_high_limit:
+
+.. cpp:function:: static constexpr index_type indexed_array::high_limit()
+
+	Returns the highest valid index for this array, ie the highest value
+    for which array[value] has defined behaviour.

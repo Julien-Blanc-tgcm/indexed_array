@@ -46,6 +46,7 @@ struct default_indexer<index_range<min, max>, std::enable_if_t<can_be_integral_v
 	static inline constexpr auto const size = integral_value_v<max> - integral_value_v<min> + 1;
 
 	static constexpr bool is_o1 = true;
+	static constexpr bool has_limits = true;
 
 	using index = T;
 	template <bool throws_on_error>
@@ -64,6 +65,14 @@ struct default_indexer<index_range<min, max>, std::enable_if_t<can_be_integral_v
 		return !(static_cast<integral_index_type>(v) < integral_value_v<min> ||
 		         static_cast<integral_index_type>(v) > integral_value_v<max>);
 	}
+	static constexpr auto low_limit()
+	{
+		return min;
+	}
+	static constexpr auto high_limit()
+	{
+		return max;
+	}
 };
 
 template <typename T, T... vals>
@@ -75,6 +84,7 @@ struct default_indexer<
 	                                          integral_value_v<mp11::mp_front<mp11::mp_list_c<T, vals...>>::value> + 1;
 
 	static constexpr bool is_o1 = true;
+	static constexpr bool has_limits = true;
 
 	using index = T;
 
@@ -97,6 +107,15 @@ struct default_indexer<
 		       (static_cast<decltype(integral_value<T, T{}>::value)>(i) <=
 		        integral_value_v<mp11::mp_back<mp11::mp_list_c<T, vals...>>::value>);
 	}
+
+	static constexpr auto low_limit()
+	{
+		return mp11::mp_front<mp11::mp_list_c<T, vals...>>::value;
+	}
+	static constexpr auto high_limit()
+	{
+		return mp11::mp_front<mp11::mp_list_c<T, vals...>>::value;
+	}
 };
 
 template <typename T, T... vals>
@@ -109,6 +128,7 @@ struct default_indexer<
 	using index = T;
 
 	static constexpr bool is_o1 = false;
+	static constexpr bool has_limits = false;
 
 	template <bool throws_on_error = false>
 	static constexpr std::size_t at(index v)
@@ -190,14 +210,14 @@ template <typename T>
 struct add_default_indexer_if_needed;
 
 template <typename T>
-requires (concepts::indexer<T>)
+    requires(concepts::indexer<T>)
 struct add_default_indexer_if_needed<T>
 {
 	using type = T;
 };
 
 template <typename T>
-requires (!concepts::indexer<T>)
+    requires(!concepts::indexer<T>)
 struct add_default_indexer_if_needed<T>
 {
 	using type = default_indexer<T>;
@@ -297,14 +317,14 @@ template <typename T>
 struct add_default_indexer;
 
 template <typename T>
-requires (!concepts::indexer<T>)
+    requires(!concepts::indexer<T>)
 struct add_default_indexer<T>
 {
 	using type = default_indexer<T>;
 };
 
 template <typename T>
-requires (concepts::indexer<T>)
+    requires(concepts::indexer<T>)
 struct add_default_indexer<T>
 {
 	using type = T;

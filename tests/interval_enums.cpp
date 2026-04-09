@@ -14,27 +14,9 @@ enum class Foo
 	bur
 };
 
-/*std::ostream& operator<<(std::ostream& o, Foo f)
-{
-	switch(f)
-	{
-		case Foo::bar:
-			return o << "bar";
-		case Foo::ber:
-			return o << "ber";
-		case Foo::bir:
-			return o << "bir";
-		case Foo::bor:
-			return o << "bor";
-		case Foo::bur:
-			return o << "bur";
-	}
-	return o;
-}*/
-
 BOOST_AUTO_TEST_CASE(index_range_enum_s)
 {
-	indexed_array<int, index_range<Foo::bir, Foo::bur> > arr{1, 2, 3};
+	indexed_array<int, index_range<Foo::bir, Foo::bur>> arr{1, 2, 3};
 	BOOST_TEST(arr.size() == 3);
 	BOOST_TEST(arr[Foo::bir] == 1);
 	BOOST_TEST(arr[Foo::bor] == 2);
@@ -43,7 +25,7 @@ BOOST_AUTO_TEST_CASE(index_range_enum_s)
 
 BOOST_AUTO_TEST_CASE(index_range_enum_negative)
 {
-	indexed_array<int, index_range<Foo::ber, Foo::bor> > arr{1, 2, 3};
+	indexed_array<int, index_range<Foo::ber, Foo::bor>> arr{1, 2, 3};
 	BOOST_TEST(arr.size() == 3);
 	BOOST_TEST(arr[Foo::ber] == 1);
 	BOOST_TEST(arr[Foo::bir] == 2);
@@ -52,7 +34,7 @@ BOOST_AUTO_TEST_CASE(index_range_enum_negative)
 
 BOOST_AUTO_TEST_CASE(index_range_enum_out_of_bound)
 {
-	indexed_array<int, index_range<Foo::bar, Foo::bir> > arr{1, 2, 3};
+	indexed_array<int, index_range<Foo::bar, Foo::bir>> arr{1, 2, 3};
 	BOOST_TEST(arr.size() == 3);
 	bool catched = false;
 	int a = 0;
@@ -70,9 +52,18 @@ BOOST_AUTO_TEST_CASE(index_range_enum_out_of_bound)
 
 BOOST_AUTO_TEST_CASE(index_range_enum_empty)
 {
-	indexed_array<int, index_range<Foo::bar, Foo::bar> > arr{3};
+	indexed_array<int, index_range<Foo::bar, Foo::bar>> arr{3};
 	BOOST_TEST(arr.size() == 1);
 	BOOST_TEST(arr[Foo::bar] == 3);
+}
+
+BOOST_AUTO_TEST_CASE(index_range_enum_limits)
+{
+	indexed_array<int, index_range<Foo::bar, Foo::bir>> arr{3};
+	bool eq = arr.low_limit() == Foo::bar;
+	BOOST_TEST(eq);
+	eq = arr.high_limit() == Foo::bir;
+	BOOST_TEST(eq);
 }
 
 #ifdef INDEXED_ARRAY_HAS_REFLECTION
@@ -80,7 +71,7 @@ BOOST_AUTO_TEST_CASE(index_reflection)
 {
 	using Idx = jbc::indexed_array::detail::default_indexer<Foo>;
 	static_assert(Idx::is_o1);
-	indexed_array<int, Foo> arr{2,3,4,5,6};
+	indexed_array<int, Foo> arr{2, 3, 4, 5, 6};
 	BOOST_TEST(arr.size() == 5);
 	BOOST_TEST(arr[Foo::bar] == 2);
 }

@@ -17,8 +17,27 @@
 
 namespace jbc::indexed_array::detail
 {
+template <typename Indexer>
+struct limits
+{
+};
+
+template <typename Indexer>
+    requires(Indexer::has_limits)
+struct limits<Indexer>
+{
+	static constexpr auto low_limit()
+	{
+		return Indexer::low_limit();
+	}
+	static constexpr auto high_limit()
+	{
+		return Indexer::high_limit();
+	}
+};
+
 template <typename Value, jbc::indexed_array::concepts::indexer Indexer>
-class indexed_array
+class indexed_array : public limits<Indexer>
 {
 	std::array<Value, Indexer::size> data_;
 

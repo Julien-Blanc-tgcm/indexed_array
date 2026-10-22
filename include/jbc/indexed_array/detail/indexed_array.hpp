@@ -408,6 +408,19 @@ constexpr decltype(auto) at(indexed_array<Value, Indexer> const& arr, typename I
 	return arr.at(index);
 }
 
+// ADL-versions for begin / end
+template <typename Value, typename Indexer>
+constexpr decltype(auto) begin(indexed_array<Value, Indexer>& arr)
+{
+	return arr.begin();
+}
+template <typename Value, typename Indexer>
+constexpr decltype(auto) end(indexed_array<Value, Indexer> const& arr)
+{
+	return arr.end();
+}
+
+
 } // namespace jbc::indexed_array::detail
 
 namespace std

@@ -48,7 +48,7 @@ struct for_each_<indexed_array<Content, Indexer>, Func>
 	{
 		using list_type = typename create_list_helper<Indexer>::type;
 		auto current = data.begin();
-		boost::mp11::mp_for_each<list_type>([&current, f](auto I) {
+		boost::mp11::mp_for_each<list_type>([&current, f](typename Indexer::index I) {
 			f(I, *current);
 			++current;
 		});
@@ -57,7 +57,7 @@ struct for_each_<indexed_array<Content, Indexer>, Func>
 	{
 		using list_type = typename create_list_helper<Indexer>::type;
 		auto current = data.begin();
-		boost::mp11::mp_for_each<list_type>([&current, f](auto I) {
+		boost::mp11::mp_for_each<list_type>([&current, f](typename Indexer::index I) {
 			f(I, *current);
 			++current;
 		});

@@ -196,3 +196,9 @@ BOOST_AUTO_TEST_CASE(large)
 	auto res = b == b;
 	BOOST_TEST(res);
 }
+
+BOOST_AUTO_TEST_CASE(trivially_copyable)
+{
+	indexed_bitset<Color, interval<0, 150>> b;
+	BOOST_TEST(std::is_trivially_copyable_v<decltype(b)>);
+}

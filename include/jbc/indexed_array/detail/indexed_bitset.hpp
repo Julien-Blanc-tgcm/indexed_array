@@ -120,14 +120,8 @@ class indexed_bitset
 
 	constexpr ~indexed_bitset() = default;
 
-	constexpr indexed_bitset(indexed_bitset<Indexer> const& other) : d_{other.d_}
-	{
-	}
-
-	constexpr indexed_bitset(indexed_bitset<Indexer>&& other) : d_{other.d_}
-	{
-	}
-
+	constexpr indexed_bitset(indexed_bitset<Indexer, underlying> const& other) = default;
+	constexpr indexed_bitset(indexed_bitset<Indexer, underlying>&& other) = default;
 	template <typename T>
 	    requires(std::is_unsigned_v<T>)
 	constexpr indexed_bitset(T v) noexcept : d_{}
@@ -145,17 +139,9 @@ class indexed_bitset
 		}
 	}
 
-	constexpr indexed_bitset& operator=(indexed_bitset<Indexer> const& other)
-	{
-		d_ = other.d_;
-		return *this;
-	}
+	constexpr indexed_bitset& operator=(indexed_bitset<Indexer, underlying> const& other) = default;
 
-	constexpr indexed_bitset& operator=(indexed_bitset<Indexer>&& other)
-	{
-		d_ = other.d_;
-		return *this;
-	}
+	constexpr indexed_bitset& operator=(indexed_bitset<Indexer, underlying>&& other) = default;
 
 	// safe_arg constructor
 	template <typename Arg,

@@ -19,31 +19,31 @@ namespace jbc::indexed_array::detail
 requires (std::is_enum_v<Enum>)
 struct enum_to_value_sequence
 {
-	template<typename T>
-	consteval std::meta::info make_integer_seq_refl(T N) {
-	  std::vector args{^T};
-	  for (T k = 0; k < N; ++k) {
-	    args.push_back(std::meta::reflect_result(k));
-	  }
-	  return substitute(^std::integer_sequence, args);
-	}	
-	using type = define_class(std::meta::substitute(^^value_sequence, std::meta::enumerators_of<^^Enum>));
-	using values = make_from_index_sequence<typelist1>(std::meta::enumerators_of<^^Enum>);
-	static constexpr auto type1 = std::tuple_cat(std::meta::enumerators_of<^^Enum> >);
+    template<typename T>
+    consteval std::meta::info make_integer_seq_refl(T N) {
+      std::vector args{^T};
+      for (T k = 0; k < N; ++k) {
+        args.push_back(std::meta::reflect_result(k));
+      }
+      return substitute(^std::integer_sequence, args);
+    }
+    using type = define_class(std::meta::substitute(^^value_sequence, std::meta::enumerators_of<^^Enum>));
+    using values = make_from_index_sequence<typelist1>(std::meta::enumerators_of<^^Enum>);
+    static constexpr auto type1 = std::tuple_cat(std::meta::enumerators_of<^^Enum> >);
 }; */
 
 /*template <typename Enum, template <class...> typename L, typename... Args>
 struct describe_to_value_sequence<Enum, L<Args...> >
 {
-	using type = value_sequence<Enum, Args::value...>;
+    using type = value_sequence<Enum, Args::value...>;
 };
 */
 template <typename Enum>
-requires (std::is_enum_v<Enum>
+    requires(std::is_enum_v<Enum>
 #if defined(INDEXED_ARRAY_HAS_DESCRIBE)
-		&& !boost::describe::has_describe_enumerators<Enum>::value
+             && !boost::describe::has_describe_enumerators<Enum>::value
 #endif
-		)
+             )
 struct default_indexer<Enum>
 {
   private:
@@ -59,8 +59,8 @@ struct default_indexer<Enum>
 		bool first = true;
 		using Type = std::underlying_type_t<Enum>;
 		Type v{};
-		template for(constexpr auto m : std::define_static_array(std::meta::enumerators_of(^^Enum)))
-	        {
+		template for (constexpr auto m : std::define_static_array(std::meta::enumerators_of(^^Enum)))
+		{
 			if (first)
 			{
 				v = static_cast<Type>([:m:]);
@@ -72,7 +72,7 @@ struct default_indexer<Enum>
 					return false;
 				v = static_cast<Type>([:m:]);
 			}
-	        }
+		}
 		return true;
 	}
 	static consteval auto size_helper()
@@ -80,8 +80,8 @@ struct default_indexer<Enum>
 		std::size_t s = 0;
 		bool first = true;
 		Enum prev = {};
-		template for(constexpr auto m : std::define_static_array(std::meta::enumerators_of(^^Enum)))
-	        {
+		template for (constexpr auto m : std::define_static_array(std::meta::enumerators_of(^^Enum)))
+		{
 			if (first)
 			{
 				prev = [:m:];
@@ -94,9 +94,34 @@ struct default_indexer<Enum>
 				prev = [:m:];
 			}
 			s += 1;
-	        }
+		}
 		return s;
 	}
+	static constexpr auto index_helper(Enum value)
+	{
+		std::size_t s = 0;
+		bool first = true;
+		Enum prev = {};
+		template for (constexpr auto m : std::define_static_array(std::meta::enumerators_of(^^Enum)))
+		{
+			if (first)
+			{
+				prev = [:m:];
+				first = false;
+			}
+			else
+			{
+				if (prev == [:m:])
+					continue;
+				prev = [:m:];
+			}
+			if (value == [:m:])
+				return s;
+			s += 1;
+		}
+		return s;
+	}
+
   public:
 	using index = Enum;
 	static constexpr bool is_o1 = is_contiguous();
@@ -108,7 +133,7 @@ struct default_indexer<Enum>
 		{
 			using Type = std::underlying_type_t<index>;
 			auto idx = static_cast<Type>(v);
-			if constexpr(throws_on_error)
+			if constexpr (throws_on_error)
 			{
 				if (idx >= start_offset() && (idx < start_offset() + static_cast<std::int64_t>(size)))
 					return idx - start_offset();
@@ -118,16 +143,13 @@ struct default_indexer<Enum>
 		}
 		else
 		{
-			std::size_t ret = 0;
-			template for(constexpr auto m : std::define_static_array(std::meta::enumerators_of(^^Enum)))
-		        {
-				if ([:m:] == v)
-					return ret;
-				++ret;
-		        }
+			std::size_t ret = index_helper(v);
 			if constexpr (throws_on_error)
-				throw std::out_of_range("Invalid index");
-			return -1;
+			{
+				if (ret == -1)
+					throw std::out_of_range("Invalid index");
+			}
+			return ret;
 		}
 	}
 	static constexpr auto in_range(index v) noexcept
@@ -139,11 +161,12 @@ struct default_indexer<Enum>
 		}
 		else
 		{
-			template for(constexpr auto m : std::define_static_array(std::meta::enumerators_of(^^Enum)))
-		        {
+
+			template for (constexpr auto m : std::define_static_array(std::meta::enumerators_of(^^Enum)))
+			{
 				if ([:m:] == v)
 					return true;
-		        }
+			}
 			return false;
 		}
 	}

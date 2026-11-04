@@ -98,6 +98,13 @@ struct value_list
 {
 };
 
+template <auto... V>
+struct add_default_indexer_if_needed<value_list<V...>>
+{
+    using type = list_indexer<value_list<V...>>;
+};
+
+
 } // namespace jbc::indexed_array::detail
 
 #endif // JBC_INDEXED_ARRAY_DETAIL_LIST_INDEXER_H

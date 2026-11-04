@@ -23,7 +23,9 @@ BOOST_DESCRIBE_ENUM(Color, Red, Green, Blue, Black, White);
 BOOST_AUTO_TEST_CASE(triviality)
 {
 	using T = indexed_array<int, Color>;
+#if __cplusplus <= 202302L // deprecated by c++26
 	BOOST_TEST(std::is_trivial_v<T>);
+#endif
 	BOOST_TEST(std::is_trivially_default_constructible_v<T>);
 	BOOST_TEST(std::is_trivially_copyable_v<T>);
 	BOOST_TEST(std::is_trivially_constructible_v<T>);
@@ -37,7 +39,9 @@ BOOST_AUTO_TEST_CASE(triviality)
 BOOST_AUTO_TEST_CASE(triviality2)
 {
 	using T = indexed_array<int, Color, Color>;
+#if __cplusplus <= 202302L // deprecated by c++26
 	BOOST_TEST(std::is_trivial_v<T>);
+#endif
 	BOOST_TEST(std::is_trivially_default_constructible_v<T>);
 	BOOST_TEST(std::is_trivially_copyable_v<T>);
 	BOOST_TEST(std::is_trivially_constructible_v<T>);

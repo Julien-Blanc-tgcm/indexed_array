@@ -420,7 +420,27 @@ constexpr decltype(auto) end(indexed_array<Value, Indexer> const& arr)
 	return arr.end();
 }
 
+template <typename T>
+struct is_indexed_array_t : std::false_type
+{
+};
 
+template <typename Value, typename Indexer>
+struct is_indexed_array_t<indexed_array<Value, Indexer>> : std::true_type
+{
+};
+
+} // namespace jbc::indexed_array::detail
+
+namespace jbc::indexed_array::concepts
+{
+template <typename Container>
+concept indexed_array = detail::is_indexed_array_t<Container>::value &&
+    indexer<typename Container::indexer>;
+
+template <typename Container>
+concept multidimensional_indexed_array = indexed_array<Container> && 
+    multidimensional_indexer<typename Container::indexer>;
 } // namespace jbc::indexed_array::detail
 
 namespace std

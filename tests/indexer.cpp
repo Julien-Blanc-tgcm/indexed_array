@@ -45,6 +45,7 @@ BOOST_DESCRIBE_ENUM(Duplicates, A, Alias, B, C);
 BOOST_AUTO_TEST_CASE(duplicates)
 {
 	using Base = indexed_array<int, Duplicates>;
+    static_assert(concepts::indexed_array<Base>);
 	Base b{};
 	BOOST_TEST(b.size(), 3);
 	BOOST_TEST(Base::is_o1);
@@ -56,3 +57,4 @@ BOOST_AUTO_TEST_CASE(error)
 	Base b;
 	b[Color::Red] = 0;
 }
+

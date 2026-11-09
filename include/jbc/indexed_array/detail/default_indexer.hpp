@@ -348,6 +348,9 @@ concept indexer_invocable_with = requires (Indexer i, Args... args)
 {
 	{ i.template at<true>(args...) } -> ::std::same_as<::std::size_t>;
 };
+
+template <typename Indexer>
+concept multidimensional_indexer = detail::has_root_indexer<Indexer, typename Indexer::root_indexer::index>::value;
 } // jbc::indexed_array::concepts
 // clang-format on
 

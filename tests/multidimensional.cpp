@@ -35,6 +35,12 @@ BOOST_AUTO_TEST_CASE(bidimensional) // NOLINT(clazy-non-pod-global-static)
 	indexed_array<std::string, Color, Material> arr;
 	using T = decltype(arr)::indexer;
 	static_assert(std::is_same_v<T::root_indexer, T::root_indexer>, "vv");
+    static_assert(concepts::indexed_array<decltype(arr)>);
+    static_assert(concepts::indexer<T>);
+    static_assert(concepts::multidimensional_indexer<T>);
+    static_assert(concepts::indexer<T::root_indexer>);
+    static_assert(!concepts::multidimensional_indexer<T::root_indexer>);
+    static_assert(!concepts::multidimensional_indexer<T::slice_indexer>);
 	auto s = T::root_indexer::in_range(Color::White);
 	BOOST_TEST(s);
 	static_assert(detail::is_indexer_invocable_with_v<T::root_indexer, Color>);
@@ -87,6 +93,12 @@ struct custom_indexer
 BOOST_AUTO_TEST_CASE(multidimensional) // NOLINT(clazy-non-pod-global-static)
 {
 	indexed_array<std::unique_ptr<std::string>, Color, index_range<3, 8>, custom_indexer, Material> arr;
+    using T = decltype(arr)::indexer;
+    static_assert(concepts::indexer<T>);
+    static_assert(concepts::multidimensional_indexer<T>);
+    static_assert(concepts::indexer<T::root_indexer>);
+    static_assert(!concepts::multidimensional_indexer<T::root_indexer>);
+    static_assert(concepts::multidimensional_indexer<T::slice_indexer>); // three dims left
 	BOOST_TEST(arr.size() == 5 * 6 * 8 * 4);
 	int i = 0;
 	for (auto& a : arr)

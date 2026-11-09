@@ -42,6 +42,7 @@ struct for_each_ // default implementation, does nothing
 };
 
 template <typename Content, typename Indexer, typename Func>
+    requires (!concepts::multidimensional_indexer<Indexer>)
 struct for_each_<indexed_array<Content, Indexer>, Func>
 {
 	static void apply(Func&& f, indexed_array<Content, Indexer>& data)
@@ -62,6 +63,26 @@ struct for_each_<indexed_array<Content, Indexer>, Func>
 			++current;
 		});
 	}
+};
+
+template <typename IndexedArray, typename Func>
+    requires (concepts::multidimensional_indexed_array<IndexedArray>)
+struct for_each_<IndexedArray, Func>
+{
+    static void apply(Func&& f, IndexedArray& data)
+    {
+        using list_type = typename create_list_helper<typename IndexedArray::indexer::root_indexer>::type;
+        boost::mp11::mp_for_each<list_type>([&](typename IndexedArray::indexer::root_indexer::index I) {
+            f(I, data.slice(I));
+        });
+    }
+    static void apply(Func&& f, IndexedArray const& data)
+    {
+        using list_type = typename create_list_helper<typename IndexedArray::indexer::root_indexer>::type;
+        boost::mp11::mp_for_each<list_type>([&](typename IndexedArray::indexer::root_indexer::index I) {
+            f(I, data.slice(I));
+        });
+    }
 };
 #if defined(INDEXED_ARRAY_HAS_REFLECTION)
 template <typename Content, typename Enum, typename Func>

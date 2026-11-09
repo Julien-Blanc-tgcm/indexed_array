@@ -171,21 +171,22 @@ BOOST_AUTO_TEST_CASE(foreach_bitset2)
 
 /*
 Not implemented yet. Uncomment this when foreach is implemented for
-multidimensional arrays
-using Test5 = indexed_array<int, index_range<1, 5>, index_range<10, 15> >;
+multidimensional arrays */
+using Test8 = indexed_array<int, index_range<1, 5>, index_range<10, 15> >;
 
-BOOST_AUTO_TEST_CASE(foreach5)
+BOOST_AUTO_TEST_CASE(foreach8)
 {
-    Test5 t{};
+    Test8 t{};
+    static_assert(jbc::indexed_array::concepts::multidimensional_indexed_array<Test8>);
     int i = 0;
     for (auto& v : t)
         v = i++;
 
-    for_each(t, [](int key1, auto& val) {
+    for_each(t, [](int key1, auto val) {
         for_each(val, [key1](int key, int& v) {
             v = key1 * 100 + key;
         });
     });
     BOOST_TEST(t.at(2, 11) == 211);
 }
-*/
+

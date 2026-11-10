@@ -21,6 +21,8 @@ jobs:
         # A list of supported versions can be found here: 
         # https://github.com/actions/boost-versions/blob/main/versions-manifest.json
         boost_version: 1.83.0
+    - name: Update apt cache
+      run: sudo apt update
     - name: Install doxygen
       run: sudo apt install -y doxygen graphviz
     - name: Install sphinx
